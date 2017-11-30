@@ -1,5 +1,5 @@
 # Infrastructure of Intel® Media SDK
-Here located product configurations of Intel® Media SDK.  
+Product configurations of Intel® Media SDK.  
   
 Repository contains only product configuration to build Intel® Media SDK.
 
