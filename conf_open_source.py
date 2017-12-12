@@ -49,8 +49,8 @@ root_dir
 """
 
 PRODUCT_REPOS = [
-    #{'name': 'MediaSDK'},
-    {'name': 'flow_test'},
+    {'name': 'MediaSDK'},
+    #{'name': 'flow_test'},
 ]
 
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
