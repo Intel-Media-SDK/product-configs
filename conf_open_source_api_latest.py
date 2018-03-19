@@ -53,17 +53,26 @@ PRODUCT_REPOS = [
     #{'name': 'flow_test'},
 ]
 
+DEVTOOLSET = [
+    'scl enable devtoolset-6 bash',
+]
+
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
 
 DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
 
+#action('cmake', cmd=DEVTOOLSET + [f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest'],
+#       work_dir=MEDIA_SDK_REPO_DIR,
+#       env={'MFX_HOME': str(MEDIA_SDK_REPO_DIR)})
 action('cmake', cmd=f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest',
        work_dir=MEDIA_SDK_REPO_DIR,
        env={'MFX_HOME': str(MEDIA_SDK_REPO_DIR)})
 
+#action('build', cmd=DEVTOOLSET + [f'make -j{DEFAULT_OPTIONS["CPU_CORES"]}'])
 action('build', cmd=f'make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
 
+#action('install', stage=Stage.INSTALL, cmd=DEVTOOLSET + [f'make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install'])
 action('install', stage=Stage.INSTALL, cmd=f'make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install')
 
 DATA_TO_ARCHIVE = [
