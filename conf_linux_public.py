@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2017 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
 
 DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
 
-action('cmake', cmd=f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest',
+action('cmake', cmd=f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG}',
        work_dir=MEDIA_SDK_REPO_DIR,
        env={'MFX_HOME': str(MEDIA_SDK_REPO_DIR)})
 
@@ -66,7 +66,7 @@ action('build', cmd=f'make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
 
 action('install', stage=Stage.INSTALL, cmd=f'make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install')
 
-DATA_TO_ARCHIVE = [
+DEV_PKG_DATA_TO_ARCHIVE = [
             {
                 'from_path': DEFAULT_OPTIONS['BUILD_DIR'],
                 'relative': [
@@ -77,6 +77,17 @@ DATA_TO_ARCHIVE = [
                     {
                         'path': 'plugins.cfg',
                         'pack_as': 'bin/release/plugins.cfg'
+                    }
+                ]
+            }
+        ]
+
+INSTALL_PKG_DATA_TO_ARCHIVE = [
+            {
+                'from_path': DEFAULT_OPTIONS['INSTALL_DIR'],
+                'relative': [
+                    {
+                        'path': 'opt'
                     }
                 ]
             }
