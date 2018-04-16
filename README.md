@@ -23,11 +23,9 @@ Additional tags may be various.
 
 Example:
 
-- `conf_linux_closed_open.py`
-  Means that configuration file for linux build from Intel inside gerrit repositories without private code
+- `conf_linux_closed_open.py` - means that configuration file for linux build from Intel inside gerrit repositories without private code
 
-- `conf_embedded_private_api_latest.py`
-  Means that configuration file for linux embedded build from Github private repository with latest API.
+- `conf_embedded_private_api_latest.py` - means that configuration file for linux embedded build from Github private repository with latest API.
 
 
 # License
