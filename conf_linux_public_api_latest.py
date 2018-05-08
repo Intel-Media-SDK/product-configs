@@ -25,7 +25,7 @@ PRODUCT_REPOS = [
 ]
 
 COMMANDS = [
-    'scl enable devtoolset-6 bash',
+    'source /opt/rh/devtoolset-6/enable',
 ]
 
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
