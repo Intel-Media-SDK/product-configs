@@ -24,24 +24,22 @@ PRODUCT_REPOS = [
     #{'name': 'flow_test'},
 ]
 
-COMMANDS = [
-    'source /opt/rh/devtoolset-6/enable',
-]
+ENABLE_DEVTOOLSET='source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
 
 DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
 
-action('compiler version', cmd=COMMANDS + [f'gcc --version'])
+action('compiler version', cmd=f'{ENABLE_DEVTOOLSET} && gcc --version')
 
-action('cmake', cmd=COMMANDS + [f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest'],
+action('cmake', cmd=f'{ENABLE_DEVTOOLSET} && perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest'],
        work_dir=MEDIA_SDK_REPO_DIR,
        env={'MFX_HOME': str(MEDIA_SDK_REPO_DIR)})
 
-action('build', cmd=COMMANDS + [f'make -j{DEFAULT_OPTIONS["CPU_CORES"]}'])
+action('build', cmd=f'{ENABLE_DEVTOOLSET} && make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
 
-action('install', stage=Stage.INSTALL, cmd=COMMANDS + [f'make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install'])
+action('install', stage=Stage.INSTALL, cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install'])
 
 DEV_PKG_DATA_TO_ARCHIVE = [
             {
