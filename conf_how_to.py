@@ -23,7 +23,7 @@ This file is an example which represents how to write product configurations
 for Media SDK needs.
 
 The main thing you have to know about these configurations that it is simple
-Python-code which injects to the build scripts (build_runner.py) so you can
+Python-code with the build scripts (`build_runner.py`) API extension so you can
 use all goodies of Python language.
 There is only some API things which will help you by writting configuration.
 They will be covered in this file.
