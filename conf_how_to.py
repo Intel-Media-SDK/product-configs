@@ -85,17 +85,16 @@ PRODUCT_REPOS = [
 You can specify the build with help of variable `DEFAULT_OPTIONS` 
 which has following data (from `infrastructure/build_scripts/build_runner.py`):
 
-self.default_options = {
-    "ROOT_DIR": root_dir,
-    "REPOS_DIR": root_dir / "repos",
-    "REPOS_FORKED_DIR": root_dir / "repos_forked",
-    "BUILD_DIR": root_dir / "build",
-    "INSTALL_DIR": root_dir / "install",
-    "PACK_DIR": root_dir / "pack",
-    "LOGS_DIR": root_dir / "logs",
-    "BUILD_TYPE": build_type,  # sets from command line argument ('release' by default)
-    "CPU_CORES": multiprocessing.cpu_count()  # count of logical CPU cores
-}
+`DEFAULT_OPTIONS` properties:
+- `ROOT_DIR`
+- `REPOS_DIR` - folder where stored all extracted repositories (`ROOT_DIR/repos`)
+- `REPOS_FORKED_DIR` - folder where stored all extracted repositories from forked repositories (`ROOT_DIR/forked_repos`)
+- `BUILD_DIR` - folder for build process (`ROOT_DIR/build`)
+- `INSTALL_DIR` - folder for install process (`ROOT_DIR/install`)
+- `PACK_DIR` - folder for pack process (`ROOT_DIR/pack`)
+- `LOGS_DIR` - folder where stored logs (`ROOT_DIR/logs`)
+- `BUILD_TYPE` - `release` by default
+- `CPU_CORES` - count of logical CPU cores
 """
 """
 Here some examples:
@@ -140,21 +139,12 @@ If you want to execute multiple commands during one actions you can use `&&`:
 DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 action('compiler version', cmd=f'{DEVTOOLSET} && gcc --version')
 
-"""
-Or execute them as a list:
-"""
-COMMANDS = [
-    'source /opt/rh/devtoolset-6/enable',
-    'gcc --version',
-]
-action('compiler version', cmd=COMMANDS)
 
 """
-On Ubuntu we recommend to call `bash -c "<your commands>"` because default
-shell on Ubuntu is `dash` :(
+If you want to start external script on Ubuntu - we recommend to call it as 
+`bash -c "<your_script>"` because default shell on Ubuntu is `dash`
 """
-DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-action('compiler version', cmd=f'bash -c "{DEVTOOLSET} && gcc --version"')
+action('script calling', cmd=f'bash -c "my_script.sh"')
 
 
 # ==============================================================================
@@ -164,6 +154,9 @@ action('compiler version', cmd=f'bash -c "{DEVTOOLSET} && gcc --version"')
 After the build you can specify what to archive with help of variables:
 - `DEV_PKG_DATA_TO_ARCHIVE`
 - `INSTALL_PKG_DATA_TO_ARCHIVE`
+
+More documentation can be found in: 
+`common/helper.py`, `def make_archive(path, data_to_archive):`
 
 Examples:
 """
