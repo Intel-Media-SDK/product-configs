@@ -85,7 +85,7 @@ PRODUCT_REPOS = [
 You can specify the build with help of variable `DEFAULT_OPTIONS` 
 which has following data (from `infrastructure/build_scripts/build_runner.py`):
 
-`DEFAULT_OPTIONS` properties:
+`DEFAULT_OPTIONS` is the dictionary that contains the following properties:
 - `ROOT_DIR`
 - `REPOS_DIR` - folder where stored all extracted repositories (`ROOT_DIR/repos`)
 - `REPOS_FORKED_DIR` - folder where stored all extracted repositories from forked repositories (`ROOT_DIR/forked_repos`)
