@@ -24,12 +24,12 @@ import pathlib
 import git
 
 #TODO: move functions to the shared module
-def get_commit_number(repo_path):
+def set_commit_number(repo_path):
     git_repo = git.Git(repo_path)
     commits = git_repo.log('--all', '--oneline')
-    return len(commits.splitlines())
+    DEFAULT_OPTIONS["BUILD_NUMBER"] = len(commits.splitlines())
 
-def get_api_version(repo_path):
+def set_api_version(repo_path):
     """
     :param name: Path to the MediaSDK folder
     :type name: String or Path
@@ -40,14 +40,14 @@ def get_api_version(repo_path):
     And prints the version like:
         `1.26`
     """
-    file_path = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+    mediasdk_api_header_path = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
 
-    with open(file_path, 'r') as file:
-        for line in file:
-            if re.search("MFX_VERSION_MAJOR\s(\d+)", line):
-                major_version = re.search("MFX_VERSION_MAJOR\s(\d+)", line).group(1)
-                minor_version = re.search("MFX_VERSION_MINOR\s(\d+)", next(file)).group(1)
-                return f"{major_version}.{minor_version}"
+    with open(mediasdk_api_header_path, 'r') as lines:
+        for line in lines:
+            major_version = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
+            if major_version:
+                minor_version = re.search("MFX_VERSION_MINOR\s(\d+)", next(lines))
+                DEFAULT_OPTIONS["API_VERSION"] = f"{major_version.group(1)}.{minor_version.group(1)}"
 
 
 PRODUCT_REPOS = [
@@ -59,8 +59,14 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
-BUILD_NUMBER = get_commit_number(str(MEDIA_SDK_REPO_DIR))
-API_VERSION = get_api_version(MEDIA_SDK_REPO_DIR)
+action('count build_number',
+       callfunc=(set_commit_number, [str(MEDIA_SDK_REPO_DIR)], {}))
+
+action('count api_version',
+       callfunc=(set_api_version, [MEDIA_SDK_REPO_DIR], {}))
+
+BUILD_NUMBER = DEFAULT_OPTIONS.get('BUILD_NUMBER')
+API_VERSION = DEFAULT_OPTIONS.get('API_VERSION')
 PLUGIN_VERSION = f'{API_VERSION}.3.${BUILD_NUMBER}'
 
 BUILD_ENVIRONMENT = {
@@ -76,6 +82,7 @@ BUILD_ENVIRONMENT = {
 
 CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
 DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
+
 
 action('compiler version',
        cmd=f'{ENABLE_DEVTOOLSET} && gcc --version')
