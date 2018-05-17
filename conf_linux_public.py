@@ -24,7 +24,7 @@ def set_commit_number(repo_path):
     import git
     git_repo = git.Git(repo_path)
     commits = git_repo.log('--all', '--oneline')
-    DEFAULT_OPTIONS["ENV"]["BUILD_NUMBER"] = len(commits.splitlines())
+    DEFAULT_OPTIONS["ENV"]["BUILD_NUMBER"] = str(len(commits.splitlines()))
 
 def set_additional_env(repo_path):
     """
