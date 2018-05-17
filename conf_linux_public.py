@@ -51,12 +51,12 @@ def set_additional_env(repo_path):
                 build_num = DEFAULT_OPTIONS["ENV"].get("BUILD_NUMBER", 0)
                 DEFAULT_OPTIONS["ENV"]["API_VERSION"] = api_ver
                 PLUGIN_VERSION = f'{api_ver}.3.${build_num}'
-                DEFAULT_OPTIONS["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}',
-                DEFAULT_OPTIONS["ENV"]['MFX_HEVC_VERSION'] = f'{PLUGIN_VERSION}',
-                DEFAULT_OPTIONS["ENV"]['MFX_H265FEI_VERSION'] = f'{PLUGIN_VERSION}',
-                DEFAULT_OPTIONS["ENV"]['MFX_VP8_VERSION'] = f'{PLUGIN_VERSION}',
-                DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{PLUGIN_VERSION}',
-                DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{PLUGIN_VERSION}',
+                DEFAULT_OPTIONS["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
+                DEFAULT_OPTIONS["ENV"]['MFX_HEVC_VERSION'] = f'{PLUGIN_VERSION}'
+                DEFAULT_OPTIONS["ENV"]['MFX_H265FEI_VERSION'] = f'{PLUGIN_VERSION}'
+                DEFAULT_OPTIONS["ENV"]['MFX_VP8_VERSION'] = f'{PLUGIN_VERSION}'
+                DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{PLUGIN_VERSION}'
+                DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{PLUGIN_VERSION}'
 
 
 PRODUCT_REPOS = [
