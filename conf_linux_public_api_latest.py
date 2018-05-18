@@ -58,7 +58,7 @@ def _get_api_version(repo_path):
                 return f"{major_version}.{minor_version}"
 
 def set_additional_env(repo_path):
-    api_ver = _set_api_version(repo_path)
+    api_ver = _get_api_version(repo_path)
     build_num = _get_commit_number(str(repo_path))
 
     plugin_version = f'{api_ver}.3.{build_num}'
