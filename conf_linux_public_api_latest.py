@@ -43,18 +43,19 @@ def _get_api_version(repo_path):
     mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
 
     with open(mediasdk_api_header, 'r') as lines:
-        version = {}
+        major_version = ""
+        minor_version = ""
         for line in lines:
-            major_version = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
-            if major_version:
-                version["major_version"] = major_version.group(1)
+            major_version_pattern = re.search("#MFX_VERSION_MAJOR\s(\d+)", line)
+            if major_version_pattern:
+                major_version = major_version_pattern.group(1)
 
-            minor_version = re.search("MFX_VERSION_MINOR\s(\d+)", lines)
-            if minor_version:
-                version["minor_version"] = minor_version.group(1)
+            minor_version_pattern = re.search("#MFX_VERSION_MINOR\s(\d+)", lines)
+            if minor_version_pattern:
+                minor_version = minor_version_pattern.group(1)
 
-            if len(version) == 2:
-                return f"{version.get("major_version")}.{version.get("minor_version")}"
+            if major_version and minor_version:
+                return f"{major_version}.{minor_version}"
 
 def set_additional_env(repo_path):
     api_ver = _set_api_version(repo_path)
