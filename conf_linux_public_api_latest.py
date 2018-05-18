@@ -20,44 +20,45 @@
 
 
 #TODO: move functions to the shared module
-def _get_commit_number(repo_path):
-    import git
-    git_repo = git.Git(repo_path)
-    commits = git_repo.log('--all', '--oneline')
-    return str(len(commits.splitlines()))
-
-def _get_api_version(repo_path):
-    """
-    :param name: Path to the MediaSDK folder
-    :type name: String or Path
-
-    Function finds the lines like:
-        `#define MFX_VERSION_MAJOR 1`
-        `#define MFX_VERSION_MINOR 26`
-    And prints the version like:
-        `1.26`
-    """
-    import re
-    import pathlib
-
-    mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
-
-    with open(mediasdk_api_header, 'r') as lines:
-        major_version = ""
-        minor_version = ""
-        for line in lines:
-            major_version_pattern = re.search("#MFX_VERSION_MAJOR\s(\d+)", line)
-            if major_version_pattern:
-                major_version = major_version_pattern.group(1)
-
-            minor_version_pattern = re.search("#MFX_VERSION_MINOR\s(\d+)", lines)
-            if minor_version_pattern:
-                minor_version = minor_version_pattern.group(1)
-
-            if major_version and minor_version:
-                return f"{major_version}.{minor_version}"
-
 def set_additional_env(repo_path):
+    def _get_commit_number(repo_path):
+        import git
+        git_repo = git.Git(repo_path)
+        commits = git_repo.log('--all', '--oneline')
+        return str(len(commits.splitlines()))
+
+    def _get_api_version(repo_path):
+        """
+        :param name: Path to the MediaSDK folder
+        :type name: String or Path
+
+        Function finds the lines like:
+            `#define MFX_VERSION_MAJOR 1`
+            `#define MFX_VERSION_MINOR 26`
+        And prints the version like:
+            `1.26`
+        """
+        import re
+        import pathlib
+
+        mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+
+        with open(mediasdk_api_header, 'r') as lines:
+            major_version = ""
+            minor_version = ""
+            for line in lines:
+                major_version_pattern = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
+                if major_version_pattern:
+                    major_version = major_version_pattern.group(1)
+
+                minor_version_pattern = re.search("MFX_VERSION_MINOR\s(\d+)", line)
+                if minor_version_pattern:
+                    minor_version = minor_version_pattern.group(1)
+
+                if major_version and minor_version:
+                    return f"{major_version}.{minor_version}"
+            raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
+
     api_ver = _get_api_version(repo_path)
     build_num = _get_commit_number(str(repo_path))
 
