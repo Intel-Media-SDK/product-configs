@@ -20,13 +20,13 @@
 
 
 #TODO: move functions to the shared module
-def set_commit_number(repo_path):
+def _get_commit_number(repo_path):
     import git
     git_repo = git.Git(repo_path)
     commits = git_repo.log('--all', '--oneline')
-    DEFAULT_OPTIONS["ENV"]["BUILD_NUMBER"] = str(len(commits.splitlines()))
+    return str(len(commits.splitlines()))
 
-def set_additional_env(repo_path):
+def _get_api_version(repo_path):
     """
     :param name: Path to the MediaSDK folder
     :type name: String or Path
@@ -40,24 +40,34 @@ def set_additional_env(repo_path):
     import re
     import pathlib
 
-    mediasdk_api_header_path = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+    mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
 
-    with open(mediasdk_api_header_path, 'r') as lines:
+    with open(mediasdk_api_header, 'r') as lines:
+        version = {}
         for line in lines:
             major_version = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
             if major_version:
-                minor_version = re.search("MFX_VERSION_MINOR\s(\d+)", next(lines))
-                api_ver = f"{major_version.group(1)}.{minor_version.group(1)}"
-                build_num = DEFAULT_OPTIONS["ENV"].get("BUILD_NUMBER", 0)
-                DEFAULT_OPTIONS["ENV"]["API_VERSION"] = api_ver
-                PLUGIN_VERSION = f'{api_ver}.3.${build_num}'
-                DEFAULT_OPTIONS["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
-                DEFAULT_OPTIONS["ENV"]['MFX_HEVC_VERSION'] = f'{PLUGIN_VERSION}'
-                DEFAULT_OPTIONS["ENV"]['MFX_H265FEI_VERSION'] = f'{PLUGIN_VERSION}'
-                DEFAULT_OPTIONS["ENV"]['MFX_VP8_VERSION'] = f'{PLUGIN_VERSION}'
-                DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{PLUGIN_VERSION}'
-                DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{PLUGIN_VERSION}'
+                version["major_version"] = major_version.group(1)
 
+            minor_version = re.search("MFX_VERSION_MINOR\s(\d+)", lines)
+            if minor_version:
+                version["minor_version"] = minor_version.group(1)
+
+            if len(version) == 2:
+                return f"{version.get("major_version")}.{version.get("minor_version")}"
+
+def set_additional_env(repo_path):
+    api_ver = _set_api_version(repo_path)
+    build_num = _get_commit_number(str(repo_path))
+
+    plugin_version = f'{api_ver}.3.{build_num}'
+    DEFAULT_OPTIONS["ENV"]["API_VERSION"] = api_ver
+    DEFAULT_OPTIONS["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
+    DEFAULT_OPTIONS["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
+    DEFAULT_OPTIONS["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
+    DEFAULT_OPTIONS["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
+    DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{plugin_version}'
+    DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
@@ -68,10 +78,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
-action('count build_number',
-       callfunc=(set_commit_number, [str(MEDIA_SDK_REPO_DIR)], {}))
-
-action('count api_version',
+action('count api version and build number',
        callfunc=(set_additional_env, [MEDIA_SDK_REPO_DIR], {}))
 
 BUILD_ENVIRONMENT = {
