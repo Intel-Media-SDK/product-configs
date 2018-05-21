@@ -20,7 +20,7 @@
 
 
 #TODO: move functions to the shared module
-def set_additional_env(repo_path):
+def set_env(repo_path):
     def _get_commit_number(repo_path):
         import git
         git_repo = git.Git(repo_path)
@@ -70,6 +70,8 @@ def set_additional_env(repo_path):
     DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{plugin_version}'
     DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
 
+    DEFAULT_OPTIONS["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
+
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
     #{'name': 'flow_test'},
@@ -80,11 +82,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 action('count api version and build number',
-       callfunc=(set_additional_env, [MEDIA_SDK_REPO_DIR], {}))
-
-BUILD_ENVIRONMENT = {
-    'MFX_HOME': str(MEDIA_SDK_REPO_DIR)
-}
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
 CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
 DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
@@ -95,12 +93,10 @@ action('compiler version',
 
 action('cmake',
        cmd=f'{ENABLE_DEVTOOLSET} && perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest',
-       work_dir=MEDIA_SDK_REPO_DIR,
-       env=BUILD_ENVIRONMENT)
+       work_dir=MEDIA_SDK_REPO_DIR)
 
 action('build',
-       cmd=f'{ENABLE_DEVTOOLSET} && make -j{DEFAULT_OPTIONS["CPU_CORES"]}',
-       env=BUILD_ENVIRONMENT)
+       cmd=f'{ENABLE_DEVTOOLSET} && make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
 
 action('install',
        stage=Stage.INSTALL,
