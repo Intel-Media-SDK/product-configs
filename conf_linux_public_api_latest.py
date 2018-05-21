@@ -24,8 +24,7 @@ def set_additional_env(repo_path):
     def _get_commit_number(repo_path):
         import git
         git_repo = git.Git(repo_path)
-        commits = git_repo.log('--all', '--oneline')
-        return str(len(commits.splitlines()))
+        return str(git_repo.rev_list('--count', 'HEAD'))
 
     def _get_api_version(repo_path):
         """
