@@ -49,6 +49,7 @@ def set_env(repo_path):
                 major_version_pattern = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
                 if major_version_pattern:
                     major_version = major_version_pattern.group(1)
+                    continue
 
                 minor_version_pattern = re.search("MFX_VERSION_MINOR\s(\d+)", line)
                 if minor_version_pattern:
