@@ -82,10 +82,10 @@ PRODUCT_REPOS = [
 
 
 """
-You can specify the build with help of variable `DEFAULT_OPTIONS` 
+You can specify the build with help of variable `options` 
 which has following data (from `infrastructure/build_scripts/build_runner.py`):
 
-`DEFAULT_OPTIONS` is the dictionary that contains the following properties:
+`options` is the dictionary that contains the following properties:
 - `ROOT_DIR`
 - `REPOS_DIR` - folder where stored all extracted repositories (`ROOT_DIR/repos`)
 - `REPOS_FORKED_DIR` - folder where stored all extracted repositories from forked repositories (`ROOT_DIR/forked_repos`)
@@ -99,10 +99,10 @@ which has following data (from `infrastructure/build_scripts/build_runner.py`):
 """
 Here some examples:
 """
-MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
-CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+CMAKE_CFG = 'intel64.make.' + options.get('BUILD_TYPE')
 
-DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
+options['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
 
 
 # ==============================================================================
@@ -129,9 +129,9 @@ action('cmake', cmd=f'perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG}',
        work_dir=MEDIA_SDK_REPO_DIR,
        env={'MFX_HOME': str(MEDIA_SDK_REPO_DIR)})
 
-action('build', cmd=f'make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
+action('build', cmd=f'make -j{options["CPU_CORES"]}')
 
-action('install', stage=Stage.INSTALL, cmd=f'make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install')
+action('install', stage=stage.INSTALL, cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
 
 """
 If you want to execute multiple commands during one actions you can use `&&`:
@@ -162,7 +162,7 @@ Examples:
 """
 DEV_PKG_DATA_TO_ARCHIVE = [
             {
-                'from_path': DEFAULT_OPTIONS['BUILD_DIR'],
+                'from_path': options['BUILD_DIR'],
                 'relative': [
                     {
                         'path': '__bin',
@@ -178,7 +178,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
 
 INSTALL_PKG_DATA_TO_ARCHIVE = [
             {
-                'from_path': DEFAULT_OPTIONS['INSTALL_DIR'],
+                'from_path': options['INSTALL_DIR'],
                 'relative': [
                     {
                         'path': 'opt'
