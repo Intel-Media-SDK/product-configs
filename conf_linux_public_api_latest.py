@@ -63,15 +63,15 @@ def set_env(repo_path):
     build_num = _get_commit_number(str(repo_path))
 
     plugin_version = f'{api_ver}.3.{build_num}'
-    DEFAULT_OPTIONS["ENV"]["API_VERSION"] = api_ver
-    DEFAULT_OPTIONS["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
-    DEFAULT_OPTIONS["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
-    DEFAULT_OPTIONS["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
-    DEFAULT_OPTIONS["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
-    DEFAULT_OPTIONS["ENV"]['MFX_VP9_VERSION'] = f'{plugin_version}'
-    DEFAULT_OPTIONS["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
+    options["ENV"]["API_VERSION"] = api_ver
+    options["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
+    options["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
+    options["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
+    options["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
+    options["ENV"]['MFX_VP9_VERSION'] = f'{plugin_version}'
+    options["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
 
-    DEFAULT_OPTIONS["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
+    options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
@@ -80,13 +80,13 @@ PRODUCT_REPOS = [
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
-MEDIA_SDK_REPO_DIR = DEFAULT_OPTIONS.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
-CMAKE_CFG = 'intel64.make.' + DEFAULT_OPTIONS.get('BUILD_TYPE')
-DEFAULT_OPTIONS['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
+CMAKE_CFG = 'intel64.make.' + options.get('BUILD_TYPE')
+options['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
 
 
 action('compiler version',
@@ -97,15 +97,15 @@ action('cmake',
        work_dir=MEDIA_SDK_REPO_DIR)
 
 action('build',
-       cmd=f'{ENABLE_DEVTOOLSET} && make -j{DEFAULT_OPTIONS["CPU_CORES"]}')
+       cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
 action('install',
-       stage=Stage.INSTALL,
-       cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={DEFAULT_OPTIONS["INSTALL_DIR"]} install')
+       stage=stage.INSTALL,
+       cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
-        'from_path': DEFAULT_OPTIONS['BUILD_DIR'],
+        'from_path': options['BUILD_DIR'],
         'relative': [
             {
                 'path': '__bin',
@@ -121,7 +121,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
 
 INSTALL_PKG_DATA_TO_ARCHIVE = [
     {
-        'from_path': DEFAULT_OPTIONS['INSTALL_DIR'],
+        'from_path': options['INSTALL_DIR'],
         'relative': [
             {
                 'path': 'opt'
