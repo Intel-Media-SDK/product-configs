@@ -78,6 +78,8 @@ PRODUCT_REPOS = [
     #{'name': 'flow_test'},
 ]
 
+options["STRIP_BINARIES"] = True
+
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
