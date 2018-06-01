@@ -77,7 +77,7 @@ PRODUCT_REPOS = [
     #{'name': 'flow_test'},
 ]
 
-options["STRIP_BINARIES"] = 'True'
+options["STRIP_BINARIES"] = True
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
