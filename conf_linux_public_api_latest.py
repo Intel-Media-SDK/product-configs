@@ -98,16 +98,18 @@ action('compiler version',
 #       cmd=f'{ENABLE_DEVTOOLSET} && perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest',
 #       work_dir=MEDIA_SDK_REPO_DIR)
 cmake_command = ['cmake',
-    '--no-warn-unused-cli"',
-    '"-Wno-dev -G "Unix Makefiles"',
-    '-DAPI:STRING=latest', #TODO: use args to unify product_configs
-    '-DWARNING_FLAGS="-Wall -Werror"',
-    '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
-    '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
-    str(MEDIA_SDK_REPO_DIR),
+                 '--no-warn-unused-cli"',
+                 '"-Wno-dev -G "Unix Makefiles"',
+                 '-DAPI:STRING=latest', #TODO: use args to unify product_configs
+                 '-DWARNING_FLAGS="-Wall -Werror"',
+                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
+                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
+                 str(MEDIA_SDK_REPO_DIR),
 ]
+cmake_string = ' '.join(cmake_command)
+
 action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && {' '.join(cmake_command)}')
+       cmd=f'{ENABLE_DEVTOOLSET} && {cmake_string}')
        #work_dir=options['BUILD_DIR'])
 
 action('build',
