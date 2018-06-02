@@ -87,16 +87,10 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
-#CMAKE_CFG = 'intel64.make.' + options.get('BUILD_TYPE')
-#options['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
-
 action('compiler version',
        cmd=f'{ENABLE_DEVTOOLSET} && gcc --version',
        verbose=True)
 
-#action('cmake',
-#       cmd=f'{ENABLE_DEVTOOLSET} && perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG} --api=latest',
-#       work_dir=MEDIA_SDK_REPO_DIR)
 cmake_command = ['cmake',
                  '--no-warn-unused-cli"',
                  '"-Wno-dev -G "Unix Makefiles"',
@@ -110,7 +104,6 @@ cmake_string = ' '.join(cmake_command)
 
 action('cmake',
        cmd=f'{ENABLE_DEVTOOLSET} && {cmake_string}')
-       #work_dir=options['BUILD_DIR'])
 
 action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
