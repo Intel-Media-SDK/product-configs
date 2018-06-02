@@ -119,6 +119,11 @@ action('install',
        stage=stage.INSTALL,
        cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
+#TODO: temporary solution
+action('rename folder',
+       stage=stage.INSTALL,
+       cmd=f'mv ./__bin/Release ./__bin/release')
+
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
         'from_path': options['BUILD_DIR'],
@@ -129,7 +134,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             },
             {
                 'path': 'plugins.cfg',
-                'pack_as': 'bin/release/plugins.cfg'
+                'pack_as': 'bin/Release/plugins.cfg'
             }
         ]
     }
