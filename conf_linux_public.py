@@ -88,7 +88,7 @@ action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
 action('compiler version',
-       cmd=f'{ENABLE_DEVTOOLSET} && gcc --version',
+       cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
        verbose=True)
 
 cmake_command = ['cmake',
@@ -108,11 +108,11 @@ action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
 action('list artifacts',
-       cmd=f'ls ./__bin/release',
+       cmd=f'echo " " && ls ./__bin/Release',
        verbose=True)
 
 action('binary versions',
-       cmd=f'strings -f *.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/Release/*.so | grep mediasdk',
        verbose=True)
 
 action('install',
