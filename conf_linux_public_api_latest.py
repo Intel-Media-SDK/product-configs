@@ -92,8 +92,8 @@ action('compiler version',
        verbose=True)
 
 cmake_command = ['cmake',
-                 '--no-warn-unused-cli"',
-                 '"-Wno-dev -G "Unix Makefiles"',
+                 '--no-warn-unused-cli',
+                 '-Wno-dev -G "Unix Makefiles"',
                  '-DAPI:STRING=latest', #TODO: use args to unify product_configs
                  '-DWARNING_FLAGS="-Wall -Werror"',
                  '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
@@ -107,6 +107,14 @@ action('cmake',
 
 action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
+
+action('list artifacts',
+       cmd=f'ls ./__bin/release',
+       verbose=True)
+
+action('binary versions',
+       cmd=f'strings -f *.so | grep mediasdk',
+       verbose=True)
 
 action('install',
        stage=stage.INSTALL,
@@ -127,7 +135,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             },
             {
                 'path': 'plugins.cfg',
-                'pack_as': 'bin/Release/plugins.cfg'
+                'pack_as': 'bin/release/plugins.cfg'
             }
         ]
     }
