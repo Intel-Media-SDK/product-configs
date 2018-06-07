@@ -87,23 +87,42 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
-CMAKE_CFG = 'intel64.make.' + options.get('BUILD_TYPE')
-options['BUILD_DIR'] = MEDIA_SDK_REPO_DIR / '__cmake' / CMAKE_CFG
-
-
 action('compiler version',
-       cmd=f'{ENABLE_DEVTOOLSET} && gcc --version')
+       cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
+       verbose=True)
+
+cmake_command = ['cmake',
+                 '--no-warn-unused-cli',
+                 '-Wno-dev -G "Unix Makefiles"',
+                 '-DWARNING_FLAGS="-Wall -Werror"',
+                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
+                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
+                 str(MEDIA_SDK_REPO_DIR),
+]
+cmake_string = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && perl tools/builder/build_mfx.pl --cmake={CMAKE_CFG}',
-       work_dir=MEDIA_SDK_REPO_DIR)
+       cmd=f'{ENABLE_DEVTOOLSET} && {cmake_string}')
 
 action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
+action('list artifacts',
+       cmd=f'echo " " && ls ./__bin/Release',
+       verbose=True)
+
+action('binary versions',
+       cmd=f'echo " " && strings -f ./__bin/Release/*.so | grep mediasdk',
+       verbose=True)
+
 action('install',
        stage=stage.INSTALL,
        cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
+
+#TODO: temporary solution
+action('rename folder',
+       stage=stage.INSTALL,
+       cmd=f'mv ./__bin/Release ./__bin/release')
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
