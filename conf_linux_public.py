@@ -99,10 +99,10 @@ cmake_command = ['cmake',
                  '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                  str(MEDIA_SDK_REPO_DIR),
 ]
-cmake_string = ' '.join(cmake_command)
+cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && {cmake_string}')
+       cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
 
 action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
@@ -119,10 +119,6 @@ action('install',
        stage=stage.INSTALL,
        cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
-#TODO: temporary solution
-action('rename folder',
-       stage=stage.INSTALL,
-       cmd=f'mv ./__bin/Release ./__bin/release')
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
@@ -134,7 +130,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             },
             {
                 'path': 'plugins.cfg',
-                'pack_as': 'bin/release/plugins.cfg'
+                'pack_as': 'bin/Release/plugins.cfg'
             }
         ]
     }
