@@ -91,7 +91,7 @@ action('compiler version',
        cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
        verbose=True)
 
-if options['api_latest']: #build with api_latest
+if args.get('api_version') == "latest": #build with api_latest
     cmake_command = ['cmake',
                      '--no-warn-unused-cli',
                      '-Wno-dev -G "Unix Makefiles"',
@@ -102,7 +102,7 @@ if options['api_latest']: #build with api_latest
                      '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                      str(MEDIA_SDK_REPO_DIR),
                     ]
-else: #build with current api
+elif args.get('api_version') == "current": #build with current api
     cmake_command = ['cmake',
                      '--no-warn-unused-cli',
                      '-Wno-dev -G "Unix Makefiles"',
