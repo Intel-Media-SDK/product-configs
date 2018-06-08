@@ -97,6 +97,7 @@ if options['api_latest']: #build with api_latest
                      '-Wno-dev -G "Unix Makefiles"',
                      '-DAPI:STRING=latest',
                      '-DWARNING_FLAGS="-Wall -Werror"',
+                     f'-DCMAKE_BUILD_TYPE:STRING={options["BUILD_TYPE"]}',
                      '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                      '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                      str(MEDIA_SDK_REPO_DIR),
@@ -106,6 +107,7 @@ else: #build with current api
                      '--no-warn-unused-cli',
                      '-Wno-dev -G "Unix Makefiles"',
                      '-DWARNING_FLAGS="-Wall -Werror"',
+                     f'-DCMAKE_BUILD_TYPE:STRING={options["BUILD_TYPE"]}',
                      '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                      '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                      str(MEDIA_SDK_REPO_DIR),
@@ -119,11 +121,11 @@ action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
 action('list artifacts',
-       cmd=f'echo " " && ls ./__bin/Release',
+       cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/Release/*.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
        verbose=True)
 
 action('install',
@@ -141,7 +143,7 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             },
             {
                 'path': 'plugins.cfg',
-                'pack_as': 'bin/Release/plugins.cfg'
+                'pack_as': 'bin/release/plugins.cfg'
             }
         ]
     }
