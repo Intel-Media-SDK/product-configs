@@ -100,7 +100,7 @@ cmake_command = ['cmake',
                  '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                 ]
 
-if args.get('api_latest') == "true": #build with api_latest
+if args.get('api_latest'): #build with api_latest
     cmake_command.append('-DAPI:STRING=latest')
 
 cmake_command.append(str(MEDIA_SDK_REPO_DIR))
