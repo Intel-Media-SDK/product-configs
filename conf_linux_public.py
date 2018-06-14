@@ -94,10 +94,8 @@ action('compiler version',
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
                  '-Wno-dev -G "Unix Makefiles"',
-                 '-DWARNING_FLAGS="-Wall -Werror"',
-                 f'-DCMAKE_BUILD_TYPE:STRING={options["BUILD_TYPE"]}',
-                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
-                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
+                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"',
+                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong "',
                 ]
 
 if args.get('api_latest'):
