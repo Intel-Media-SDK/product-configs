@@ -95,34 +95,36 @@ cmake_command = ['cmake',
                  '--no-warn-unused-cli',
                  '-Wno-dev -G "Unix Makefiles"',
                  '-DWARNING_FLAGS="-Wall -Werror"',
+                 f'-DCMAKE_BUILD_TYPE:STRING={options["BUILD_TYPE"]}',
                  '-DCMAKE_C_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
                  '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -D_FORTIFY_SOURCE=2 -fstack-protector"',
-                 str(MEDIA_SDK_REPO_DIR),
-]
-cmake_string = ' '.join(cmake_command)
+                ]
+
+if args.get('api_latest'):
+    cmake_command.append('-DAPI:STRING=latest')
+
+cmake_command.append(str(MEDIA_SDK_REPO_DIR))
+
+cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && {cmake_string}')
+       cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
 
 action('build',
        cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
 action('list artifacts',
-       cmd=f'echo " " && ls ./__bin/Release',
+       cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/Release/*.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
        verbose=True)
 
 action('install',
        stage=stage.INSTALL,
        cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
-#TODO: temporary solution
-action('rename folder',
-       stage=stage.INSTALL,
-       cmd=f'mv ./__bin/Release ./__bin/release')
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
