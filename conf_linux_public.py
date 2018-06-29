@@ -101,6 +101,15 @@ cmake_command = ['cmake',
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
 
+#Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
+if args.get('disable_w_error'):
+    cmake_command = ['cmake',
+                     '--no-warn-unused-cli',
+                     '-Wno-dev -G "Unix Makefiles"',
+                     '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"',
+                     '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong "',
+                    ]
+
 cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
