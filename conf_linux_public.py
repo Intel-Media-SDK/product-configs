@@ -73,16 +73,16 @@ def set_env(repo_path):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
+    if args.get('gcc_latest'):
+        options["ENV"]['CC'] = '/usr/bin/gcc-8'
+        options["ENV"]['CXX'] = '/usr/bin/g++-8'
+
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
     #{'name': 'flow_test'},
 ]
 
 options["STRIP_BINARIES"] = True
-
-if args.get('gcc_latest'):
-    options["ENV"]['CC'] = '/usr/bin/gcc-8'
-    options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
