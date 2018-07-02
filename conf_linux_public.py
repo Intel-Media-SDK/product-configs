@@ -92,9 +92,14 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
-action('compiler version',
-       cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
-       verbose=True)
+if args.get('gcc_latest'):
+    action('compiler version',
+           cmd=f'echo " " && gcc --version',
+           verbose=True)
+else:
+    action('compiler version',
+           cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
+           verbose=True)
 
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
@@ -141,10 +146,14 @@ action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
        verbose=True)
 
-action('install',
-       stage=stage.INSTALL,
-       cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
-
+if args.get('gcc_latest'):
+    action('install',
+           stage=stage.INSTALL,
+           cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
+else:
+    action('install',
+           stage=stage.INSTALL,
+           cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
