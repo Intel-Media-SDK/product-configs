@@ -80,9 +80,14 @@ PRODUCT_REPOS = [
 
 options["STRIP_BINARIES"] = True
 
+if args.get('api_latest'):
+    options["ENV"]['CC'] = '/usr/bin/gcc-8'
+    options["ENV"]['CXX'] = '/usr/bin/g++-8'
+
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+
 
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
@@ -102,7 +107,7 @@ if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
 
 #Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
-if args.get('disable_w_error'):
+if args.get('gcc_latest'):
     cmake_command = ['cmake',
                      '--no-warn-unused-cli',
                      '-Wno-dev -G "Unix Makefiles"',
