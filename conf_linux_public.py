@@ -80,7 +80,7 @@ PRODUCT_REPOS = [
 
 options["STRIP_BINARIES"] = True
 
-if args.get('api_latest'):
+if args.get('gcc_latest'):
     options["ENV"]['CC'] = '/usr/bin/gcc-8'
     options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
