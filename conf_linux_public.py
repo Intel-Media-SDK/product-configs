@@ -119,11 +119,19 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
-action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
+if args.get('gcc_latest'):
+    action('cmake',
+           cmd=f'{cmake}')
+else:
+    action('cmake',
+           cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
 
-action('build',
-       cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
+if args.get('gcc_latest'):
+    action('build',
+           cmd=f'make -j{options["CPU_CORES"]}')
+else:
+    action('build',
+           cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
