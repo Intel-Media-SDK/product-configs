@@ -98,7 +98,7 @@ if args.get('gcc_latest'):
            verbose=True)
 else:
     action('compiler version',
-           cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
+           cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version && echo " " && echo "$CC" ',
            verbose=True)
 
 cmake_command = ['cmake',
