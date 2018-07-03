@@ -73,9 +73,21 @@ def set_env(repo_path):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('gcc_latest'):
+    if args.get('gcc_version'):
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
+
+def print_gcc_version():
+    if args.get('gcc_version'):
+        return f'echo " " && echo "$CC"'
+    else:
+        return f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version'
+
+def construct_command(command):
+    if args.get('gcc_version'): #in case of Ubuntu Server 18.04
+        return command
+    else:
+        return f'{ENABLE_DEVTOOLSET} && {command}' #enable new compiler on CentOS
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
@@ -92,51 +104,35 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
 
-if args.get('gcc_latest'):
-    action('compiler version',
-           cmd=f'echo " " && gcc --version',
-           verbose=True)
-else:
-    action('compiler version',
-           cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version && echo " " && echo "$CC" ',
-           verbose=True)
+action('compiler version',
+       cmd=print_gcc_version(),
+       verbose=True)
 
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
                  '-Wno-dev -G "Unix Makefiles"',
-                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"',
-                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong "',
                 ]
+
+#Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
+if args.get('gcc_version'):
+    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong "')
+else:
+    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong "')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
-
-#Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
-if args.get('gcc_latest'):
-    cmake_command = ['cmake',
-                     '--no-warn-unused-cli',
-                     '-Wno-dev -G "Unix Makefiles"',
-                     '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"',
-                     '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong "',
-                    ]
 
 cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
-if args.get('gcc_latest'):
-    action('cmake',
-           cmd=f'{cmake}')
-else:
-    action('cmake',
-           cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
+action('cmake',
+       cmd=construct_command(cmake))
 
-if args.get('gcc_latest'):
-    action('build',
-           cmd=f'make -j{options["CPU_CORES"]}')
-else:
-    action('build',
-           cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
+action('build',
+       cmd=construct_command(f'make -j{options["CPU_CORES"]}'))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -146,14 +142,10 @@ action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
        verbose=True)
 
-if args.get('gcc_latest'):
-    action('install',
-           stage=stage.INSTALL,
-           cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
-else:
-    action('install',
-           stage=stage.INSTALL,
-           cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
+action('install',
+       stage=stage.INSTALL,
+       cmd=construct_command(f'make DESTDIR={options["INSTALL_DIR"]} install'))
+
 
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
