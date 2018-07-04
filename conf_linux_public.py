@@ -73,21 +73,22 @@ def set_env(repo_path):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('gcc_version'):
+    if args.get('gcc_version') == GCC_LATEST:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
 def print_gcc_version():
-    if args.get('gcc_version'):
+    if args.get('gcc_version') == GCC_LATEST:
         return f'echo " " && echo "$CC"'
-    else:
-        return f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version'
+    return f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version'
 
-def construct_command(command):
-    if args.get('gcc_version'): #in case of Ubuntu Server 18.04
+def get_building_cmd(command):
+    if args.get('gcc_version') == GCC_LATEST: #in case of Ubuntu Server 18.04
         return command
     else:
         return f'{ENABLE_DEVTOOLSET} && {command}' #enable new compiler on CentOS
+
+GCC_LATEST = '8.1.0'
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
@@ -113,13 +114,13 @@ cmake_command = ['cmake',
                  '-Wno-dev -G "Unix Makefiles"',
                 ]
 
+#Ignore Werror
 #Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
-if args.get('gcc_version'):
-    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong "')
-else:
-    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong "')
+w_error = '-Werror'
+if args.get('gcc_version') == GCC_LATEST:
+    w_error = ''
+cmake_command.append(f'-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(f'-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
@@ -129,10 +130,10 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=construct_command(cmake))
+       cmd=get_building_cmd(cmake))
 
 action('build',
-       cmd=construct_command(f'make -j{options["CPU_CORES"]}'))
+       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}'))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -144,7 +145,7 @@ action('binary versions',
 
 action('install',
        stage=stage.INSTALL,
-       cmd=construct_command(f'make DESTDIR={options["INSTALL_DIR"]} install'))
+       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install'))
 
 
 DEV_PKG_DATA_TO_ARCHIVE = [
