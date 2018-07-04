@@ -20,7 +20,7 @@
 
 
 #TODO: move functions to the shared module
-def set_env(repo_path):
+def set_env(repo_path, gcc_latest):
     def _get_commit_number(repo_path):
         import git
         git_repo = git.Git(repo_path)
@@ -73,6 +73,23 @@ def set_env(repo_path):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
+    if args.get('gcc_version') == gcc_latest:
+        options["ENV"]['CC'] = '/usr/bin/gcc-8'
+        options["ENV"]['CXX'] = '/usr/bin/g++-8'
+
+def print_gcc_version(gcc_latest):
+    if args.get('gcc_version') == gcc_latest:
+        return f'echo " " && echo "$CC"'
+    return f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version'
+
+def get_building_cmd(command, gcc_latest):
+    if args.get('gcc_version') == gcc_latest: #in case of Ubuntu Server 18.04
+        return command
+    else:
+        return f'{ENABLE_DEVTOOLSET} && {command}' #enable new compiler on CentOS
+
+GCC_LATEST = '8.1.0'
+
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
     #{'name': 'flow_test'},
@@ -84,19 +101,26 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
+
 action('count api version and build number',
-       callfunc=(set_env, [MEDIA_SDK_REPO_DIR], {}))
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
 
 action('compiler version',
-       cmd=f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version',
+       cmd=print_gcc_version(GCC_LATEST),
        verbose=True)
 
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
                  '-Wno-dev -G "Unix Makefiles"',
-                 '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"',
-                 '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong "',
                 ]
+
+#Ignore Werror
+#Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
+w_error = '-Werror'
+if args.get('gcc_version') == GCC_LATEST:
+    w_error = ''
+cmake_command.append(f'-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(f'-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
@@ -106,10 +130,10 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=f'{ENABLE_DEVTOOLSET} && {cmake}')
+       cmd=get_building_cmd(cmake, GCC_LATEST))
 
 action('build',
-       cmd=f'{ENABLE_DEVTOOLSET} && make -j{options["CPU_CORES"]}')
+       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -121,7 +145,7 @@ action('binary versions',
 
 action('install',
        stage=stage.INSTALL,
-       cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
+       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST))
 
 
 DEV_PKG_DATA_TO_ARCHIVE = [
