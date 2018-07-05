@@ -77,28 +77,26 @@ def set_env(repo_path, gcc_latest):
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
-def print_gcc_version(gcc_latest):
+def print_gcc_version(gcc_latest, enable_devtoolset):
     if args.get('gcc_version') == gcc_latest:
         return f'echo " " && echo "$CC"'
-    return f'{ENABLE_DEVTOOLSET} && echo " " && gcc --version'
+    return f'{enable_devtoolset} && echo " " && gcc --version'
 
-def get_building_cmd(command, gcc_latest):
+def get_building_cmd(command, gcc_latest, enable_devtoolset):
     if args.get('gcc_version') == gcc_latest: #in case of Ubuntu Server 18.04
         return command
     else:
-        return f'{ENABLE_DEVTOOLSET} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
-GCC_LATEST = '8.1.0'
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
     #{'name': 'flow_test'},
 ]
 
-options["STRIP_BINARIES"] = True
-
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-
+GCC_LATEST = '8.1.0'
+options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 
@@ -106,7 +104,7 @@ action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
 
 action('compiler version',
-       cmd=print_gcc_version(GCC_LATEST),
+       cmd=print_gcc_version(GCC_LATEST, ENABLE_DEVTOOLSET),
        verbose=True)
 
 cmake_command = ['cmake',
@@ -130,10 +128,10 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=get_building_cmd(cmake, GCC_LATEST))
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('build',
-       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST))
+       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -145,7 +143,7 @@ action('binary versions',
 
 action('install',
        stage=stage.INSTALL,
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST))
+       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 
 DEV_PKG_DATA_TO_ARCHIVE = [
