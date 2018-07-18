@@ -112,13 +112,8 @@ cmake_command = ['cmake',
                  '-Wno-dev -G "Unix Makefiles"',
                 ]
 
-#Ignore Werror
-#Temporary solution for gcc-8: https://github.com/Intel-Media-SDK/MediaSDK/issues/359
-w_error = '-Werror'
-if args.get('gcc_version') == GCC_LATEST:
-    w_error = ''
-cmake_command.append(f'-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-cmake_command.append(f'-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall {w_error} -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
