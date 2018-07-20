@@ -88,9 +88,10 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
-
+#Repositories which will be downloaded
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
+    {'name': 'libva'},
     #{'name': 'flow_test'},
 ]
 
@@ -98,6 +99,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.1.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+LIBVA_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[1]['name']
 
 
 action('count api version and build number',
@@ -107,6 +109,22 @@ action('compiler version',
        cmd=print_gcc_version(GCC_LATEST, ENABLE_DEVTOOLSET),
        verbose=True)
 
+#Build dependencies
+##Build LibVA
+action('autogen.sh', #TODO: Do we have to build with latest gcc?
+       cmd=get_building_cmd("./autogen.sh", GCC_LATEST, ENABLE_DEVTOOLSET),
+       work_dir=LIBVA_REPO_DIR)
+
+action('build',
+       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET),
+       work_dir=LIBVA_REPO_DIR)
+
+action('list libva artifacts',
+       cmd=f'echo " " && ls ./va',
+       work_dir=LIBVA_REPO_DIR,
+       verbose=True)
+
+#Build MediaSDK
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
                  '-Wno-dev -G "Unix Makefiles"',
@@ -141,6 +159,7 @@ action('install',
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 
+#Form install and developer packages of MediaSDK
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
         'from_path': options['BUILD_DIR'],
