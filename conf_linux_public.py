@@ -124,6 +124,12 @@ action('list libva artifacts',
        work_dir=LIBVA_REPO_DIR,
        verbose=True)
 
+
+#TODO: build MediaSDK with fresh build LibVA (not system)(install / packaging?!)
+#export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig
+
+#TODO: add manifest to build MediaSDK with specified version of LibVA
+
 #Build MediaSDK
 cmake_command = ['cmake',
                  '--no-warn-unused-cli',
@@ -159,23 +165,28 @@ action('install',
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 
-#Form install and developer packages of MediaSDK
+#Form developer package of MediaSDK and LibVA
 DEV_PKG_DATA_TO_ARCHIVE = [
     {
-        'from_path': options['BUILD_DIR'],
+        'from_path': options['ROOT_DIR'],
         'relative': [
             {
-                'path': '__bin',
-                'pack_as': 'bin'
+                'path': options['BUILD_DIR'] / '__bin',
+                'pack_as': 'mediasdk/bin'
             },
             {
-                'path': 'plugins.cfg',
-                'pack_as': 'bin/release/plugins.cfg'
+                'path': options['BUILD_DIR'] / 'plugins.cfg',
+                'pack_as': 'mediasdk/bin/release/plugins.cfg'
+            },
+            {
+                'path': LIBVA_REPO_DIR / 'va',
+                'pack_as': 'libva/va'
             }
         ]
     }
 ]
 
+#Form install package of MediaSDK
 INSTALL_PKG_DATA_TO_ARCHIVE = [
     {
         'from_path': options['INSTALL_DIR'],
