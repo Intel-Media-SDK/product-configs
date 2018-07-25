@@ -73,7 +73,7 @@ def set_env(repo_path, gcc_latest):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('gcc_version') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_verson') == gcc_latest:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
@@ -107,13 +107,15 @@ action('compiler version',
        cmd=print_gcc_version(GCC_LATEST, ENABLE_DEVTOOLSET),
        verbose=True)
 
-cmake_command = ['cmake',
-                 '--no-warn-unused-cli',
-                 '-Wno-dev -G "Unix Makefiles"',
-                ]
-
-cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command = ['cmake']
+if args.get('compiler') == "clang":
+    cmake_command.append('-DCMAKE_C_COMPILER=clang-6.0')
+    cmake_command.append('-DCMAKE_CXX_COMPILER=clang++-6.0')
+else:
+    cmake_command.append('--no-warn-unused-cli')
+    cmake_command.append('-Wno-dev -G "Unix Makefiles"')
+    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
