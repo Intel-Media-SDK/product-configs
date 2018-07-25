@@ -78,12 +78,14 @@ def set_env(repo_path, gcc_latest):
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
 def print_gcc_version(gcc_latest, enable_devtoolset):
-    if args.get('gcc_version') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
         return f'echo " " && echo "$CC"'
+    elif args.get('compiler') == "clang":
+        return f'echo " " && clang --version'
     return f'{enable_devtoolset} && echo " " && gcc --version'
 
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    if args.get('gcc_version') == gcc_latest: #in case of Ubuntu Server 18.04
+    if args.get('compiler'): #in case of Ubuntu Server 18.04
         return command
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
