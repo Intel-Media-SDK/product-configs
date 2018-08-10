@@ -64,7 +64,7 @@ def set_env(repo_path, gcc_latest):
 
     plugin_version = f'{api_ver}.3.{build_num}'
     options["ENV"]["API_VERSION"] = api_ver
-    options["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
+    options["ENV"]['MFX_VERSION'] = f'8.0.16093{build_num}'
     options["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
