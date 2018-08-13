@@ -113,6 +113,9 @@ cmake_command = ['cmake']
 if args.get('compiler') == "clang":
     cmake_command.append('-DCMAKE_C_COMPILER=clang-6.0')
     cmake_command.append('-DCMAKE_CXX_COMPILER=clang++-6.0')
+elif args.get('fastboot'):
+    fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder' / 'profiles' / 'fastboot.cmake'
+    cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
 else:
     cmake_command.append('--no-warn-unused-cli')
     cmake_command.append('-Wno-dev -G "Unix Makefiles"')
@@ -130,8 +133,13 @@ cmake = ' '.join(cmake_command)
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('build',
-       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
+if args.get('fastboot'):
+    target = 'mfxhw64'
+    action('build',
+           cmd=get_building_cmd(f'make -j{options["CPU_CORES"]} {target}', GCC_LATEST, ENABLE_DEVTOOLSET))
+else:
+    action('build',
+           cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
