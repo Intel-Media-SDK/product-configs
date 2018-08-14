@@ -84,8 +84,10 @@ def print_gcc_version(gcc_latest, enable_devtoolset):
         return f'echo " " && clang --version'
     return f'{enable_devtoolset} && echo " " && gcc --version'
 
+#TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    if args.get('compiler'): #in case of Ubuntu Server 18.04
+     # Ubuntu Server: gcc_latest or clang
+    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
