@@ -112,17 +112,26 @@ action('compiler version',
        verbose=True)
 
 cmake_command = ['cmake']
+#In case of clang build will be used only these cmake parameters:
 if args.get('compiler') == "clang":
     cmake_command.append('-DCMAKE_C_COMPILER=clang-6.0')
     cmake_command.append('-DCMAKE_CXX_COMPILER=clang++-6.0')
+#Default parameters (default flow):
 else:
     cmake_command.append('--no-warn-unused-cli')
     cmake_command.append('-Wno-dev -G "Unix Makefiles"')
     cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
     cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+
+#In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
+if not args.get('fastboot') and not args.get('compiler') == "clang":
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
 
+#Additional (custom) options (they extend default parameters):
+if args.get('fastboot'):
+    fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder' / 'profiles' / 'fastboot.cmake'
+    cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
 
