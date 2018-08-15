@@ -84,8 +84,10 @@ def print_gcc_version(gcc_latest, enable_devtoolset):
         return f'echo " " && clang --version'
     return f'{enable_devtoolset} && echo " " && gcc --version'
 
+#TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    if args.get('compiler'): #in case of Ubuntu Server 18.04
+     # Ubuntu Server: gcc_latest or clang
+    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
@@ -123,7 +125,8 @@ else:
 
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if not args.get('fastboot') and not args.get('compiler') == "clang":
-    cmake_command.append('-DENABLE_TOOLS=ON')
+    cmake_command.append('-DBUILD_ALL=ON')
+    cmake_command.append('-DENABLE_ALL=ON')
 
 #Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
