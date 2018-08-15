@@ -124,7 +124,7 @@ action('install',
        cmd=f'{ENABLE_DEVTOOLSET} && make DESTDIR={options["INSTALL_DIR"]} install')
 
 
-DEV_PKG_DATA_TO_ARCHIVE = [
+DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['BUILD_DIR'],
         'relative': [
@@ -138,9 +138,9 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             }
         ]
     }
-]
+])
 
-INSTALL_PKG_DATA_TO_ARCHIVE = [
+INSTALL_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['INSTALL_DIR'],
         'relative': [
@@ -149,4 +149,4 @@ INSTALL_PKG_DATA_TO_ARCHIVE = [
             }
         ]
     }
-]
+])
