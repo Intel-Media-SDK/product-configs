@@ -115,15 +115,15 @@ action('compiler version',
 
 #Build dependencies
 ##Build LibVA
-action('autogen.sh', #TODO: Do we have to build with latest gcc?
+action('LibVA: autogen.sh', #TODO: Do we have to build with latest gcc?
        cmd=get_building_cmd("./autogen.sh", GCC_LATEST, ENABLE_DEVTOOLSET),
        work_dir=LIBVA_REPO_DIR)
 
-action('build',
+action('LibVA: build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET),
        work_dir=LIBVA_REPO_DIR)
 
-action('list libva artifacts',
+action('LibVA: list artifacts',
        cmd=f'echo " " && ls ./va',
        work_dir=LIBVA_REPO_DIR,
        verbose=True)
