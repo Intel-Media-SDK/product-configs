@@ -64,7 +64,7 @@ def set_env(repo_path, gcc_latest):
 
     plugin_version = f'{api_ver}.3.{build_num}'
     options["ENV"]["API_VERSION"] = api_ver
-    options["ENV"]['MFX_VERSION'] = f'7.0.16093{build_num}'
+    options["ENV"]['MFX_VERSION'] = f'8.0.16093{build_num}'
     options["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
@@ -73,17 +73,21 @@ def set_env(repo_path, gcc_latest):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('gcc_version') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_verson') == gcc_latest:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
 def print_gcc_version(gcc_latest, enable_devtoolset):
-    if args.get('gcc_version') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
         return f'echo " " && echo "$CC"'
+    elif args.get('compiler') == "clang":
+        return f'echo " " && clang --version'
     return f'{enable_devtoolset} && echo " " && gcc --version'
 
+#TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    if args.get('gcc_version') == gcc_latest: #in case of Ubuntu Server 18.04
+     # Ubuntu Server: gcc_latest or clang
+    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
@@ -131,13 +135,27 @@ action('list libva artifacts',
 #TODO: add manifest to build MediaSDK with specified version of LibVA
 
 #Build MediaSDK
-cmake_command = ['cmake',
-                 '--no-warn-unused-cli',
-                 '-Wno-dev -G "Unix Makefiles"',
-                ]
+cmake_command = ['cmake']
+#In case of clang build will be used only these cmake parameters:
+if args.get('compiler') == "clang":
+    cmake_command.append('-DCMAKE_C_COMPILER=clang-6.0')
+    cmake_command.append('-DCMAKE_CXX_COMPILER=clang++-6.0')
+#Default parameters (default flow):
+else:
+    cmake_command.append('--no-warn-unused-cli')
+    cmake_command.append('-Wno-dev -G "Unix Makefiles"')
+    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
-cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+#In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
+if not args.get('fastboot') and not args.get('compiler') == "clang":
+    cmake_command.append('-DBUILD_ALL=ON')
+    cmake_command.append('-DENABLE_ALL=ON')
+
+#Additional (custom) options (they extend default parameters):
+if args.get('fastboot'):
+    fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder' / 'profiles' / 'fastboot.cmake'
+    cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
 
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
@@ -166,7 +184,7 @@ action('install',
 
 
 #Form developer package of MediaSDK and LibVA
-DEV_PKG_DATA_TO_ARCHIVE = [
+DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['ROOT_DIR'],
         'relative': [
@@ -184,10 +202,10 @@ DEV_PKG_DATA_TO_ARCHIVE = [
             }
         ]
     }
-]
+])
 
 #Form install package of MediaSDK
-INSTALL_PKG_DATA_TO_ARCHIVE = [
+INSTALL_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['INSTALL_DIR'],
         'relative': [
@@ -196,4 +214,4 @@ INSTALL_PKG_DATA_TO_ARCHIVE = [
             }
         ]
     }
-]
+])
