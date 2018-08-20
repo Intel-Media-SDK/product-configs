@@ -138,9 +138,12 @@ action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
-action('used compiler',
-       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
-       verbose=True)                            
+#TODO: `if gcc` - but need to update config.py. Need to fill ALL compilers fields
+#In current case: if gcc:
+if not args.get('compiler') == "clang"
+    action('used compiler',
+           cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
+           verbose=True)                            
 
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
