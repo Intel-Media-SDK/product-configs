@@ -138,8 +138,7 @@ action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
-#TODO: `if gcc` - but need to update config.py. Need to fill ALL compilers fields
-#In current case: if gcc:
+#TODO: add check for clang compiler
 if args.get('compiler') == "gcc":
     action('used compiler',
            cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
