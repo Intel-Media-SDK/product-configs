@@ -77,13 +77,6 @@ def set_env(repo_path, gcc_latest):
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
-def print_gcc_version(gcc_latest, enable_devtoolset):
-    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
-        return f'echo " " && echo "$CC"'
-    elif args.get('compiler') == "clang":
-        return f'echo " " && clang --version'
-    return f'{enable_devtoolset} && echo " " && gcc --version'
-
 #TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
      # Ubuntu Server: gcc_latest or clang
@@ -106,10 +99,6 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
-
-action('compiler version',
-       cmd=print_gcc_version(GCC_LATEST, ENABLE_DEVTOOLSET),
-       verbose=True)
 
 cmake_command = ['cmake']
 #In case of clang build will be used only these cmake parameters:
@@ -148,6 +137,12 @@ action('build',
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
+
+#TODO: add check for clang compiler
+if args.get('compiler') == "gcc":
+    action('used compiler',
+           cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
+           verbose=True)                            
 
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
