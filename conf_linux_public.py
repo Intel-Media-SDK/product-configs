@@ -145,7 +145,7 @@ if args.get('compiler') == "gcc":
            verbose=True)                            
 
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo', # temporary fix
        verbose=True)
 
 action('install',
