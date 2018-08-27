@@ -73,7 +73,7 @@ def set_env(repo_path, gcc_latest):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('compiler') == "gcc" and args.get('compiler_verson') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
@@ -144,8 +144,9 @@ if args.get('compiler') == "gcc":
            cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
            verbose=True)                            
 
+#TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
 action('install',
