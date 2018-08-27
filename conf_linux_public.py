@@ -144,8 +144,9 @@ if args.get('compiler') == "gcc":
            cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
            verbose=True)                            
 
+#TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo', # temporary fix
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
 action('install',
