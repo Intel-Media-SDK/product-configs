@@ -73,16 +73,9 @@ def set_env(repo_path, gcc_latest):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('compiler') == "gcc" and args.get('compiler_verson') == gcc_latest:
+    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
-
-def print_gcc_version(gcc_latest, enable_devtoolset):
-    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
-        return f'echo " " && echo "$CC"'
-    elif args.get('compiler') == "clang":
-        return f'echo " " && clang --version'
-    return f'{enable_devtoolset} && echo " " && gcc --version'
 
 #TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
@@ -109,15 +102,12 @@ LIBVA_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[1]['name']
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
 
-action('compiler version',
-       cmd=print_gcc_version(GCC_LATEST, ENABLE_DEVTOOLSET),
-       verbose=True)
 
 #Build dependencies
 ##Build LibVA
 action('LibVA: autogen.sh', #TODO: Do we have to build with latest gcc?
        cmd=get_building_cmd("./autogen.sh", GCC_LATEST, ENABLE_DEVTOOLSET),
-       work_dir=LIBVA_REPO_DIR)
+       work_dir=LIBVA_REPO_DIR) #TODO: build outside of repo
 
 action('LibVA: build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET),
@@ -128,11 +118,11 @@ action('LibVA: list artifacts',
        work_dir=LIBVA_REPO_DIR,
        verbose=True)
 
-
 #TODO: build MediaSDK with fresh build LibVA (not system)(install / packaging?!)
 #export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig
 
 #TODO: add manifest to build MediaSDK with specified version of LibVA
+
 
 #Build MediaSDK
 cmake_command = ['cmake']
@@ -174,8 +164,15 @@ action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
+#TODO: add check for clang compiler
+if args.get('compiler') == "gcc":
+    action('used compiler',
+           cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
+           verbose=True)                            
+
+#TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
-       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk',
+       cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
 action('install',
