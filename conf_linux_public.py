@@ -22,6 +22,8 @@
 #TODO: move functions to the shared module
 def set_env(repo_path, gcc_latest):
     def _get_commit_number(repo_path):
+        if not repo_path.exists():
+            return '0'
         import git
         git_repo = git.Git(repo_path)
         return str(git_repo.rev_list('--count', 'HEAD'))
