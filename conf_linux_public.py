@@ -25,7 +25,7 @@ def set_env(repo_path, gcc_latest):
         if not repo_path.exists():
             return '0'
         import git
-        git_repo = git.Git(repo_path)
+        git_repo = git.Git(str(repo_path))
         return str(git_repo.rev_list('--count', 'HEAD'))
 
     def _get_api_version(repo_path):
@@ -62,7 +62,7 @@ def set_env(repo_path, gcc_latest):
             raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
 
     api_ver = _get_api_version(repo_path)
-    build_num = _get_commit_number(str(repo_path))
+    build_num = _get_commit_number(repo_path)
 
     plugin_version = f'{api_ver}.3.{build_num}'
     options["ENV"]["API_VERSION"] = api_ver
