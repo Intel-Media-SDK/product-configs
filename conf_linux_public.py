@@ -94,7 +94,7 @@ PRODUCT_REPOS = [
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-GCC_LATEST = '8.1.0'
+GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
