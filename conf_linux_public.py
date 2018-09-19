@@ -99,8 +99,8 @@ options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 
-action('count api version and build number',
-       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
+# action('count api version and build number',
+#        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
 
 cmake_command = ['cmake']
 #In case of clang build will be used only these cmake parameters:
