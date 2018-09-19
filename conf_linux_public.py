@@ -43,6 +43,8 @@ def set_env(repo_path, gcc_latest):
         import pathlib
 
         mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+        if not mediasdk_api_header.exists():
+            return '0'
 
         with open(mediasdk_api_header, 'r') as lines:
             major_version = ""
