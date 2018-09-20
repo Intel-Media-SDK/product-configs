@@ -43,6 +43,8 @@ def set_env(repo_path, gcc_latest):
         import pathlib
 
         mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+        if not mediasdk_api_header.exists():
+            return '0'
 
         with open(mediasdk_api_header, 'r') as lines:
             major_version = ""
@@ -90,6 +92,9 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
+    # Give possibility to build linux for changes from product configs repository
+    # This repo not needed for build and added only to support CI process
+    {'name': 'product-configs'}
     #{'name': 'flow_test'},
 ]
 
