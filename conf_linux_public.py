@@ -20,7 +20,7 @@
 
 
 #TODO: move functions to the shared module
-def set_env(repo_path, gcc_latest):
+def set_env(repo_path, gcc_latest, clang_version):
     def _get_commit_number(repo_path):
         if not repo_path.exists():
             return '0'
@@ -77,9 +77,14 @@ def set_env(repo_path, gcc_latest):
 
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
-    if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
+    compiler_version = args.get('compiler_version')
+    if args.get('compiler') == "gcc" and compiler_version == gcc_latest:
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
+
+    elif args.get('compiler') == "clang" and compiler_version == clang_version:
+        options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
+        options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
 
 #TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
@@ -100,24 +105,32 @@ PRODUCT_REPOS = [
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.2.0'
+CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 
 
 action('count api version and build number',
-       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
 cmake_command = ['cmake']
-#In case of clang build will be used only these cmake parameters:
+
+cmake_command.append('--no-warn-unused-cli')
+cmake_command.append('-Wno-dev -G "Unix Makefiles"')
+
+#Build without -Werror option in case of clang:
+#TODO: use the same command as for 'gcc'
 if args.get('compiler') == "clang":
-    cmake_command.append('-DCMAKE_C_COMPILER=clang-6.0')
-    cmake_command.append('-DCMAKE_CXX_COMPILER=clang++-6.0')
+    cmake_command.append(
+        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append(
+        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 #Default parameters (default flow):
 else:
-    cmake_command.append('--no-warn-unused-cli')
-    cmake_command.append('-Wno-dev -G "Unix Makefiles"')
-    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append(
+        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append(
+        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if 'no_x11' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
