@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 #TODO: move functions to the shared module
 def set_env(repo_path, gcc_latest):
     def _get_commit_number(repo_path):
@@ -91,12 +90,16 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 
 
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': 'product-configs'}
     #{'name': 'flow_test'},
 ]
+
+if product_type == 'public_linux':
+    PRODUCT_REPOS.append({'name': 'MediaSDK'})
+else:
+    PRODUCT_REPOS.append({'name': 'Next-GEN'})
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.2.0'
