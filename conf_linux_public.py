@@ -116,8 +116,8 @@ if args.get('compiler') == "clang":
 else:
     cmake_command.append('--no-warn-unused-cli')
     cmake_command.append('-Wno-dev -G "Unix Makefiles"')
-    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
+    cmake_command.append('-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
 
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if 'no_x11' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
