@@ -96,7 +96,7 @@ PRODUCT_REPOS = [
     #{'name': 'flow_test'},
 ]
 
-if product_type == 'public_linux':
+if product_type.startswith("public"):
     PRODUCT_REPOS.append({'name': 'MediaSDK'})
 else:
     PRODUCT_REPOS.append({'name': 'Next-GEN'})
