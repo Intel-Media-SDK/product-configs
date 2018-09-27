@@ -2,3 +2,4 @@ Deployment of infrastructure is enabled for Next-Gen service
 Test 1
 Test 2: Checking change properties and trigger builds same as closed source (2)
 Test 3: reporting to github
+Test
