@@ -154,7 +154,7 @@ action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 if args.get('fastboot'):
-    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin / release / libmfxhw64-fastboot.so.1.28'
+    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.1.28'
     action('build',
                cmd=f'strip {fastboot_lib}')
     # Check fastboot lib size
