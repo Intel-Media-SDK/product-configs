@@ -102,6 +102,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
 
 action('count api version and build number',
@@ -127,6 +128,13 @@ if 'defconfig' not in product_type and not args.get('fastboot') and not args.get
 #Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
     fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder' / 'profiles' / 'fastboot.cmake'
+    # Check fastboot library size
+    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin' / 'release' / 'libmfxhw64-fastboot.so.1.28.so'
+    action('strip lib',
+           cmd=f'strip {fastboot_lib}')
+    if (fastboot_lib.stat().st_size > 110000):
+        raise Exception(f"Fastboot library size exceeds 110000 bytes")
+
     cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
