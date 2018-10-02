@@ -89,6 +89,16 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
+def check_lib_size(lib):
+    """
+    :param lib: path to lib
+    :return: pathlib.Path
+    """
+    #TODO:max_size should be adjusted according to current binary size
+    max_size = 110000
+    if lib.stat().st_size > 110000:
+        raise Exception(f"The lib size exceeds {max_size} bytes")
+
 
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
@@ -127,15 +137,9 @@ if 'defconfig' not in product_type and not args.get('fastboot') and not args.get
 
 #Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
-    fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder' / 'profiles' / 'fastboot.cmake'
-    # Check fastboot library size
-    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin' / 'release' / 'libmfxhw64-fastboot.so.1.28.so'
-    action('strip lib',
-           cmd=f'strip {fastboot_lib}')
-    if (fastboot_lib.stat().st_size > 110000):
-        raise Exception(f"Fastboot library size exceeds 110000 bytes")
-
+    fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder/profiles/fastboot.cmake'
     cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
+
 if args.get('api_latest'):
     cmake_command.append('-DAPI:STRING=latest')
 
@@ -148,6 +152,14 @@ action('cmake',
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+if args.get('fastboot'):
+    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin / release / libmfxhw64-fastboot.so.1.28.so'
+    action('build',
+               cmd=f'strip {fastboot_lib}')
+    # Check fastboot lib size
+    action('build',
+           callfunc=(check_lib_size, fastboot_lib))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -163,6 +175,7 @@ if args.get('compiler') == "gcc":
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
+
 
 action('install',
        stage=stage.INSTALL,
