@@ -89,15 +89,15 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
-def check_lib_size(lib):
+def check_lib_size(lib, lib_name):
     """
     :param lib: path to lib
     :return: pathlib.Path
     """
     #TODO:max_size should be adjusted according to current binary size
-    max_size = 110000
-    if lib.stat().st_size > 110000:
-        raise Exception(f"The lib size exceeds {max_size} bytes")
+    max_size = 1500000
+    if lib.stat().st_size > max_size:
+        raise Exception(f"{lib_name} lib size exceeds {max_size} bytes")
 
 
 PRODUCT_REPOS = [
@@ -159,7 +159,7 @@ if args.get('fastboot'):
                cmd=f'strip {fastboot_lib}')
     # Check fastboot lib size
     action('build',
-           callfunc=(check_lib_size, [fastboot_lib], {}))
+           callfunc=(check_lib_size, [fastboot_lib, 'fastboot'], {}))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
