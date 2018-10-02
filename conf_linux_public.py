@@ -159,7 +159,7 @@ if args.get('fastboot'):
                cmd=f'strip {fastboot_lib}')
     # Check fastboot lib size
     action('build',
-           callfunc=(check_lib_size, fastboot_lib))
+           callfunc=(check_lib_size, fastboot_lib, {}))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
