@@ -18,51 +18,67 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+PRODUCT_REPOS = [
+    {'name': 'MediaSDK'},
+    # Give possibility to build linux for changes from product configs repository
+    # This repo not needed for build and added only to support CI process
+    {'name': 'product-configs'}
+    #{'name': 'flow_test'},
+]
 
-#TODO: move functions to the shared module
-def set_env(repo_path, gcc_latest):
-    def _get_commit_number(repo_path):
-        if not repo_path.exists():
-            return '0'
-        import git
-        git_repo = git.Git(str(repo_path))
-        return str(git_repo.rev_list('--count', 'HEAD'))
+ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
+GCC_LATEST = '8.2.0'
+options["STRIP_BINARIES"] = True
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
-    def _get_api_version(repo_path):
-        """
-        :param name: Path to the MediaSDK folder
-        :type name: String or Path
 
-        Function finds the lines like:
-            `#define MFX_VERSION_MAJOR 1`
-            `#define MFX_VERSION_MINOR 26`
-        And prints the version like:
-            `1.26`
-        """
-        import re
-        import pathlib
+def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
+    if not repo_path.exists():
+        return '0'
+    import git
+    git_repo = git.Git(str(repo_path))
+    return str(git_repo.rev_list('--count', 'HEAD'))
 
-        mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
-        if not mediasdk_api_header.exists():
-            return '0'
 
-        with open(mediasdk_api_header, 'r') as lines:
-            major_version = ""
-            minor_version = ""
-            for line in lines:
-                major_version_pattern = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
-                if major_version_pattern:
-                    major_version = major_version_pattern.group(1)
-                    continue
+def get_api_version(repo_path=MEDIA_SDK_REPO_DIR):
+    """
+    :param name: Path to the MediaSDK folder
+    :type name: String or Path
 
-                minor_version_pattern = re.search("MFX_VERSION_MINOR\s(\d+)", line)
-                if minor_version_pattern:
-                    minor_version = minor_version_pattern.group(1)
+    Function finds the lines like:
+        `#define MFX_VERSION_MAJOR 1`
+        `#define MFX_VERSION_MINOR 26`
+    And prints the version like:
+        `1.26`
+    """
+    import re
+    import pathlib
 
-                if major_version and minor_version:
-                    return f"{major_version}.{minor_version}"
-            raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
+    mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
+    if not mediasdk_api_header.exists():
+        return '0'
 
+    with open(mediasdk_api_header, 'r') as lines:
+        major_version = ""
+        minor_version = ""
+        for line in lines:
+            major_version_pattern = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
+            if major_version_pattern:
+                major_version = major_version_pattern.group(1)
+                continue
+
+            minor_version_pattern = re.search("MFX_VERSION_MINOR\s(\d+)", line)
+            if minor_version_pattern:
+                minor_version = minor_version_pattern.group(1)
+
+            if major_version and minor_version:
+                return f"{major_version}.{minor_version}"
+        raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
+
+
+# TODO: move functions to the shared module
+def set_env(repo_path, gcc_latest, _get_commit_number=get_commit_number, _get_api_version=get_api_version):
     api_ver = _get_api_version(repo_path)
     build_num = _get_commit_number(repo_path)
 
@@ -94,25 +110,10 @@ def check_lib_size(lib, lib_name):
     :param lib: path to lib
     :return: pathlib.Path
     """
-    #TODO:max_size should be adjusted according to current binary size
+    # TODO: max_size should be adjusted according to current binary size
     max_size = 1500000
     if lib.stat().st_size > max_size:
         raise Exception(f"{lib_name} lib size exceeds {max_size} bytes")
-
-
-PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    # Give possibility to build linux for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-    #{'name': 'flow_test'},
-]
-
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-GCC_LATEST = '8.2.0'
-options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
-MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
 
 action('count api version and build number',
@@ -154,9 +155,11 @@ action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 if args.get('fastboot'):
-    fastboot_lib = MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.1.28'
+    api_version = get_api_version()
+    fastboot_lib = MEDIA_SDK_BUILD_DIR / f'__bin/release/libmfxhw64-fastboot.so.{api_version}'
+
     action('build',
-               cmd=f'strip {fastboot_lib}')
+               cmd=f'strip ./__bin/release/libmfxhw64-fastboot.so.{api_version}')
     # Check fastboot lib size
     action('build',
            callfunc=(check_lib_size, [fastboot_lib, 'fastboot'], {}))
