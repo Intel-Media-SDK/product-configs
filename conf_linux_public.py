@@ -31,6 +31,7 @@ GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
+FASTBOOT_LIB_MAX_SIZE = 1116786
 
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
@@ -57,7 +58,7 @@ def get_api_version(repo_path=MEDIA_SDK_REPO_DIR):
 
     mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
     if not mediasdk_api_header.exists():
-        return '0'
+        raise Exception(f"No {mediasdk_api_header.name} found in {mediasdk_api_header.parent}")
 
     with open(mediasdk_api_header, 'r') as lines:
         major_version = ""
@@ -97,6 +98,7 @@ def set_env(repo_path, gcc_latest, _get_commit_number=get_commit_number, _get_ap
         options["ENV"]['CC'] = '/usr/bin/gcc-8'
         options["ENV"]['CXX'] = '/usr/bin/g++-8'
 
+
 #TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
      # Ubuntu Server: gcc_latest or clang
@@ -105,15 +107,16 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
-def check_lib_size(lib, lib_name):
+
+def check_lib_size(lib_path, threshold_size):
     """
-    :param lib: path to lib
+    :param lib_path: path to lib
     :return: pathlib.Path
     """
-    # TODO: max_size should be adjusted according to current binary size
-    max_size = 1500000
-    if lib.stat().st_size > max_size:
-        raise Exception(f"{lib_name} lib size exceeds {max_size} bytes")
+
+    current_lib_size = lib_path.stat().st_size
+    if current_lib_size > threshold_size:
+        raise Exception(f"{lib_path.name} size={current_lib_size}Kb exceeds max_size={threshold_size}Kb")
 
 
 action('count api version and build number',
@@ -160,9 +163,9 @@ if args.get('fastboot'):
 
     action('build',
                cmd=f'strip ./__bin/release/libmfxhw64-fastboot.so.{api_version}')
-    # Check fastboot lib size
-    action('build',
-           callfunc=(check_lib_size, [fastboot_lib, 'fastboot'], {}))
+
+    action('check fastboot lib size',
+           callfunc=(check_lib_size, [fastboot_lib, FASTBOOT_LIB_MAX_SIZE], {}))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
