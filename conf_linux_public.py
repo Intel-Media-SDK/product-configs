@@ -91,7 +91,6 @@ def set_env(repo_path, gcc_latest, _get_commit_number=get_commit_number, _get_ap
     options["ENV"]['MFX_VP8_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_VP9_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
-
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
     if args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest:
@@ -108,13 +107,18 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def check_lib_size(lib_path, threshold_size):
+def check_lib_size(threshold_size, mediasdk_lib_path, _get_api_version=get_api_version):
     """
     :param lib_path: path to lib
     :return: pathlib.Path
     """
 
+    lib_parent_dir = mediasdk_lib_path.parent
+    lib_name = f'{mediasdk_lib_path.name}.{_get_api_version()}'
+    lib_path = lib_parent_dir / lib_name
+
     current_lib_size = lib_path.stat().st_size
+    log.info(f'Lib size: {current_lib_size}')
     if current_lib_size > threshold_size:
         raise Exception(f"{lib_path.name} size={current_lib_size}Kb exceeds max_size={threshold_size}Kb")
 
@@ -158,14 +162,11 @@ action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 if args.get('fastboot'):
-    api_version = get_api_version()
-    fastboot_lib = MEDIA_SDK_BUILD_DIR / f'__bin/release/libmfxhw64-fastboot.so.{api_version}'
-
     action('build',
-               cmd=f'strip ./__bin/release/libmfxhw64-fastboot.so.{api_version}')
+               cmd=('strip ./__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'))
 
     action('check fastboot lib size',
-           callfunc=(check_lib_size, [fastboot_lib, FASTBOOT_LIB_MAX_SIZE], {}))
+           callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so'], {}))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
