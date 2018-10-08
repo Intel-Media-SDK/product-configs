@@ -123,6 +123,7 @@ else:
 if 'defconfig' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
+    cmake_command.append('-DENABLE_ITT=ON')
 
 #Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
