@@ -91,8 +91,10 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 # Choose repository in accordance with prefix of product type
 if product_type.startswith("public"):
     repo_name = 'MediaSDK'
-else:
+elif product_type.startswith("private"):
     repo_name = 'Next-GEN'
+else:
+    raise IOError(f"Unknown product type '{product_type}'")
 
 PRODUCT_REPOS = [
     {'name': repo_name},
