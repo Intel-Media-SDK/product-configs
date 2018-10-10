@@ -107,17 +107,16 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def check_lib_size(threshold_size, mediasdk_lib_path, _get_api_version=get_api_version):
+def check_lib_size(threshold_size, lib_path):
     """
     :param lib_path: path to lib
     :return: pathlib.Path
     """
 
-    lib_parent_dir = mediasdk_lib_path.parent
-    lib_name = f'{mediasdk_lib_path.name}.{_get_api_version()}'
-    lib_path = lib_parent_dir / lib_name
+    import pathlib
 
-    current_lib_size = lib_path.stat().st_size
+    lib_path = str(lib_path).format_map(options)
+    current_lib_size = pathlib.Path(lib_path).stat().st_size
     log.info(f'Lib size: {current_lib_size}')
     if current_lib_size > threshold_size:
         raise Exception(f"{lib_path.name} size={current_lib_size}Kb exceeds max_size={threshold_size}Kb")
@@ -166,7 +165,7 @@ if args.get('fastboot'):
                cmd=('strip ./__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'))
 
     action('check fastboot lib size',
-           callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so'], {}))
+           callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
