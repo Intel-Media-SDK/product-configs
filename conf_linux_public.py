@@ -90,8 +90,17 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
+# Choose repository in accordance with prefix of product type
+if product_type.startswith("public"):
+    repo_name = 'MediaSDK'
+elif product_type.startswith("private"):
+    repo_name = 'Next-GEN'
+else:
+    raise IOError(f"Unknown product type '{product_type}'")
+
+
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
+    {'name': repo_name},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': 'product-configs'}
@@ -101,7 +110,7 @@ PRODUCT_REPOS = [
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
 
 
 action('count api version and build number',
