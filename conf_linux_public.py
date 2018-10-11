@@ -156,7 +156,7 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
 
 
 action('count api version and build number',
-       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
 
 cmake_command = ['cmake']
 
