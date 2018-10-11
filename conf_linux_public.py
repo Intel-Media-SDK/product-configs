@@ -80,7 +80,7 @@ def get_api_version(repo_path=MEDIA_SDK_REPO_DIR):
 
 
 # TODO: move functions to the shared module
-def set_env(repo_path, gcc_latest, _get_commit_number=get_commit_number, _get_api_version=get_api_version):
+def set_env(repo_path, gcc_latest, clang_version, _get_commit_number=get_commit_number, _get_api_version=get_api_version):
   
     api_ver = _get_api_version(repo_path)
     build_num = _get_commit_number(repo_path)
@@ -156,7 +156,7 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
 
 
 action('count api version and build number',
-       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
 cmake_command = ['cmake']
 
@@ -225,7 +225,7 @@ if args.get('fastboot'):
     # TODO: Pass data between stages with pickle in build scripts instead
     action('count api version and build number',
             stage=stage.INSTALL,
-            callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
+            callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
     action('check fastboot lib size',
            stage=stage.INSTALL,
