@@ -116,8 +116,10 @@ def check_lib_size(threshold_size, lib_path):
 
     lib_path = str(lib_path).format_map(options)
     current_lib_size = pathlib.Path(lib_path).stat().st_size
-    log.info(f'Lib size: {current_lib_size}')
+    log.info(f'{lib_path} size={current_lib_size}Kb')
     if current_lib_size > threshold_size:
+        if not options['STRIP_BINARIES']:
+            log.warning("Library size could exceed threshold because stripping build binaries option is OFF")
         raise Exception(f"{lib_path.name} size={current_lib_size}Kb exceeds max_size={threshold_size}Kb")
 
 # Choose repository in accordance with prefix of product type
@@ -182,13 +184,6 @@ action('cmake',
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-if args.get('fastboot'):
-    action('build',
-               cmd=('strip ./__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'))
-
-    action('check fastboot lib size',
-           callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
-
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
@@ -204,10 +199,14 @@ action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
-
 action('install',
        stage=stage.INSTALL,
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+if args.get('fastboot'):
+    action('check fastboot lib size',
+           stage=stage.INSTALL,
+           callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
