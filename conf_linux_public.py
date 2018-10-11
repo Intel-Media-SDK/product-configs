@@ -123,8 +123,8 @@ def check_lib_size(threshold_size, lib_path):
 
     print(lib_path)
     print(options['ENV'])
-    lib_path = str(lib_path).format_map(options)
-    current_lib_size = pathlib.Path(lib_path).stat().st_size
+    lib_path = pathlib.Path(str(lib_path).format_map(options))
+    current_lib_size = lib_path.stat().st_size
     log.info(f'{lib_path} size={current_lib_size}Kb')
     if current_lib_size > threshold_size:
         if not options['STRIP_BINARIES']:
