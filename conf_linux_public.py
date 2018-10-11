@@ -121,6 +121,8 @@ def check_lib_size(threshold_size, lib_path):
 
     import pathlib
 
+    print(lib_path)
+    print(options['ENV'])
     lib_path = str(lib_path).format_map(options)
     current_lib_size = pathlib.Path(lib_path).stat().st_size
     log.info(f'{lib_path} size={current_lib_size}Kb')
@@ -219,6 +221,12 @@ action('install',
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 if args.get('fastboot'):
+
+    # TODO: Pass data between stages with pickle in build scripts instead
+    action('count api version and build number',
+            stage=stage.INSTALL,
+            callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST], {}))
+
     action('check fastboot lib size',
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
