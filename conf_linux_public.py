@@ -32,7 +32,7 @@ GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
-FASTBOOT_LIB_MAX_SIZE = 1116786
+FASTBOOT_LIB_MAX_SIZE = 1124978
 
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
@@ -121,8 +121,6 @@ def check_lib_size(threshold_size, lib_path):
 
     import pathlib
 
-    print(lib_path)
-    print(options['ENV'])
     lib_path = pathlib.Path(str(lib_path).format_map(options))
     current_lib_size = lib_path.stat().st_size
     log.info(f'{lib_path} size={current_lib_size}Kb')
@@ -221,7 +219,6 @@ action('install',
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 if args.get('fastboot'):
-
     # TODO: Pass data between stages with pickle in build scripts instead
     action('count api version and build number',
             stage=stage.INSTALL,
