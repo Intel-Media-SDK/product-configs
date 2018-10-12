@@ -18,4 +18,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '9e763bf0a9ed67191ddc8588f9674062c7c99bc8'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': '3ea2f602ac8c26bbdaa26505a67d4a822c8b7b88'}
