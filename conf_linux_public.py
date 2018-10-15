@@ -32,7 +32,8 @@ GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
-FASTBOOT_LIB_MAX_SIZE = 1124978
+# Max size = current fastboot lib size + ~50Kb
+FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
 
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
@@ -123,11 +124,11 @@ def check_lib_size(threshold_size, lib_path):
 
     lib_path = pathlib.Path(str(lib_path).format_map(options))
     current_lib_size = lib_path.stat().st_size
-    log.info(f'{lib_path} size={current_lib_size}Kb')
+    log.info(f'{lib_path} size = {current_lib_size}byte\n')
     if current_lib_size > threshold_size:
         if not options['STRIP_BINARIES']:
             log.warning("Library size could exceed threshold because stripping build binaries option is OFF")
-        raise Exception(f"{lib_path.name} size={current_lib_size}Kb exceeds max_size={threshold_size}Kb")
+        raise Exception(f"{lib_path.name} size = {current_lib_size}byte exceeds max_size = {threshold_size}byte")
 
 # Choose repository in accordance with prefix of product type
 if product_type.startswith("public"):
