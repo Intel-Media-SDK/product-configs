@@ -146,6 +146,14 @@ If you want to start external script on Ubuntu - we recommend to call it as
 """
 action('script calling', cmd=f'bash -c "my_script.sh"')
 
+"""
+If you need access to variable that is initialized during action execution, you should use str.format_map()
+"""
+action('build', cmd=('strip ./__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'))
+"""
+Here we add options[ENV][API_VERSION] to 'lib_path' 
+"""
+lib_path = str(lib_path).format_map(options)
 
 # ==============================================================================
 # Configuration: archiving
