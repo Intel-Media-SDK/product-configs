@@ -38,6 +38,8 @@ PACKAGES_TARGET_DIRS = {
 
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
+# Need for CentOS 6.9
+ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
 CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
@@ -132,10 +134,15 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def get_packing_cmd(pack_type, LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS):
-    return f'fpm --verbose -s dir -t {pack_type} --version 1.0.0  -n intel-ci-libva \
+def get_packing_cmd(pack_type, LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24):
+    comand = f'fpm --verbose -s dir -t {pack_type} --version 1.0.0  -n intel-ci-libva \
                                 ./{LIBVA_CONFIG_DIR}/lib/={PACKAGES_TARGET_DIRS[pack_type]}/lib64/ \
                                 ./{LIBVA_CONFIG_DIR}/include/={PACKAGES_TARGET_DIRS[pack_type]}/include/'
+
+    # CentOS 6.9 ruby version in system is less then required
+    if 'defconfig' in product_type:
+        return f'{ENABLE_RUBY24} && {comand}'
+    return comand
 
 def check_lib_size(threshold_size, lib_path):
     """
@@ -266,13 +273,13 @@ if args.get('fastboot'):
 action('create rpm package',
            stage=stage.PACK,
            work_dir=LIBVA_BUILD_DIR,
-           cmd=get_packing_cmd("rpm", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS))
+           cmd=get_packing_cmd("rpm", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
 
 
 action('create deb package',
            stage=stage.PACK,
            work_dir=LIBVA_BUILD_DIR,
-           cmd=get_packing_cmd("deb", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS))
+           cmd=get_packing_cmd("deb", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
