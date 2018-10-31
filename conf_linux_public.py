@@ -18,20 +18,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+MEDIA_SDK_REPO_NAME = 'MediaSDK'
+LIBVA_REPO_NAME = 'libva'
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
+
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
+    {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-    #{'name': 'flow_test'},
+    {'name': PRODUCT_CONFIGS_REPO_NAME},
+    {'name': LIBVA_REPO_NAME},
+    # {'name': 'flow_test'},
 ]
+
+PACKAGES_TARGET_DIRS = {
+    'deb': '/opt/intel/msdk_driver',
+    'rpm': '/opt/intel/msdk_driver',
+}
 
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 GCC_LATEST = '8.2.0'
+CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
+LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
+LIBVA_BUILD_DIR = options.get('DEPENDENCIES_DIR') / LIBVA_REPO_NAME
+
+# dir of package config
+LIBVA_CONFIG_DIR = 'usr/local'
+
 # Max size = current fastboot lib size + ~50Kb
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
 
@@ -114,6 +131,12 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
+
+def get_packing_cmd(pack_type, LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS):
+    return f'fpm --verbose -s dir -t {pack_type} --version 1.0.0  -n intel-ci-libva \
+                                ./{LIBVA_CONFIG_DIR}/lib/={PACKAGES_TARGET_DIRS[pack_type]}/lib64/ \
+                                ./{LIBVA_CONFIG_DIR}/include/={PACKAGES_TARGET_DIRS[pack_type]}/include/'
+
 def check_lib_size(threshold_size, lib_path):
     """
     :param lib_path: path to lib
@@ -139,23 +162,28 @@ else:
     raise IOError(f"Unknown product type '{product_type}'")
 
 
-PRODUCT_REPOS = [
-    {'name': repo_name},
-    # Give possibility to build linux for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-    #{'name': 'flow_test'},
-]
-
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-GCC_LATEST = '8.2.0'
-CLANG_VERSION = '6.0'
-options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
-
-
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
+
+# Build dependencies
+# Build LibVA
+action('LibVA: autogen.sh',
+       cmd=get_building_cmd(f'./autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET),
+       work_dir=LIBVA_REPO_DIR)
+
+action('LibVA: build',
+       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET),
+       work_dir=LIBVA_REPO_DIR)
+
+action('LibVA: list artifacts',
+       cmd=f'echo " " && ls ./va',
+       work_dir=LIBVA_REPO_DIR,
+       verbose=True)
+
+action('install',
+       stage=stage.INSTALL,
+       work_dir=LIBVA_REPO_DIR,
+       cmd=get_building_cmd(f'make DESTDIR={LIBVA_BUILD_DIR} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 cmake_command = ['cmake']
 
@@ -194,6 +222,9 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
+# Change system libva
+options["ENV"]['PKG_CONFIG_PATH'] = f'{LIBVA_BUILD_DIR}/{LIBVA_CONFIG_DIR}/lib/pkgconfig'
+
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
 
@@ -229,19 +260,32 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+# Create rpm and deb packages of libva
+# TODO: get libva version from manifest
+# if options['BUILD_TYPE'] == 'release':
+action('create rpm package',
+           stage=stage.PACK,
+           work_dir=LIBVA_BUILD_DIR,
+           cmd=get_packing_cmd("rpm", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS))
+
+
+action('create deb package',
+           stage=stage.PACK,
+           work_dir=LIBVA_BUILD_DIR,
+           cmd=get_packing_cmd("deb", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS))
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
-        'from_path': options['BUILD_DIR'],
+        'from_path': options['ROOT_DIR'],
         'relative': [
             {
-                'path': '__bin',
-                'pack_as': 'bin'
+                'path': options['BUILD_DIR'] / '__bin',
+                'pack_as': 'mediasdk/bin'
             },
             {
-                'path': 'plugins.cfg',
-                'pack_as': 'bin/release/plugins.cfg'
-            }
+                'path': options['BUILD_DIR'] / 'plugins.cfg',
+                'pack_as': 'mediasdk/bin/release/plugins.cfg'
+            },
         ]
     }
 ])
@@ -251,7 +295,16 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         'from_path': options['INSTALL_DIR'],
         'relative': [
             {
-                'path': 'opt'
+                'path': 'opt',
+            }
+        ]
+    },
+    {
+        'from_path': options['DEPENDENCIES_DIR'],
+        'relative': [
+            {
+                'path': 'libva',
+                'pack_as': 'dependencies/libva'
             }
         ]
     }
