@@ -176,6 +176,8 @@ else:
     cmake_command.append(
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
 
+cmake_command.append('-DBUILD_TESTS=ON ')
+
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if 'defconfig' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
     cmake_command.append('-DBUILD_ALL=ON')
@@ -213,6 +215,10 @@ if args.get('compiler') == "gcc":
 #TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
+       verbose=True)
+
+action('run_unit_tests',
+       cmd=f'make test',
        verbose=True)
 
 action('install',
