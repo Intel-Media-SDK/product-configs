@@ -134,14 +134,14 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def get_packing_cmd(pack_type, LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24):
+def get_packing_cmd(pack_type, libva_config_dir, packages_target_dirs, enable_ruby):
     comand = f'fpm --verbose -s dir -t {pack_type} --version 1.0.0  -n intel-ci-libva \
-                                ./{LIBVA_CONFIG_DIR}/lib/={PACKAGES_TARGET_DIRS[pack_type]}/lib64/ \
-                                ./{LIBVA_CONFIG_DIR}/include/={PACKAGES_TARGET_DIRS[pack_type]}/include/'
+    ./{libva_config_dir}/lib/={packages_target_dirs[pack_type]}/lib64/ \
+    ./{libva_config_dir}/include/={packages_target_dirs[pack_type]}/include/'
 
     # CentOS 6.9 ruby version in system is less then required
     if 'defconfig' in product_type:
-        return f'{ENABLE_RUBY24} && {comand}'
+        return f'{enable_ruby} && {comand}'
     return comand
 
 def check_lib_size(threshold_size, lib_path):
@@ -190,7 +190,7 @@ action('LibVA: list artifacts',
 action('install',
        stage=stage.INSTALL,
        work_dir=LIBVA_REPO_DIR,
-       cmd=get_building_cmd(f'make DESTDIR={LIBVA_BUILD_DIR} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'make DESTDIR={LIBVA_BUILD_DIR} install', GCC_LATEST, ENABLE_DEVTOOLSET)),
 
 cmake_command = ['cmake']
 
@@ -233,7 +233,8 @@ cmake = ' '.join(cmake_command)
 options["ENV"]['PKG_CONFIG_PATH'] = f'{LIBVA_BUILD_DIR}/{LIBVA_CONFIG_DIR}/lib/pkgconfig'
 
 action('cmake',
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{LIBVA_BUILD_DIR}/{LIBVA_CONFIG_DIR}/lib/pkgconfig'})
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
@@ -271,15 +272,15 @@ if args.get('fastboot'):
 # TODO: get libva version from manifest
 # if options['BUILD_TYPE'] == 'release':
 action('create rpm package',
-           stage=stage.PACK,
-           work_dir=LIBVA_BUILD_DIR,
-           cmd=get_packing_cmd("rpm", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
+       stage=stage.PACK,
+       work_dir=LIBVA_BUILD_DIR,
+       cmd=get_packing_cmd('rpm', LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
 
 
 action('create deb package',
-           stage=stage.PACK,
-           work_dir=LIBVA_BUILD_DIR,
-           cmd=get_packing_cmd("deb", LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
+       stage=stage.PACK,
+       work_dir=LIBVA_BUILD_DIR,
+       cmd=get_packing_cmd('deb', LIBVA_CONFIG_DIR, PACKAGES_TARGET_DIRS, ENABLE_RUBY24))
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
