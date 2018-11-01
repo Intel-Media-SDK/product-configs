@@ -157,7 +157,7 @@ MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
-cmake_command = ['cmake']
+cmake_command = ['cmake3']
 
 cmake_command.append('--no-warn-unused-cli')
 cmake_command.append('-Wno-dev -G "Unix Makefiles"')
