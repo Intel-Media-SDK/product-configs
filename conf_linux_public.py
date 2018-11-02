@@ -179,7 +179,7 @@ else:
 cmake_command.append('-DBUILD_TESTS=ON ')
 
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
-if 'defconfig' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
+if 'defconfig' not in product_type and not args.get('fastboot'):
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
     cmake_command.append('-DENABLE_ITT=ON')
