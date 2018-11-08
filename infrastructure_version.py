@@ -18,4 +18,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-OPEN_SOURCE = {'branch': 'fixed_import_modules', 'commit_id': 'acb905e68bffcebe2834f807fee0002d15732d1f'}
+OPEN_SOURCE = {'branch': 'fixed_import_modules', 'commit_id': 'c5e4a9862b9f47f1c69e8b8655ceea27b994f8c4'}
