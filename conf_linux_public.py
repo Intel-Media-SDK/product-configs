@@ -57,8 +57,8 @@ LIBVA_PREFIX = Path('usr/local')
 LIBVA_PKGCONFIG_DIR = LIBVA_PREFIX / 'lib/pkgconfig'
 
 LIBVA_LIB_INSTALL_DIRS = {
-    'rpm': '/usr/lib64',
-    'deb': '/usr/local/lib/x86_64-linux-gnu'
+    'rpm': 'lib64',
+    'deb': 'lib/x86_64-linux-gnu'
 }
 # TODO: get version from manifest
 LIBVA_VERSION = '2.3.0'
@@ -144,7 +144,7 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 
 def get_packing_cmd(pack_type, pack_dir, prefix, lib_install_dir, enable_ruby, version):
     comand = f'fpm --verbose -s dir -t {pack_type} --version {version} -n libva \
-    {pack_dir}/{prefix}/lib/={lib_install_dir} \
+    {pack_dir}/{prefix}/lib/=/{prefix}/{lib_install_dir} \
     {pack_dir}/{prefix}/include/=/{prefix}/include'
 
     # TODO: check OS version
@@ -203,9 +203,11 @@ action('install libva',
        cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 # Create fake libva pkgconfigs to build MediaSDK from custom location
+libva_pkgconfig = {'prefix': libva_options["INSTALL_DIR"] / LIBVA_PREFIX}
+
 action('generate libVA pkgconfigs',
        callfunc=(generate_configs, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR,
-                                    options["LIBVA_PKG_DIR"], libva_options["INSTALL_DIR"] / LIBVA_PREFIX], {}))
+                                    options["LIBVA_PKG_DIR"], libva_pkgconfig], {}))
 
 cmake_command = ['cmake']
 
@@ -285,6 +287,15 @@ if args.get('fastboot'):
 # Create rpm and deb packages of libva
 # TODO: get libva version from manifest
 
+# Pkgconfig for OS Ubuntu
+libva_pkgconfig_deb = {
+    'libdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['deb']}",
+    'driverdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['deb']}/dri"
+}
+
+action('change pkgconfig for deb pack',
+       callfunc=(change_config, [libva_options["INSTALL_DIR"] / LIBVA_PREFIX / 'lib/pkgconfig',
+                                 libva_pkgconfig_deb], {}))
 action('create deb package',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
@@ -294,9 +305,16 @@ action('create deb package',
 # Dir of system libVA on CentOS is /usr --> change prefix in pkgconfigs
 LIBVA_RPM_PREFIX = '/usr'
 
+# Pkgconfig for OS CentOS
+libva_pkgconfig_rpm = {
+    'prefix': LIBVA_RPM_PREFIX,
+    'libdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['rpm']}",
+    'driverdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['rpm']}/dri"
+}
+
 action('change prefix for rpm pack',
-       callfunc=(change_prefix, [libva_options["INSTALL_DIR"] / LIBVA_PREFIX / 'lib/pkgconfig',
-                                 LIBVA_RPM_PREFIX], {}))
+       callfunc=(change_config, [libva_options["INSTALL_DIR"] / LIBVA_PREFIX / 'lib/pkgconfig',
+                                 libva_pkgconfig_rpm], {}))
 
 action('create rpm package',
        stage=stage.PACK,
