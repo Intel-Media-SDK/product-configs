@@ -46,15 +46,19 @@ FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
 
 # Create subfolders for libVA
 libva_options = {
-        "BUILD_DIR": options["BUILD_DIR"] / "libva",
-        "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
-        "LOGS_DIR": options["LOGS_DIR"] / "libva",
+    "BUILD_DIR": options["BUILD_DIR"] / "libva",
+    "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
+    "LOGS_DIR": options["LOGS_DIR"] / "libva",
+    "LIBVA_PKG_DIR": options["CONFIGS_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
 }
 
 LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
 
-LIBVA_PREFIX = Path('usr/local')
-LIBVA_PKGCONFIG_DIR = LIBVA_PREFIX / 'lib/pkgconfig'
+# _DEB_PREFIX is used by default
+LIBVA_DEB_PREFIX = Path('/usr/local')
+LIBVA_CENTOS_PREFIX = Path('/usr')
+
+LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
 
 LIBVA_LIB_INSTALL_DIRS = {
     'rpm': 'lib64',
@@ -142,10 +146,10 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def get_packing_cmd(pack_type, pack_dir, prefix, lib_install_dir, enable_ruby, version):
+def get_packing_cmd(pack_type, pack_from, lib_install_to, include_install_to, enable_ruby, version):
     comand = f'fpm --verbose -s dir -t {pack_type} --version {version} -n libva \
-    {pack_dir}/{prefix}/lib/=/{prefix}/{lib_install_dir} \
-    {pack_dir}/{prefix}/include/=/{prefix}/include'
+    {pack_from}/lib/={lib_install_to} \
+    {pack_from}/include/={include_install_to}/include'
 
     # TODO: check OS version
     if 'defconfig' in product_type:
@@ -182,12 +186,11 @@ action('count api version and build number',
 
 # Build dependencies
 # Build LibVA
-# prefix = /usr/local
 action('LibVA: autogen.sh',
        work_dir=libva_options['BUILD_DIR'],
        cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('LibVA: build',
+action('LibVA: make',
        work_dir=libva_options['BUILD_DIR'],
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
@@ -198,16 +201,16 @@ action('LibVA: list artifacts',
 
 # libva should be installed before MediaSDK build
 # install on the build stage
-action('install libva',
+action('LibVA: make install',
        work_dir=libva_options['BUILD_DIR'],
        cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-# Create fake libva pkgconfigs to build MediaSDK from custom location
-libva_pkgconfig = {'prefix': libva_options["INSTALL_DIR"] / LIBVA_PREFIX}
+# Create fake LibVA pkgconfigs to build MediaSDK from custom location
+pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
 
-action('generate libVA pkgconfigs',
-       callfunc=(generate_configs, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR,
-                                    options["LIBVA_PKG_DIR"], libva_pkgconfig], {}))
+action('LibVA: change LibVA pkgconfigs',
+       callfunc=(create_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
+                                    libva_options["LIBVA_PKG_DIR"], pkgconfig_pattern], {}))
 
 cmake_command = ['cmake']
 
@@ -247,10 +250,10 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
-# Change to fake libVA pkgconfig
+# Set path to fake LibVA pkgconfigs
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{options["LIBVA_PKG_DIR"]}'})
+       env={'PKG_CONFIG_PATH': f'{libva_options["LIBVA_PKG_DIR"]}'})
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
@@ -284,43 +287,42 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
-# Create rpm and deb packages of libva
-# TODO: get libva version from manifest
+# LibVA: create rpm and deb packages
+# TODO: get LibVA version from manifest
 
-# Pkgconfig for OS Ubuntu
-libva_pkgconfig_deb = {
-    'libdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['deb']}",
-    'driverdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['deb']}/dri"
+# LibVA: pkgconfig for OS Ubuntu
+pkgconfig_deb_pattern = {
+    '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
 }
 
-action('change pkgconfig for deb pack',
-       callfunc=(change_config, [libva_options["INSTALL_DIR"] / LIBVA_PREFIX / 'lib/pkgconfig',
-                                 libva_pkgconfig_deb], {}))
-action('create deb package',
+action('LibVA: change pkgconfig for deb',
+       stage=stage.PACK,
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+                                 pkgconfig_deb_pattern], {}))
+
+action('LibVA: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', libva_options['INSTALL_DIR'], LIBVA_PREFIX,
-                           LIBVA_LIB_INSTALL_DIRS['deb'], ENABLE_RUBY24, LIBVA_VERSION))
+       cmd=get_packing_cmd('deb', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
+                           LIBVA_DEB_PREFIX /LIBVA_LIB_INSTALL_DIRS['deb'], LIBVA_DEB_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
 
-# Dir of system libVA on CentOS is /usr --> change prefix in pkgconfigs
-LIBVA_RPM_PREFIX = '/usr'
 
-# Pkgconfig for OS CentOS
-libva_pkgconfig_rpm = {
-    'prefix': LIBVA_RPM_PREFIX,
-    'libdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['rpm']}",
-    'driverdir': "${exec_prefix}/" + f"{LIBVA_LIB_INSTALL_DIRS['rpm']}/dri"
+# LibVA: pkgconfig for OS CentOS
+libva_rpm_pattern = {
+    '^prefix=.+': 'prefix=/usr',
+    f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
 }
 
-action('change prefix for rpm pack',
-       callfunc=(change_config, [libva_options["INSTALL_DIR"] / LIBVA_PREFIX / 'lib/pkgconfig',
-                                 libva_pkgconfig_rpm], {}))
+action('LibVA: change pkgconfigs for rpm',
+       stage=stage.PACK,
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+                                 libva_rpm_pattern], {}))
 
-action('create rpm package',
+action('LibVA: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', libva_options['INSTALL_DIR'], LIBVA_PREFIX,
-                           LIBVA_LIB_INSTALL_DIRS['rpm'], ENABLE_RUBY24, LIBVA_VERSION))
+       cmd=get_packing_cmd('rpm', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
+                           LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm'], LIBVA_CENTOS_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
