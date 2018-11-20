@@ -18,4 +18,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-OPEN_SOURCE = {'branch': 'libva_full_stack', 'commit_id': 'd31f483a3d3e958e36c26d5844db33ee6944c2c8'}
+OPEN_SOURCE = {'branch': 'libva_full_stack', 'commit_id': 'fbd7193ef8fb2704f38163fec4ebc1ab6c9c4da8'}
