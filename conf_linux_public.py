@@ -209,8 +209,8 @@ action('LibVA: make install',
 pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
 
 action('LibVA: change LibVA pkgconfigs',
-       callfunc=(create_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
-                                    libva_options["LIBVA_PKG_DIR"], pkgconfig_pattern], {}))
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
+                                 pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
 
 cmake_command = ['cmake']
 
@@ -308,7 +308,7 @@ action('LibVA: create deb pkg',
 
 
 # LibVA: pkgconfig for OS CentOS
-libva_rpm_pattern = {
+pkgconfig_rpm_pattern = {
     '^prefix=.+': 'prefix=/usr',
     f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
 }
@@ -316,7 +316,7 @@ libva_rpm_pattern = {
 action('LibVA: change pkgconfigs for rpm',
        stage=stage.PACK,
        callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
-                                 libva_rpm_pattern], {}))
+                                 pkgconfig_rpm_pattern], {}))
 
 action('LibVA: create rpm pkg',
        stage=stage.PACK,
