@@ -212,7 +212,7 @@ action('LibVA: change LibVA pkgconfigs',
        callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
                                  pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
 
-cmake_command = ['cmake']
+cmake_command = ['cmake3']
 
 cmake_command.append('--no-warn-unused-cli')
 cmake_command.append('-Wno-dev -G "Unix Makefiles"')
@@ -232,8 +232,10 @@ else:
     cmake_command.append(
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
 
+cmake_command.append('-DBUILD_TESTS=ON ')
+
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
-if 'defconfig' not in product_type and not args.get('fastboot') and not args.get('compiler') == "clang":
+if 'defconfig' not in product_type and not args.get('fastboot'):
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
     cmake_command.append('-DENABLE_ITT=ON')
@@ -271,6 +273,10 @@ if args.get('compiler') == "gcc":
 #TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
+       verbose=True)
+
+action('run_unit_tests',
+       cmd=f'make test',
        verbose=True)
 
 action('install',
