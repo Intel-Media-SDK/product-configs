@@ -18,23 +18,54 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from pathlib import Path
+
+MEDIA_SDK_REPO_NAME = 'MediaSDK'
+LIBVA_REPO_NAME = 'libva'
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
+
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
+    {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-    #{'name': 'flow_test'},
+    {'name': PRODUCT_CONFIGS_REPO_NAME},
+    {'name': LIBVA_REPO_NAME},
 ]
 
-
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
+# Workaround to run fpm tool on CentOS 6.9
+ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
+CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / PRODUCT_REPOS[0]['name']
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
+
 # Max size = current fastboot lib size + ~50Kb
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
 
+# Create subfolders for libVA
+libva_options = {
+    "BUILD_DIR": options["BUILD_DIR"] / "libva",
+    "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
+    "LOGS_DIR": options["LOGS_DIR"] / "libva",
+    "LIBVA_PKG_DIR": options["CONFIGS_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
+}
+
+LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
+
+# _DEB_PREFIX is used by default
+LIBVA_DEB_PREFIX = Path('/usr/local')
+LIBVA_CENTOS_PREFIX = Path('/usr')
+
+LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
+
+LIBVA_LIB_INSTALL_DIRS = {
+    'rpm': 'lib64',
+    'deb': 'lib/x86_64-linux-gnu'
+}
+# TODO: get version from manifest
+LIBVA_VERSION = '2.3.0'
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
     if not repo_path.exists():
@@ -114,6 +145,17 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
+
+def get_packing_cmd(pack_type, pack_from, lib_install_to, include_install_to, enable_ruby, version):
+    comand = f'fpm --verbose -s dir -t {pack_type} --version {version} -n libva \
+    {pack_from}/lib/={lib_install_to} \
+    {pack_from}/include/={include_install_to}/include'
+
+    # TODO: check OS version
+    if 'defconfig' in product_type:
+        return f'{enable_ruby} && {comand}'
+    return comand
+
 def check_lib_size(threshold_size, lib_path):
     """
     :param lib_path: path to lib
@@ -139,28 +181,42 @@ else:
     raise IOError(f"Unknown product type '{product_type}'")
 
 
-PRODUCT_REPOS = [
-    {'name': repo_name},
-    # Give possibility to build linux for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-    #{'name': 'flow_test'},
-]
-
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
-GCC_LATEST = '8.2.0'
-CLANG_VERSION = '6.0'
-options["STRIP_BINARIES"] = True
-MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / repo_name
-
-
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
+
+# Build dependencies
+# Build LibVA
+action('LibVA: autogen.sh',
+       work_dir=libva_options['BUILD_DIR'],
+       cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+action('LibVA: make',
+       work_dir=libva_options['BUILD_DIR'],
+       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+action('LibVA: list artifacts',
+       work_dir=libva_options['BUILD_DIR'],
+       cmd=f'echo " " && ls ./va',
+       verbose=True)
+
+# libva should be installed before MediaSDK build
+# install on the build stage
+action('LibVA: make install',
+       work_dir=libva_options['BUILD_DIR'],
+       cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+# Create fake LibVA pkgconfigs to build MediaSDK from custom location
+pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
+
+action('LibVA: change LibVA pkgconfigs',
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
+                                 pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
 
 cmake_command = ['cmake3']
 
 cmake_command.append('--no-warn-unused-cli')
 cmake_command.append('-Wno-dev -G "Unix Makefiles"')
+cmake_command.append('-LA')
 
 #Build without -Werror option in case of clang:
 #TODO: use the same command as for 'gcc'
@@ -196,8 +252,10 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
+# Set path to fake LibVA pkgconfigs
 action('cmake',
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{libva_options["LIBVA_PKG_DIR"]}'})
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
@@ -235,19 +293,55 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+# LibVA: create rpm and deb packages
+# TODO: get LibVA version from manifest
+
+# LibVA: pkgconfig for OS Ubuntu
+pkgconfig_deb_pattern = {
+    '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
+}
+
+action('LibVA: change pkgconfig for deb',
+       stage=stage.PACK,
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+                                 pkgconfig_deb_pattern], {}))
+
+action('LibVA: create deb pkg',
+       stage=stage.PACK,
+       work_dir=options['PACK_DIR'],
+       cmd=get_packing_cmd('deb', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
+                           LIBVA_DEB_PREFIX /LIBVA_LIB_INSTALL_DIRS['deb'], LIBVA_DEB_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
+
+
+# LibVA: pkgconfig for OS CentOS
+pkgconfig_rpm_pattern = {
+    '^prefix=.+': 'prefix=/usr',
+    f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
+}
+
+action('LibVA: change pkgconfigs for rpm',
+       stage=stage.PACK,
+       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+                                 pkgconfig_rpm_pattern], {}))
+
+action('LibVA: create rpm pkg',
+       stage=stage.PACK,
+       work_dir=options['PACK_DIR'],
+       cmd=get_packing_cmd('rpm', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
+                           LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm'], LIBVA_CENTOS_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
-        'from_path': options['BUILD_DIR'],
+        'from_path': options['ROOT_DIR'],
         'relative': [
             {
-                'path': '__bin',
-                'pack_as': 'bin'
+                'path': options['BUILD_DIR'] / '__bin',
+                'pack_as': 'mediasdk/bin'
             },
             {
-                'path': 'plugins.cfg',
-                'pack_as': 'bin/release/plugins.cfg'
-            }
+                'path': options['BUILD_DIR'] / 'plugins.cfg',
+                'pack_as': 'mediasdk/bin/release/plugins.cfg'
+            },
         ]
     }
 ])
@@ -257,8 +351,11 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         'from_path': options['INSTALL_DIR'],
         'relative': [
             {
-                'path': 'opt'
+                'path': 'opt',
+            },
+            {
+                'path': 'libva',
             }
         ]
-    }
+    },
 ])
