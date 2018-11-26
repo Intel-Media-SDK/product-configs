@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'delete_config_dir', 'commit_id': 'c0021b4a561d13e44b9f84500788884cfb5ca5d3'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': '22e6d81d9b0f88db5809dae89f638c400997eeb3'}
