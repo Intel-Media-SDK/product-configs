@@ -49,7 +49,7 @@ libva_options = {
     "BUILD_DIR": options["BUILD_DIR"] / "libva",
     "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
     "LOGS_DIR": options["LOGS_DIR"] / "libva",
-    "LIBVA_PKG_DIR": options["CONFIGS_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
+    "LIBVA_PKG_DIR": options["BUILD_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
 }
 
 LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
