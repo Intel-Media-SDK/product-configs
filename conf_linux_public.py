@@ -332,15 +332,15 @@ action('LibVA: create rpm pkg',
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
-        'from_path': options['ROOT_DIR'],
+        'from_path': options['BUILD_DIR'],
         'relative': [
             {
-                'path': options['BUILD_DIR'] / '__bin',
-                'pack_as': 'mediasdk/bin'
+                'path': '__bin',
+                'pack_as': 'bin'
             },
             {
-                'path': options['BUILD_DIR'] / 'plugins.cfg',
-                'pack_as': 'mediasdk/bin/release/plugins.cfg'
+                'path': 'plugins.cfg',
+                'pack_as': 'bin/release/plugins.cfg'
             },
         ]
     }
