@@ -275,7 +275,7 @@ action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
-if build_event == 'klocwork':
+if build_event != 'klocwork':
     action('run_unit_tests',
            cmd=f'make test',
            verbose=True)
