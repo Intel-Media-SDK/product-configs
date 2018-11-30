@@ -29,7 +29,7 @@ PRODUCT_REPOS = [
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
-    {'name': LIBVA_REPO_NAME},
+    {'name': LIBVA_REPO_NAME, 'branch': 'master'},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
