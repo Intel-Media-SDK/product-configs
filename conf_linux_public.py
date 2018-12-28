@@ -64,6 +64,13 @@ LIBVA_LIB_INSTALL_DIRS = {
     'rpm': 'lib64',
     'deb': 'lib/x86_64-linux-gnu'
 }
+
+# TODO: install mediasdk to system
+MSDK_LIB_INSTALL_DIRS = {
+    'rpm': '/opt/intel/mediasdk',
+    'deb': '/opt/intel/mediasdk'
+}
+
 # TODO: get version from manifest
 LIBVA_VERSION = '2.3.0'
 
@@ -110,7 +117,6 @@ def get_api_version(repo_path=MEDIA_SDK_REPO_DIR):
                 return f"{major_version}.{minor_version}"
         raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
 
-
 # TODO: move functions to the shared module
 def set_env(repo_path, gcc_latest, clang_version, _get_commit_number=get_commit_number, _get_api_version=get_api_version):
   
@@ -146,15 +152,16 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def get_packing_cmd(pack_type, pack_from, lib_install_to, include_install_to, enable_ruby, version):
-    comand = f'fpm --verbose -s dir -t {pack_type} --version {version} -n libva \
-    {pack_from}/lib/={lib_install_to} \
-    {pack_from}/include/={include_install_to}/include'
+def get_packing_cmd(pack_type, pack_dir, enable_ruby, version, source_name):
+    import subprocess
+    params = ['fpm', '--verbose', '-s', 'dir', '-t', pack_type, '--version', version,
+                '-n', source_name] + pack_dir
+    command = subprocess.list2cmdline(params)
 
     # TODO: check OS version
     if 'defconfig' in product_type:
-        return f'{enable_ruby} && {comand}'
-    return comand
+        return f'{enable_ruby} && {command}'
+    return command
 
 def check_lib_size(threshold_size, lib_path):
     """
@@ -268,7 +275,7 @@ action('list artifacts',
 if args.get('compiler') == "gcc":
     action('used compiler',
            cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
-           verbose=True)                            
+           verbose=True)
 
 #TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
@@ -307,12 +314,20 @@ action('LibVA: change pkgconfig for deb',
        callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
                                  pkgconfig_deb_pattern], {}))
 
+# Get package installation dirs for LibVA
+pack_dir = libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)
+lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
+include_install_to = LIBVA_CENTOS_PREFIX
+
+LIBVA_PACK_DIRS = [
+    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/include/={include_install_to}/include',
+]
+
 action('LibVA: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
-                           LIBVA_DEB_PREFIX /LIBVA_LIB_INSTALL_DIRS['deb'], LIBVA_DEB_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
-
+       cmd=get_packing_cmd('deb',  LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
 
 # LibVA: pkgconfig for OS CentOS
 pkgconfig_rpm_pattern = {
@@ -325,11 +340,42 @@ action('LibVA: change pkgconfigs for rpm',
        callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
                                  pkgconfig_rpm_pattern], {}))
 
+# Get package installation dir for LibVA
+lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
+
+LIBVA_PACK_DIRS = [
+    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/include/={include_install_to}/include',
+]
+
 action('LibVA: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root),
-                           LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm'], LIBVA_CENTOS_PREFIX, ENABLE_RUBY24, LIBVA_VERSION))
+       cmd=get_packing_cmd('rpm', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
+
+
+# Get api version for MediaSDK package
+action('count api version and build number',
+       stage=stage.PACK,
+       callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
+
+# Get package installation dirs for MediaSDK
+pack_dir = options['INSTALL_DIR'] / 'opt/intel/mediasdk'
+
+MEDIASDK_PACK_DIRS = [
+    f'{pack_dir}/={MSDK_LIB_INSTALL_DIRS["rpm"]}/',
+]
+
+action('MediaSDK: create rpm pkg',
+       stage=stage.PACK,
+       work_dir=options['PACK_DIR'],
+       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME))
+
+action('MediaSDK: create deb pkg',
+       stage=stage.PACK,
+       work_dir=options['PACK_DIR'],
+       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME))
+
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
