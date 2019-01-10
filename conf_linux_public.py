@@ -234,6 +234,7 @@ if args.get('compiler') == "clang":
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 #Default parameters (default flow):
 else:
+    # -DNDEBUG flag is needed for release branches
     cmake_command.append(
         '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
     cmake_command.append(
