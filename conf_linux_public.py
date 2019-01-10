@@ -223,7 +223,6 @@ cmake_command = ['cmake3']
 
 cmake_command.append('--no-warn-unused-cli')
 cmake_command.append('-Wno-dev -G "Unix Makefiles"')
-cmake_command.append('-LA')
 
 #Build without -Werror option in case of clang:
 #TODO: use the same command as for 'gcc'
@@ -234,13 +233,11 @@ if args.get('compiler') == "clang":
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 #Default parameters (default flow):
 else:
-    # -DNDEBUG flag is needed for release branches
     cmake_command.append(
         '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
     cmake_command.append(
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong"')
 
-cmake_command.append('-DBUILD_TESTS=ON ')
 
 #In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if 'defconfig' not in product_type and not args.get('fastboot'):
@@ -282,11 +279,6 @@ if args.get('compiler') == "gcc":
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
-
-if build_event != 'klocwork':
-    action('run_unit_tests',
-           cmd=f'make test',
-           verbose=True)
 
 action('install',
        stage=stage.INSTALL,
