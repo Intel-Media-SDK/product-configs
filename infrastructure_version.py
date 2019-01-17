@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'deploying_private_infrastructure', 'commit_id': '5cb8acbd000c42b52d5688174a7de7a6662a3bc0'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': 'e33a194542d2b7230c05acdea445b81e3c2cd13f'}
