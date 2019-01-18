@@ -25,7 +25,7 @@ LIBVA_REPO_NAME = 'libva'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
 PRODUCT_REPOS = [
-    {'name': MEDIA_SDK_REPO_NAME},
+    {'name': MEDIA_SDK_REPO_NAME, 'branch': 'akharche:enable_x11', 'commit_id': '48a25aab42560e515a3a24f5f10773446f1d1083'},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
@@ -246,6 +246,8 @@ if 'defconfig' not in product_type and not args.get('fastboot'):
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
     cmake_command.append('-DENABLE_ITT=ON')
+if 'defconfig' in product_type:
+    cmake_command.append('-DENABLE_X11=OFF')
 
 #Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
