@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '688bee91d8e750e0cc85a558cccd54b988c2d885'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': 'ed88fa75c24ce34b14c4e68f0242ed40149ec89a'}
