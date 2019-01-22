@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': 'e33a194542d2b7230c05acdea445b81e3c2cd13f'}
+OPEN_SOURCE = {'branch': 'install_msdk_pkg', 'commit_id': '76aef42a522c3571a9f73a6984f6d4b7b0a7c03a'}
