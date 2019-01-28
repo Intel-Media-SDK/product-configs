@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': 'e33a194542d2b7230c05acdea445b81e3c2cd13f'}
+OPEN_SOURCE = {'branch': 'make_pack_func_common', 'commit_id': 'cf4f8bf66d4c350005f8f6cc813fd4a646de3220'}
