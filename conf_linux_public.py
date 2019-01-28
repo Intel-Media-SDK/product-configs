@@ -316,8 +316,8 @@ action('LibVA: change pkgconfig for deb',
 
 # Get package installation dirs for LibVA
 pack_dir = libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)
-lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
-include_install_to = LIBVA_CENTOS_PREFIX
+lib_install_to = LIBVA_DEB_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
+include_install_to = LIBVA_DEB_PREFIX
 
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib/={lib_install_to}/',
@@ -342,6 +342,7 @@ action('LibVA: change pkgconfigs for rpm',
 
 # Get package installation dir for LibVA
 lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
+include_install_to = LIBVA_CENTOS_PREFIX
 
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib/={lib_install_to}/',
