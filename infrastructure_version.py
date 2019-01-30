@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'new_poller', 'commit_id': '8a41cc909321da0409d315a05db600359224abeb'}
+OPEN_SOURCE = {'branch': 'new_poller', 'commit_id': 'a6ca39a817a2d4663b9f341504089d6918da0ee5'}
