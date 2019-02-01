@@ -1,3 +1,4 @@
 Test 1: initial commit
 Test 2: create other commit, try to checkout by time 
 Test 3: added Poller
+Test 4
