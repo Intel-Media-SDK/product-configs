@@ -369,12 +369,12 @@ MEDIASDK_PACK_DIRS = [
 action('MediaSDK: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME))
+       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
 
 action('MediaSDK: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME))
+       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
 
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
