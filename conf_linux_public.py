@@ -74,8 +74,6 @@ MSDK_LIB_INSTALL_DIRS = {
     'deb': '/opt/intel/mediasdk'
 }
 
-# TODO: get version from manifest
-LIBVA_VERSION = '2.3.0'
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
     if not repo_path.exists():
