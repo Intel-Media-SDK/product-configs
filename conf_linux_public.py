@@ -24,12 +24,15 @@ MEDIA_SDK_REPO_NAME = 'MediaSDK'
 LIBVA_REPO_NAME = 'libva'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
+# TODO: get version from manifest
+LIBVA_VERSION = '2.4.0'
+
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
-    {'name': LIBVA_REPO_NAME, 'branch': 'master'},
+    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
