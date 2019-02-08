@@ -171,7 +171,7 @@ action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
 if build_event != 'klocwork':
-    # Build dependencies
+    # Build libva
     PRODUCT_REPOS.append({'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},)
 
     LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
@@ -317,6 +317,11 @@ if args.get('api_latest'):
 cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
+
+# Set path to fake LibVA pkgconfigs
+action('cmake',
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': str(PATH_TO_LIBVA)})
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
