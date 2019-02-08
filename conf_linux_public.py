@@ -52,6 +52,7 @@ MSDK_LIB_INSTALL_DIRS = {
     'deb': '/opt/intel/mediasdk'
 }
 
+
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
     if not repo_path.exists():
         return '0'
