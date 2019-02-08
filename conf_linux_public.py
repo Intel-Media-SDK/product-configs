@@ -32,7 +32,6 @@ PRODUCT_REPOS = [
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
-    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -46,27 +45,6 @@ MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
 # Max size = current fastboot lib size + ~50Kb
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
-
-# Create subfolders for libVA
-libva_options = {
-    "BUILD_DIR": options["BUILD_DIR"] / "libva",
-    "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
-    "LOGS_DIR": options["LOGS_DIR"] / "libva",
-    "LIBVA_PKG_DIR": options["BUILD_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
-}
-
-LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
-
-# _DEB_PREFIX is used by default
-LIBVA_DEB_PREFIX = Path('/usr/local')
-LIBVA_CENTOS_PREFIX = Path('/usr')
-
-LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
-
-LIBVA_LIB_INSTALL_DIRS = {
-    'rpm': 'lib64',
-    'deb': 'lib/x86_64-linux-gnu'
-}
 
 # TODO: install mediasdk to system
 MSDK_LIB_INSTALL_DIRS = {
@@ -192,33 +170,116 @@ else:
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
-# Build dependencies
-# Build LibVA
-action('LibVA: autogen.sh',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
+if build_event != 'klocwork':
+    # Build libva
+    PRODUCT_REPOS.append({'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},)
 
-action('LibVA: make',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+    LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
+    # _DEB_PREFIX is used by default
+    LIBVA_DEB_PREFIX = Path('/usr/local')
+    LIBVA_CENTOS_PREFIX = Path('/usr')
+    LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
+    LIBVA_LIB_INSTALL_DIRS = {
+        'rpm': 'lib64',
+        'deb': 'lib/x86_64-linux-gnu'
+    }
 
-action('LibVA: list artifacts',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=f'echo " " && ls ./va',
-       verbose=True)
+    # Create subfolders for libVA
+    libva_options = {
+        "BUILD_DIR": options["BUILD_DIR"] / "libva",
+        "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
+        "LOGS_DIR": options["LOGS_DIR"] / "libva",
+        "LIBVA_PKG_DIR": options["BUILD_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
+    }
 
-# libva should be installed before MediaSDK build
-# install on the build stage
-action('LibVA: make install',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+    # Build LibVA
+    action('LibVA: autogen.sh',
+           work_dir=libva_options['BUILD_DIR'],
+           cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-# Create fake LibVA pkgconfigs to build MediaSDK from custom location
-pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
+    action('LibVA: make',
+           work_dir=libva_options['BUILD_DIR'],
+           cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('LibVA: change LibVA pkgconfigs',
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
-                                 pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
+    action('LibVA: list artifacts',
+           work_dir=libva_options['BUILD_DIR'],
+           cmd=f'echo " " && ls ./va',
+           verbose=True)
+
+    # libva should be installed before MediaSDK build
+    # install on the build stage
+    action('LibVA: make install',
+           work_dir=libva_options['BUILD_DIR'],
+           cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+    # Create fake LibVA pkgconfigs to build MediaSDK from custom location
+    pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
+
+    action('LibVA: change LibVA pkgconfigs',
+           callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
+                                     pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
+
+    PATH_TO_LIBVA = libva_options['LIBVA_PKG_DIR']
+
+    # LibVA: create rpm and deb packages
+    # TODO: get LibVA version from manifest
+
+    # LibVA: pkgconfig for OS Ubuntu
+    pkgconfig_deb_pattern = {
+        '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
+    }
+
+    action('LibVA: change pkgconfig for deb',
+           stage=stage.PACK,
+           callfunc=(update_config, [
+               libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+               pkgconfig_deb_pattern], {}))
+
+    # Get package installation dirs for LibVA
+    pack_dir = libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)
+    lib_install_to = LIBVA_DEB_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
+    include_install_to = LIBVA_DEB_PREFIX
+
+    LIBVA_PACK_DIRS = [
+        f'{pack_dir}/lib/={lib_install_to}/',
+        f'{pack_dir}/include/={include_install_to}/include',
+    ]
+
+    action('LibVA: create deb pkg',
+           stage=stage.PACK,
+           work_dir=options['PACK_DIR'],
+           cmd=get_packing_cmd('deb', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
+
+    # LibVA: pkgconfig for OS CentOS
+    pkgconfig_rpm_pattern = {
+        '^prefix=.+': 'prefix=/usr',
+        f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
+    }
+
+    action('LibVA: change pkgconfigs for rpm',
+           stage=stage.PACK,
+           callfunc=(update_config, [
+               libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+               pkgconfig_rpm_pattern], {}))
+
+    # Get package installation dir for LibVA
+    lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
+    include_install_to = LIBVA_CENTOS_PREFIX
+
+    LIBVA_PACK_DIRS = [
+        f'{pack_dir}/lib/={lib_install_to}/',
+        f'{pack_dir}/include/={include_install_to}/include',
+    ]
+
+    action('LibVA: create rpm pkg',
+           stage=stage.PACK,
+           work_dir=options['PACK_DIR'],
+           cmd=get_packing_cmd('rpm', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
+
+
+else:
+    #TODO: workaround hardcoded path to defined libva version
+    PATH_TO_LIBVA = Path(f'/localdisk/dependencies/libva{LIBVA_VERSION}/lib/pkgconfig')
 
 cmake_command = ['cmake3']
 
@@ -263,7 +324,7 @@ cmake = ' '.join(cmake_command)
 # Set path to fake LibVA pkgconfigs
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{libva_options["LIBVA_PKG_DIR"]}'})
+       env={'PKG_CONFIG_PATH': str(PATH_TO_LIBVA)})
 
 action('build',
        cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
@@ -301,59 +362,6 @@ if args.get('fastboot'):
     action('check fastboot lib size',
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
-
-# LibVA: create rpm and deb packages
-# TODO: get LibVA version from manifest
-
-# LibVA: pkgconfig for OS Ubuntu
-pkgconfig_deb_pattern = {
-    '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
-}
-
-action('LibVA: change pkgconfig for deb',
-       stage=stage.PACK,
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
-                                 pkgconfig_deb_pattern], {}))
-
-# Get package installation dirs for LibVA
-pack_dir = libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)
-lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
-include_install_to = LIBVA_CENTOS_PREFIX
-
-LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-]
-
-action('LibVA: create deb pkg',
-       stage=stage.PACK,
-       work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb',  LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
-
-# LibVA: pkgconfig for OS CentOS
-pkgconfig_rpm_pattern = {
-    '^prefix=.+': 'prefix=/usr',
-    f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
-}
-
-action('LibVA: change pkgconfigs for rpm',
-       stage=stage.PACK,
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
-                                 pkgconfig_rpm_pattern], {}))
-
-# Get package installation dir for LibVA
-lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
-
-LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-]
-
-action('LibVA: create rpm pkg',
-       stage=stage.PACK,
-       work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
-
 
 # Get api version for MediaSDK package
 action('count api version and build number',
@@ -394,16 +402,15 @@ DEV_PKG_DATA_TO_ARCHIVE.extend([
     }
 ])
 
+relative = [{'path': 'opt'}]
+if build_event != 'klocwork':
+    relative.append({'path': 'libva'})
+
+
 INSTALL_PKG_DATA_TO_ARCHIVE.extend([
-    {
-        'from_path': options['INSTALL_DIR'],
-        'relative': [
-            {
-                'path': 'opt',
-            },
-            {
-                'path': 'libva',
-            }
-        ]
-    },
+        {
+            'from_path': options['INSTALL_DIR'],
+            'relative': relative
+        },
 ])
+
