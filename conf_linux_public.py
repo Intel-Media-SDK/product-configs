@@ -25,7 +25,7 @@ LIBVA_REPO_NAME = 'libva'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
 # TODO: get version from manifest
-LIBVA_VERSION = '2.4.0'
+LIBVA_VERSION = '2.1.1.pre1-20180601'
 
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
@@ -283,11 +283,6 @@ if args.get('compiler') == "gcc":
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
-
-if build_event != 'klocwork':
-    action('run_unit_tests',
-           cmd=f'make test',
-           verbose=True)
 
 action('install',
        stage=stage.INSTALL,
