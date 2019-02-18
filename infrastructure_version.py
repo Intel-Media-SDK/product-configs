@@ -19,5 +19,5 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'add_driver_repo', 'commit_id': 'ef7d7ded42d65a9d33a0d4632f937b007cfc83c1'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': '9c264739ba41922eb8c80c2afacceab8e0798d60'}
 
