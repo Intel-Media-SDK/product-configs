@@ -286,7 +286,7 @@ action('binary versions',
 
 if build_event != 'klocwork':
     action('run_unit_tests',
-           cmd=f'make test',
+           cmd=f'ctest --verbose',
            verbose=True)
 
 action('install',
