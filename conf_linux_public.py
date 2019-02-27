@@ -154,17 +154,6 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
-def get_packing_cmd(pack_type, pack_dir, enable_ruby, version, source_name):
-    import subprocess
-    params = ['fpm', '--verbose', '-s', 'dir', '-t', pack_type, '--version', version,
-                '-n', source_name] + pack_dir
-    command = subprocess.list2cmdline(params)
-
-    # TODO: check OS version
-    if 'defconfig' in product_type:
-        return f'{enable_ruby} && {command}'
-    return command
-
 def check_lib_size(threshold_size, lib_path):
     """
     :param lib_path: path to lib
