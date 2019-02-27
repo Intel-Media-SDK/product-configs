@@ -19,4 +19,5 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'move_pack_to_common', 'commit_id': '2a86338ed6db31f0c33e7b6c9201a99361c6ca0a'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': 'f2bac268b021216c7097591b677d68dcc3a4c0de'}
+

@@ -24,12 +24,16 @@ MEDIA_SDK_REPO_NAME = 'MediaSDK'
 LIBVA_REPO_NAME = 'libva'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
+# TODO: get version from manifest
+LIBVA_VERSION = '2.4.0'
+
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
-    {'name': LIBVA_REPO_NAME, 'branch': 'master'},
+    # Define LibVA version to get by commit_id
+    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -71,8 +75,6 @@ MSDK_LIB_INSTALL_DIRS = {
     'deb': '/opt/intel/mediasdk'
 }
 
-# TODO: get version from manifest
-LIBVA_VERSION = '2.3.0'
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
     if not repo_path.exists():
