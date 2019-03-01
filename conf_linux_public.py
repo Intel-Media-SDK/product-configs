@@ -24,12 +24,16 @@ MEDIA_SDK_REPO_NAME = 'MediaSDK'
 LIBVA_REPO_NAME = 'libva'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
+# TODO: get version from manifest
+LIBVA_VERSION = '2.4.0'
+
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
-    {'name': LIBVA_REPO_NAME, 'branch': 'master'},
+    # Define LibVA version to get by commit_id
+    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -71,8 +75,6 @@ MSDK_LIB_INSTALL_DIRS = {
     'deb': '/opt/intel/mediasdk'
 }
 
-# TODO: get version from manifest
-LIBVA_VERSION = '2.3.0'
 
 def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
     if not repo_path.exists():
@@ -151,17 +153,6 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
-
-def get_packing_cmd(pack_type, pack_dir, enable_ruby, version, source_name):
-    import subprocess
-    params = ['fpm', '--verbose', '-s', 'dir', '-t', pack_type, '--version', version,
-                '-n', source_name] + pack_dir
-    command = subprocess.list2cmdline(params)
-
-    # TODO: check OS version
-    if 'defconfig' in product_type:
-        return f'{enable_ruby} && {command}'
-    return command
 
 def check_lib_size(threshold_size, lib_path):
     """
@@ -284,7 +275,7 @@ action('binary versions',
 
 if build_event != 'klocwork':
     action('run_unit_tests',
-           cmd=f'make test',
+           cmd=f'ctest --verbose',
            verbose=True)
 
 action('install',
