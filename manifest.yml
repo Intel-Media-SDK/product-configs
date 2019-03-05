@@ -1,0 +1,10 @@
+components:
+  libva:
+    repository:
+    - branch: master
+      url: https://github.com/intel/libva
+      name: libva
+      revision: 2.4.0
+      type: git
+    version: '1'
+version: '1'
