@@ -33,7 +33,7 @@ PRODUCT_REPOS = [
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME},
     # Define LibVA version to get by commit_id
-    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{LIBVA_VERSION}'},
+    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': LIBVA_VERSION},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'

@@ -23,15 +23,17 @@ from pathlib import Path
 
 
 LIBVA_REPO_NAME = 'libva'
-
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 # TODO: get LibVA version from manifest
-LIBVA_VERSION = '2.3.0'
+LIBVA_VERSION = '2.4.0'
+
+PRODUCT = LIBVA_REPO_NAME
 
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    {'name': LIBVA_REPO_NAME, }
+    {'name': LIBVA_REPO_NAME},
+    {'name': PRODUCT_CONFIGS_REPO_NAME}
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -153,7 +155,7 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         'from_path': options['INSTALL_DIR'],
         'relative': [
             {
-                'path': 'libva',
+                'path': 'usr'
             }
         ]
     },
