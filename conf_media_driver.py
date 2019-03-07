@@ -30,7 +30,10 @@ DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
     {'name': 'MediaSDK'},
-    {'name': DRIVER_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{DRIVER_VERSION}'}
+    {'name': DRIVER_REPO_NAME},
+    # Give possibility to build the driver for changes from product configs repository
+    # This repo not needed for build and added only to support CI process
+    {'name': 'product-configs'}
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
