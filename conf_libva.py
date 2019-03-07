@@ -28,12 +28,17 @@ LIBVA_UTILS_REPO_NAME = 'libva-utils'
 # TODO: get LibVA version from manifest
 # Libva-utils version maps libva version
 LIBVA_VERSION = '2.4.0'
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
+
+PRODUCT = LIBVA_REPO_NAME
 
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
     {'name': LIBVA_REPO_NAME},
     {'name': LIBVA_UTILS_REPO_NAME},
+    {'name': PRODUCT_CONFIGS_REPO_NAME}
+
 ]
 
 LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
