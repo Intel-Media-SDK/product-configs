@@ -115,3 +115,16 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         ]
     },
 ])
+
+# TODO: Define where to copy
+DEV_PKG_DATA_TO_ARCHIVE.extend([
+    {
+        'from_path': options['BUILD_DIR'],
+        'relative': [
+            {
+                'path': '',
+                'pack_as': ''
+            },
+        ]
+    }
+])
