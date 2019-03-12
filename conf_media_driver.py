@@ -29,7 +29,6 @@ DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
     {'name': DRIVER_REPO_NAME},
     # Give possibility to build the driver for changes from product configs repository
     # This repo not needed for build and added only to support CI process
