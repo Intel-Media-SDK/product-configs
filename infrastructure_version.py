@@ -19,5 +19,5 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'manifest', 'commit_id': 'a0bef6158b714fdb7b8444bcfe76d0174758c397'}
+OPEN_SOURCE = {'branch': 'manifest', 'commit_id': 'aa9f53418ce5f24386d186893162c3d012f03f52'}
 
