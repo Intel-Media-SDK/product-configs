@@ -23,16 +23,25 @@ from pathlib import Path
 
 
 LIBVA_REPO_NAME = 'libva'
+LIBVA_UTILS_REPO_NAME = 'libva-utils'
 
 # TODO: get LibVA version from manifest
-LIBVA_VERSION = '2.3.0'
+# Libva-utils version maps libva version
+LIBVA_VERSION = '2.4.0'
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
+
+PRODUCT = LIBVA_REPO_NAME
 
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    {'name': LIBVA_REPO_NAME, }
+    {'name': LIBVA_REPO_NAME},
+    {'name': LIBVA_UTILS_REPO_NAME},
+    {'name': PRODUCT_CONFIGS_REPO_NAME}
+
 ]
+
+LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
@@ -40,7 +49,6 @@ ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
 CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
-
 
 # Create dir for Fake pkgconfig
 options["LIBVA_PKG_DIR"] = options["BUILD_DIR"] / "libva_pkgconfig"
@@ -57,6 +65,8 @@ LIBVA_LIB_INSTALL_DIRS = {
 }
 
 LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
+LIBVA_UTILS_REPO_DIR = options.get('REPOS_DIR') / LIBVA_UTILS_REPO_NAME
+
 
 #TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
@@ -86,6 +96,21 @@ action('LibVA: make install',
        work_dir=options['BUILD_DIR'],
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
+# Build libva-utils
+action('libva-utils: autogen.sh',
+       work_dir=LIBVA_UTILS_BUILD_DIR,
+       cmd=get_building_cmd(f'{LIBVA_UTILS_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+action('libva-utils: make',
+       work_dir=LIBVA_UTILS_BUILD_DIR,
+       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+action('libva-utils: make install',
+       stage=stage.INSTALL,
+       work_dir=LIBVA_UTILS_BUILD_DIR,
+       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+
+
 # Create fake LibVA pkgconfigs to build MediaSDK from custom location
 pkgconfig_pattern = {'^prefix=.+': f'prefix={options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
 
@@ -114,6 +139,7 @@ include_install_to = LIBVA_DEB_PREFIX
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
+    f'{pack_dir}/bin/={include_install_to}/bin',
 ]
 
 action('LibVA: create deb pkg',
@@ -139,6 +165,7 @@ include_install_to = LIBVA_CENTOS_PREFIX
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
+    f'{pack_dir}/bin/={include_install_to}/bin',
 ]
 
 action('LibVA: create rpm pkg',
@@ -147,13 +174,12 @@ action('LibVA: create rpm pkg',
        cmd=get_packing_cmd('rpm', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
 
 
-
 INSTALL_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['INSTALL_DIR'],
         'relative': [
             {
-                'path': 'libva',
+                'path': 'usr',
             }
         ]
     },
