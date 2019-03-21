@@ -17,7 +17,7 @@ components:
       type: git
       trigger: True
     version: '18.4.1'
-  media_driver:
+  media-driver:
     repository:
       - branch: master
         url: https://github.com/intel/media-driver
