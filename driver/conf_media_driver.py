@@ -20,8 +20,8 @@
 
 from pathlib import Path
 
-
 DRIVER_REPO_NAME = 'media-driver'
+PRODUCT_NAME = DRIVER_REPO_NAME
 # TODO: get Media-driver version from manifest
 DRIVER_VERSION = 'intel-media-18.4.0'
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
