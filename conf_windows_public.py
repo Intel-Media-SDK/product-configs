@@ -65,27 +65,21 @@ for platform in ['x64', 'Win32']:
             env=BUILD_ENVIRONMENT
         )
 
+        install_package_file_suffixes = ['.lib', '.pdb']
+        if configuration == 'Debug':
+            install_package_file_suffixes.append('.idb')
+
         INSTALL_PKG_DATA_TO_ARCHIVE.extend([{
             'from_path': options['REPOS_DIR'] / 'build',
-            'relative': [
-                {
-                    'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}.idb'
-                },
-                {
-                    'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}.lib'
-                },
-                {
-                    'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}.pdb'
-                }
-            ]
-        }])
+            'relative': [ {'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}{suffix}'}
+                          for suffix in install_package_file_suffixes]}])
 
-        DEV_PKG_DATA_TO_ARCHIVE.extend([{
-            'from_path': options['REPOS_DIR'] / 'build',
-            'relative': [
-                {
-                    'path': rf'win_{platform}'
-                }
-            ]
-        }])
+    DEV_PKG_DATA_TO_ARCHIVE.extend([{
+        'from_path': options['REPOS_DIR'] / 'build',
+        'relative': [
+            {
+                'path': rf'win_{platform}'
+            }
+        ]
+    }])
 
