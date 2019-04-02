@@ -34,4 +34,5 @@ TESTS = [
 for test_id in TESTS:
     action(f'Run test {test_id}',
            work_dir=TEST_SCRIPT_PATH,
-           cmd=f'./run_test.sh {test_id}')
+           cmd=f'./run_test.sh {test_id}',
+           verbose=True)
