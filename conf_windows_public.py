@@ -52,6 +52,7 @@ action(
 )
 
 for platform in ['x64', 'Win32']:
+    # TODO: Release and/or Debug configurations should be previded by build scripts
     for configuration in ['Release', 'Debug']:
         vs_component(
             f"Build dispatcher (2017) {platform}",
@@ -69,6 +70,7 @@ for platform in ['x64', 'Win32']:
         if configuration == 'Debug':
             install_package_file_suffixes.append('.idb')
 
+        # TODO: release and debug install packages should be separated
         for suffix in install_package_file_suffixes:
             INSTALL_PKG_DATA_TO_ARCHIVE.append({
                 'from_path': options['REPOS_DIR'] / 'build',
