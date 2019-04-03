@@ -292,6 +292,19 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+# Create configuration files
+system_config = {
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.conf': f'{MSDK_LIB_INSTALL_DIRS["rpm"]}/lib64',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf': '/opt/intel/msdk_driver/lib64',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.sh': '# add libva driver path/name exporting for intel media solution\n'
+                                                   'export LIBVA_DRIVERS_PATH=/opt/intel/msdk_driver/lib64\n'
+                                                   'export LIBVA_DRIVER_NAME=iHD',
+}
+action('create config files',
+       stage=stage.INSTALL,
+       callfunc=(create_config_file, [system_config], {}))
+
+
 # LibVA: create rpm and deb packages
 # TODO: get LibVA version from manifest
 
@@ -356,6 +369,9 @@ pack_dir = options['INSTALL_DIR'] / 'opt/intel/mediasdk'
 
 MEDIASDK_PACK_DIRS = [
     f'{pack_dir}/={MSDK_LIB_INSTALL_DIRS["rpm"]}/',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.conf=/etc/ld.so.conf.d/',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.sh=/etc/profile.d/',
 ]
 
 action('MediaSDK: create rpm pkg',
