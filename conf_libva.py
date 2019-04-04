@@ -25,15 +25,13 @@ from pathlib import Path
 LIBVA_REPO_NAME = 'libva'
 LIBVA_UTILS_REPO_NAME = 'libva-utils'
 
-# TODO: get LibVA version from manifest
 # Libva-utils version maps libva version
-LIBVA_VERSION = '2.4.0'
+LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-PRODUCT = LIBVA_REPO_NAME
+PRODUCT_NAME = LIBVA_REPO_NAME
 
 # Repos_to_extract
-# TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
     {'name': LIBVA_REPO_NAME},
     {'name': LIBVA_UTILS_REPO_NAME},
