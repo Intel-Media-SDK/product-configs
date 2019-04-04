@@ -23,7 +23,7 @@ from pathlib import Path
 
 IGC_REPO_NAME = 'intel-graphics-compiler'
 IGC_PACK_NAME = 'intel-igc-opencl'
-
+PRODUCT_NAME = IGC_REPO_NAME
 # Dependency repos
 LLVM_REPO_NAME = 'llvm'
 CLANG_REPO_NAME = 'clang'
@@ -36,7 +36,7 @@ IGC_VERSION = 'igc_release_2019-03-12'
 
 # Repos_to_extract
 PRODUCT_REPOS = [
-    {'name': IGC_REPO_NAME, 'branch': 'master', 'commit_id': f'{IGC_VERSION}'},
+    {'name': IGC_REPO_NAME},
 
     # Dependencies needed to build igc
     {'name': LLVM_REPO_NAME, 'branch': 'master', 'commit_id': 'release_70'},

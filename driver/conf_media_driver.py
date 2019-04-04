@@ -26,6 +26,11 @@ PRODUCT_NAME = DRIVER_REPO_NAME
 DRIVER_VERSION = 'intel-media-18.4.0'
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 
+DEPENDENCIES = [
+    'libva',
+    'gmmlib'
+]
+
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
@@ -46,31 +51,59 @@ DRIVER_INSTALL_PREFIX = Path('/opt/intel/msdk_driver')
 DRIVER_LIB_DIR = 'lib64'
 
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
+    # Ubuntu Server: gcc_latest or clang
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
-cmake_command = ['cmake3']
-cmake_command.append(f'-DMEDIA_VERSION="$MEDIA_VERSION"')
-# By default install driver to /opt/intel/msdk_driver
-cmake_command.append(f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}')
-cmake_command.append(f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}')
-cmake_command.append(f'-DINSTALL_DRIVER_SYSCONF=OFF')
-# Path contains iHD_drv_video.so
-cmake_command.append(f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}')
+cmake_command = [
+    'cmake3',
+    f'-DMEDIA_VERSION="$MEDIA_VERSION"',
+    f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}',
+    # By default install driver to /opt/intel/msdk_driver
+    f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    f'-DINSTALL_DRIVER_SYSCONF=OFF',
+    # Path contains iHD_drv_video.so
+    f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    str(DRIVER_REPO_DIR)
+]
 
-cmake_command.append(str(DRIVER_REPO_DIR))
 cmake = ' '.join(cmake_command)
+
+
+# Prepare dependencies
+# Libva
+LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
+LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={LIBVA_PATH}',
+}
+action('LibVA: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
+
+# Gmmlib
+GMMLIB_PATH = options['DEPENDENCIES_DIR'] / 'gmmlib' / 'usr' / 'local'
+GMMLIB_PKG_CONFIG_PATH = GMMLIB_PATH / 'lib64' / 'pkgconfig'
+GMMLIB_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={GMMLIB_PATH}',
+    '^includedir=.+': f'includedir={GMMLIB_PATH}/include/igdgmm',
+    '^libdir=.+': f'libdir={GMMLIB_PATH}/lib64'
+}
+
+action('Gmmlib: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, GMMLIB_PKG_CONFIG_RPM_PATTERN], {}))
 
 # Build Media Driver
 action('media-driver: cmake',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
 action('media-driver: build',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))

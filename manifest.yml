@@ -8,7 +8,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: '2.4.0'
+    version: 2.4.0
   gmmlib:
     repository:
     - branch: master
@@ -17,7 +17,8 @@ components:
       revision: intel-gmmlib-18.4.1
       type: git
       trigger: True
-    version: '18.4.1'
+    product_type: public_linux_gmmlib
+    version: 18.4.1
   media-driver:
     repository:
       - branch: master
@@ -26,7 +27,8 @@ components:
         revision: intel-media-18.4.1
         type: git
         trigger: True
-    version: '18.4.1'
+    product_type: public_linux_driver
+    version: 18.4.1
   intel-graphics-compiler:
     repository:
       - branch: master
@@ -35,7 +37,8 @@ components:
         revision: igc_release_2019-03-12
         type: git
         trigger: True
-    version: 'igc_release_2019-03-12'
+    product_type: public_linux_igc
+    version: igc_release_2019-03-12
   opencl_runtime:
     repository:
       - branch: master
@@ -44,5 +47,6 @@ components:
         revision: 19.10.12542
         type: git
         trigger: True
-    version: '19.10.12542'
-version: '1'
+    product_type: public_linux_opencl_runtime
+    version: 19.10.12542
+version: 1

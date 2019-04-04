@@ -30,7 +30,7 @@ LIBVA_UTILS_REPO_NAME = 'libva-utils'
 LIBVA_VERSION = '2.4.0'
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-PRODUCT = LIBVA_REPO_NAME
+PRODUCT_NAME = LIBVA_REPO_NAME
 
 # Repos_to_extract
 # TODO: get branch, commit_id from Manifest
