@@ -17,6 +17,7 @@ components:
       revision: intel-gmmlib-18.4.1
       type: git
       trigger: True
+    product_type: public_linux_gmmlib
     version: '18.4.1'
   media-driver:
     repository:
@@ -26,6 +27,7 @@ components:
         revision: intel-media-18.4.1
         type: git
         trigger: True
+    product_type: public_linux_driver
     version: '18.4.1'
   intel-graphics-compiler:
     repository:
@@ -35,6 +37,7 @@ components:
         revision: igc_release_2019-03-12
         type: git
         trigger: True
+    product_type: public_linux_igc
     version: 'igc_release_2019-03-12'
   opencl_runtime:
     repository:
@@ -44,5 +47,6 @@ components:
         revision: 19.10.12542
         type: git
         trigger: True
+    product_type: public_linux_opencl_runtime
     version: '19.10.12542'
 version: '1'
