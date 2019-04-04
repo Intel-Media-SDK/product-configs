@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from pathlib import Path
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '6fceb7b4d7c4f87dddeaca539f1a722c4cb0b623'}
+INSTALL = ['media-driver']
+# TODO: Temporarily hardcoded path. Prepare test scripts automatically
+TEST_SCRIPT_PATH = Path('/localdisk/driver_test_scripts')
+TESTS = [
+    'CABA1_SVA_B',
+    'CABA1_Sony_D',
+    'avc_cbr_001',
+    'avc_cqp_001',
+    'scale_001'
+]
 
+for test_id in TESTS:
+    action(f'Run test {test_id}',
+           work_dir=TEST_SCRIPT_PATH,
+           cmd=f'./run_test.sh {test_id}',
+           verbose=True)

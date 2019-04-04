@@ -37,8 +37,7 @@ PRODUCT = LIBVA_REPO_NAME
 PRODUCT_REPOS = [
     {'name': LIBVA_REPO_NAME},
     {'name': LIBVA_UTILS_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME}
-
+    {'name': PRODUCT_CONFIGS_REPO_NAME},
 ]
 
 LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
@@ -57,7 +56,7 @@ options["LIBVA_PKG_DIR"] = options["BUILD_DIR"] / "libva_pkgconfig"
 LIBVA_DEB_PREFIX = Path('/usr/local')
 LIBVA_CENTOS_PREFIX = Path('/usr')
 
-LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
+LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib64/pkgconfig'
 
 LIBVA_LIB_INSTALL_DIRS = {
     'rpm': 'lib64',
@@ -76,39 +75,44 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
+cmd = []
+cmd.append('--buildtype=release')
+cmd.append('-Ddriverdir=/opt/intel/mediasdk/lib64')
+cmd.append('-Dc_args="-O2 -fPIC -fPIE -D_FORTIFY_SOURCE=2 -DNDEBUG -fstack-protector-strong -Wno-dev"')
+cmd.append('-Dc_link_args="-z noexecstack -z relro -z now"')
 
 # Build LibVA
-action('LibVA: autogen.sh',
+action('LibVA: meson',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'meson {(" ").join(cmd)} {LIBVA_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('LibVA: make',
+action('LibVA: ninja-build',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'ninja-build -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('LibVA: list artifacts',
        work_dir=options['BUILD_DIR'],
        cmd=f'echo " " && ls ./va',
        verbose=True)
 
-action('LibVA: make install',
+action('LibVA: ninja-build install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 # Build libva-utils
-action('libva-utils: autogen.sh',
+action('libva-utils: meson',
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'{LIBVA_UTILS_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'meson {LIBVA_UTILS_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('libva-utils: make',
+action('libva-utils: ninja-build',
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'ninja-build -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('libva-utils: make install',
+action('libva-utils: ninja-build install',
        stage=stage.INSTALL,
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 
 # Create fake LibVA pkgconfigs to build MediaSDK from custom location
@@ -123,12 +127,12 @@ action('LibVA: change LibVA pkgconfigs',
 # LibVA: pkgconfig for OS Ubuntu
 # Update pkgconfig prefix
 pkgconfig_deb_pattern = {
-    '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
+    'libdir=.*/lib64': "libdir=${prefix}/"+LIBVA_LIB_INSTALL_DIRS['deb'],
 }
 
 action('LibVA: change pkgconfig for deb',
        stage=stage.PACK,
-       callfunc=(update_config, [options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+       callfunc=(update_config, [options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
                                  pkgconfig_deb_pattern], {}))
 
 # Get package installation dirs for LibVA
@@ -137,7 +141,7 @@ lib_install_to = LIBVA_DEB_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
 include_install_to = LIBVA_DEB_PREFIX
 
 LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/lib64/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
     f'{pack_dir}/bin/={include_install_to}/bin',
 ]
@@ -155,7 +159,7 @@ pkgconfig_rpm_pattern = {
 
 action('LibVA: change pkgconfigs for rpm',
        stage=stage.PACK,
-       callfunc=(update_config, [options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
+       callfunc=(update_config, [options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
                                  pkgconfig_rpm_pattern], {}))
 
 # Get package installation dir for LibVA
@@ -163,7 +167,7 @@ lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
 include_install_to = LIBVA_CENTOS_PREFIX
 
 LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/lib64/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
     f'{pack_dir}/bin/={include_install_to}/bin',
 ]
