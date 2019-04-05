@@ -114,13 +114,13 @@ else:
 # Prepare dependencies
 LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
 LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
-pkgconfig_rpm_pattern = {
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
     '^prefix=.+': f'prefix={LIBVA_PATH}',
 }
 
 action('LibVA: change pkgconfigs',
        stage=stage.EXTRACT,
-       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, pkgconfig_rpm_pattern], {}))
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
 
 
 action('count api version and build number',

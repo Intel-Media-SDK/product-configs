@@ -57,7 +57,7 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
 cmake_command = [
@@ -79,17 +79,17 @@ cmake = ' '.join(cmake_command)
 # Libva
 LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
 LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
-libva_pkgconfig_rpm_pattern = {
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
     '^prefix=.+': f'prefix={LIBVA_PATH}',
 }
 action('LibVA: change pkgconfigs',
        stage=stage.EXTRACT,
-       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, libva_pkgconfig_rpm_pattern], {}))
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
 
 # Gmmlib
 GMMLIB_PATH = options['DEPENDENCIES_DIR'] / 'gmmlib' / 'usr' / 'local'
 GMMLIB_PKG_CONFIG_PATH = GMMLIB_PATH / 'lib64' / 'pkgconfig'
-gmmlib_pkgconfig_rpm_pattern = {
+GMMLIB_PKG_CONFIG_RPM_PATTERN = {
     '^prefix=.+': f'prefix={GMMLIB_PATH}',
     '^includedir=.+': f'includedir={GMMLIB_PATH}/include/igdgmm',
     '^libdir=.+': f'libdir={GMMLIB_PATH}/lib64'
@@ -97,7 +97,7 @@ gmmlib_pkgconfig_rpm_pattern = {
 
 action('Gmmlib: change pkgconfigs',
        stage=stage.EXTRACT,
-       callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, gmmlib_pkgconfig_rpm_pattern], {}))
+       callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, GMMLIB_PKG_CONFIG_RPM_PATTERN], {}))
 
 # Build Media Driver
 action('media-driver: cmake',
