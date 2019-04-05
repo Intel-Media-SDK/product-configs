@@ -111,6 +111,17 @@ elif product_type.startswith("private"):
 else:
     raise IOError(f"Unknown product type '{product_type}'")
 
+# Prepare dependencies
+LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
+LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
+pkgconfig_rpm_pattern = {
+    '^prefix=.+': f'prefix={LIBVA_PATH}',
+}
+
+action('LibVA: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, pkgconfig_rpm_pattern], {}))
+
 
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
@@ -153,7 +164,6 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
-LIBVA_PKG_CONFIG_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local' / 'lib' / 'pkgconfig'
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
        env={'PKG_CONFIG_PATH': str(LIBVA_PKG_CONFIG_PATH)})
