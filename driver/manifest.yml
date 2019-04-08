@@ -4,19 +4,19 @@ components:
     - branch: master
       url: https://github.com/intel/libva
       name: libva
-      revision: 2.4.0
+      revision: c98b06d2b8c00dc4df628488b672711b3f0eb118
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: 2.4.0
+    version: 2.5.0 pre1
   gmmlib:
     repository:
     - branch: master
       url: https://github.com/intel/gmmlib
       name: gmmlib
-      revision: intel-gmmlib-18.4.1
+      revision: intel-gmmlib-19.1.1
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: 18.4.1
+    version: 19.1.1
 version: 1
