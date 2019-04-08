@@ -25,9 +25,8 @@ from pathlib import Path
 LIBVA_REPO_NAME = 'libva'
 LIBVA_UTILS_REPO_NAME = 'libva-utils'
 
-# TODO: get LibVA version from manifest
 # Libva-utils version maps libva version
-LIBVA_VERSION = '2.4.0'
+LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
 PRODUCT_NAME = LIBVA_REPO_NAME

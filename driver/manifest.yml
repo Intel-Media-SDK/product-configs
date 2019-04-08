@@ -19,4 +19,14 @@ components:
       trigger: True
     product_type: public_linux_gmmlib
     version: 19.1.1
+  media-driver:
+    repository:
+    - branch: master
+      url: https://github.com/intel/media-driver
+      name: media-driver
+      revision: intel-media-19.1.1
+      type: git
+      trigger: True
+    product_type: public_linux_driver
+    version: 19.1.1
 version: 1

@@ -31,8 +31,7 @@ OPENCL_CLANG_REPO_NAME = 'opencl-clang'
 LLVM_SPIRV_REPO_NAME = 'spirv-llvm-translator'
 LLVM_PATCHES = 'llvm-patches'
 
-# TODO: get igc version from manifest
-IGC_VERSION = 'igc_release_2019-03-12'
+IGC_VERSION = manifest.get_component(IGC_REPO_NAME).version
 
 # Repos_to_extract
 PRODUCT_REPOS = [
