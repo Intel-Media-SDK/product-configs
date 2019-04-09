@@ -19,5 +19,5 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'change_config_suffix', 'commit_id': 'b8e8011de8379270c247d211e09670a84042386d'}
+OPEN_SOURCE = {'branch': 'master', 'commit_id': 'effea5834017491c6a24c4c87a292b82f064848e'}
 
