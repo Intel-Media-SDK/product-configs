@@ -45,8 +45,8 @@ options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
-# Full build log
-VERBOSE = True
+# Full build log for checking SDL options
+VERBOSE_BUILD_OUTPUT = True
 
 # Max size = current fastboot lib size + ~50Kb
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
@@ -258,7 +258,7 @@ action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
        env={'PKG_CONFIG_PATH': f'{libva_options["LIBVA_PKG_DIR"]}'})
 
-BUILD_VERBOSE = 'VEBOSE=1' if VERBOSE else ''
+BUILD_VERBOSE = 'VERBOSE=1' if VERBOSE_BUILD_OUTPUT else ''
 action('build',
        cmd=get_building_cmd(f'make {BUILD_VERBOSE} -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
