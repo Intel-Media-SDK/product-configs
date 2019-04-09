@@ -293,6 +293,7 @@ if args.get('fastboot'):
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
 # Create configuration files
+# TODO: Should be a part of Cmake config
 intel_mediasdk_conf = options["INSTALL_DIR"] / 'intel-mediasdk.conf'
 data = f'{MSDK_LIB_INSTALL_DIRS["rpm"]}/lib64'
 action('create intel-mediasdk.conf',
