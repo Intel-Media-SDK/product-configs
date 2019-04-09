@@ -29,4 +29,14 @@ components:
       trigger: True
     product_type: public_linux_driver
     version: 19.1.1
+  mediasdk:
+    repository:
+    - branch: intel-mediasdk-18.4
+      url: https://github.com/Intel-Media-SDK/MediaSDK
+      name: mediasdk
+      revision: intel-mediasdk-18.4.1
+      type: git
+      trigger: True
+    product_type: public_linux
+    version: 18.4.1
 version: 1
