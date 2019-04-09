@@ -20,7 +20,6 @@
 
 from pathlib import Path
 
-
 OPENCL_REPO_NAME = 'opencl_runtime'
 # Codename for opencl_runtime is neo
 OPENCL_CODE_NAME = 'neo'
@@ -37,17 +36,16 @@ PRODUCT_REPOS = [
     {'name': 'product-configs'}
 ]
 
-DEPENDENCIES = {
-    'gmmlib': 'public_linux_gmmlib',
-    'intel-graphic-compiler': 'public_linux_intel-graphic-compiler'
-}
+DEPENDENCIES = [
+    'gmmlib',
+    'intel-graphic-compiler',
+]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = True
-
 
 OPENCL_DEB_PREFIX = Path('/usr/local')
 OPENCL_CENTOS_PREFIX = Path('/usr')
@@ -61,26 +59,26 @@ OPENCL_LIB_INSTALL_DIRS = {
 GMMLIB_PKG_DIR = '/usr/local/lib64/pkgconfig/'
 IGC_DIR = '/usr/local/'
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
+    # Ubuntu Server: gcc_latest or clang
+    if args.get('compiler') == "clang" or (
+            args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
-cmake_command = ['cmake3']
-
-cmake_command.append('-DBUILD_TYPE=Release')
-cmake_command.append(f'-DCMAKE_INSTALL_PREFIX={OPENCL_CENTOS_PREFIX}')
-cmake_command.append(f'-DCMAKE_INSTALL_LIBDIR={OPENCL_LIB_INSTALL_DIRS["rpm"]}')
+cmake_command = ['cmake3',
+                 '-DBUILD_TYPE=Release',
+                 f'-DCMAKE_INSTALL_PREFIX={OPENCL_CENTOS_PREFIX}',
+                 f'-DCMAKE_INSTALL_LIBDIR={OPENCL_LIB_INSTALL_DIRS["rpm"]}',
+                 f'-DIGC_DIR={IGC_DIR}',
+                 f'-DSKIP_UNIT_TESTS=ON',
+                 str(OPENCL_REPO_DIR)]
 
 # TODO: define path to igc
-cmake_command.append(f'-DIGC_DIR={IGC_DIR}')
 # TODO: WORKAROUND Enable tests when issue https://github.com/intel/compute-runtime/issues/155 is closed
-cmake_command.append(f'-DSKIP_UNIT_TESTS=ON')
-cmake_command.append(str(OPENCL_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
@@ -101,7 +99,7 @@ action('OpenCL: make install',
 # OpenCL: rpm package
 pack_dir = options['INSTALL_DIR']
 
-# TODO: Hack of file intel.icd
+# TODO: Hack of file intel.icd to resolve location of artifacts
 OPENCL_PACK_DIRS = [
     f'{pack_dir}/etc/=/etc/',
     f'{pack_dir}/{OPENCL_CENTOS_PREFIX.relative_to(OPENCL_CENTOS_PREFIX.root)}/{OPENCL_LIB_INSTALL_DIRS["rpm"]}/='
@@ -142,7 +140,6 @@ action('OpenCL: create deb pkg',
        work_dir=options['PACK_DIR'],
        cmd=get_packing_cmd('deb', OPENCL_PACK_DIRS, ENABLE_RUBY24, OPENCL_VERSION, OPENCL_CODE_NAME))
 
-
 INSTALL_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['INSTALL_DIR'],
@@ -156,4 +153,3 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         ]
     },
 ])
-
