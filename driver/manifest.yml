@@ -39,4 +39,14 @@ components:
       trigger: True
     product_type: public_linux
     version: 19.1.pre3
+  metrics_calc_lite:
+    repository:
+    - branch: master
+      url: https://github.com/Intel-Media-SDK/tools
+      name: metrics_calc_lite
+      revision: c118c7a059400bd1819a416118076f75de50b9ac
+      type: git
+      trigger: True
+    product_type: public_linux_metrics_calc
+    version: 1.0.0
 version: 1
