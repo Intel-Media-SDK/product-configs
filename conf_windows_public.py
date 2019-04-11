@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK', 'branch': 'refs/pull/1352/head', 'commit_id': '14ef73a316f6ea11ffb8caaf2295328b98ce88a4'},
+    {'name': 'MediaSDK'},
     # Give possibility to build windows for changes from product configs repository
     {'name': 'product-configs'}
 ]
@@ -36,6 +36,7 @@ MSBUILD_ARGUMENTS = {
     '/verbosity': 'minimal',
     '/maxcpucount': options['CPU_CORES']
 }
+
 
 def clean_msbuild_dirs(repos_dir):
     import shutil
@@ -116,11 +117,13 @@ action(
 )
 
 
-dispatcher()
-dispatcher(configuration='Debug')
-dispatcher(platform='Win32')
+# TODO: add support for the build-type arg
+dispatcher(platform='x64', configuration='Release')
+dispatcher(platform='x64', configuration='Debug')
+dispatcher(platform='Win32', configuration='Release')
 dispatcher(platform='Win32', configuration='Debug')
-samples()
-samples(configuration='Debug')
-samples(platform='Win32')
+
+samples(platform='x64', configuration='Release')
+samples(platform='x64', configuration='Debug')
+samples(platform='Win32', configuration='Release')
 samples(platform='Win32', configuration='Debug')
