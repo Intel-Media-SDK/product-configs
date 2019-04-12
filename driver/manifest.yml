@@ -8,7 +8,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: 2.5.0 pre1
+    version: 2.5.pre1
   gmmlib:
     repository:
     - branch: master
@@ -24,19 +24,19 @@ components:
     - branch: master
       url: https://github.com/intel/media-driver
       name: media-driver
-      revision: intel-media-19.1.1
+      revision: intel-media-19.1.pre3
       type: git
       trigger: True
     product_type: public_linux_driver
-    version: 19.1.1
+    version: 19.1.pre3
   mediasdk:
     repository:
-    - branch: intel-mediasdk-18.4
+    - branch: master
       url: https://github.com/Intel-Media-SDK/MediaSDK
       name: mediasdk
-      revision: intel-mediasdk-18.4.1
+      revision: intel-mediasdk-19.1.pre3
       type: git
       trigger: True
     product_type: public_linux
-    version: 18.4.1
+    version: 19.1.pre3
 version: 1
