@@ -20,4 +20,3 @@
 
 
 OPEN_SOURCE = {'branch': 'master', 'commit_id': '912c667f6cbfeee2c03d3235d5f3e166851a84a2'}
-
