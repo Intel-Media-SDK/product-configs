@@ -21,15 +21,16 @@
 from pathlib import Path
 
 GMMLIB_REPO_NAME = 'gmmlib'
-# TODO: get gmmlib version from manifest
-GMMLIB_VERSION = 'intel-gmmlib-18.4.1'
+PRODUCT_NAME = GMMLIB_REPO_NAME
+PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
+
+GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version
 GMMLIB_REPO_DIR = options.get('REPOS_DIR') / GMMLIB_REPO_NAME
 
 # Repos_to_extract
-# TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    {'name': GMMLIB_REPO_NAME, 'branch': 'master', 'commit_id': f'tags/{GMMLIB_VERSION}'}
+    {'name': GMMLIB_REPO_NAME},
+    {'name': PRODUCT_CONFIGS_REPO_NAME},
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -62,6 +63,7 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 
 
 cmake_command = ['cmake3']
+cmake_command.append('-DCMAKE_SHARED_LINKER_FLAGS="-pie -z noexecstack -z relro -z now"')
 cmake_command.append(str(GMMLIB_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
