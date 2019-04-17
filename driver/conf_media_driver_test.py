@@ -18,4 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '912c667f6cbfeee2c03d3235d5f3e166851a84a2'}
+from pathlib import Path
+
+INSTALL = ['media-driver']
+# TODO: Temporarily hardcoded path. Prepare test scripts automatically
+TEST_SCRIPT_PATH = Path('/localdisk/driver_test_scripts')
+TESTS = [
+    'CABA1_SVA_B',
+    'CABA1_Sony_D',
+    'avc_cbr_001',
+    'avc_cqp_001',
+    'scale_001'
+]
+
+for test_id in TESTS:
+    action(f'Run test {test_id}',
+           work_dir=TEST_SCRIPT_PATH,
+           cmd=f'./run_test.sh {test_id}',
+           verbose=True)
