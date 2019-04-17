@@ -22,16 +22,17 @@ MEDIA_SDK_REPO_NAME = 'MediaSDK'
 PRODUCT_NAME = MEDIA_SDK_REPO_NAME.lower()
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-
 DEPENDENCIES = [
     'libva'
 ]
+
 
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
     {'name': PRODUCT_CONFIGS_REPO_NAME}
+
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -54,7 +55,6 @@ MSDK_LIB_INSTALL_DIRS = {
     'rpm': '/opt/intel/mediasdk',
     'deb': '/opt/intel/mediasdk'
 }
-
 
 def set_env(repo_path, gcc_latest, clang_version):
     build_num = get_commit_number(repo_path)
@@ -129,7 +129,6 @@ action('LibVA: change pkgconfigs',
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
-
 cmake_command = ['cmake3', '--no-warn-unused-cli', '-Wno-dev -G "Unix Makefiles"', '-LA']
 
 
@@ -170,6 +169,7 @@ cmake = ' '.join(cmake_command)
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
        env={'PKG_CONFIG_PATH': str(LIBVA_PKG_CONFIG_PATH)})
+
 
 BUILD_VERBOSE = 'VERBOSE=1' if VERBOSE_BUILD_OUTPUT else ''
 action('build',
@@ -248,6 +248,11 @@ DEV_PKG_DATA_TO_ARCHIVE.extend([
     }
 ])
 
+relative = [{'path': 'opt'}]
+if build_event != 'klocwork':
+    relative.append({'path': 'libva'})
+
+
 INSTALL_PKG_DATA_TO_ARCHIVE.extend([
     {
         'from_path': options['INSTALL_DIR'],
@@ -258,3 +263,4 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         ]
     },
 ])
+
