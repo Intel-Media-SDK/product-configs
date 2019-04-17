@@ -27,6 +27,7 @@ DEPENDENCIES = [
     'libva'
 ]
 
+
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
@@ -189,11 +190,6 @@ if args.get('compiler') == "gcc":
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
-
-if build_event != 'klocwork':
-    action('run_unit_tests',
-           cmd=f'ctest --verbose',
-           verbose=True)
 
 action('install',
        stage=stage.INSTALL,
