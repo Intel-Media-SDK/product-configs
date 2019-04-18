@@ -86,6 +86,15 @@ action('media-driver: make install',
        work_dir=options['BUILD_DIR'],
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
+# Create configuration files
+intel_mediasdk_file = options["INSTALL_DIR"] / 'intel-mediasdk.sh'
+data = '# add libva driver path/name exporting for intel media solution\n'\
+       'export LIBVA_DRIVERS_PATH=/opt/intel/msdk_driver/lib64\n'\
+       'export LIBVA_DRIVER_NAME=iHD'
+
+action('create intel-mediasdk.sh',
+       stage=stage.INSTALL,
+       callfunc=(create_file, [intel_mediasdk_file, data], {}))
 
 # Get package installation dir for media-driver
 pack_dir = options['INSTALL_DIR'] / DRIVER_INSTALL_PREFIX.relative_to(DRIVER_INSTALL_PREFIX.root)
@@ -93,6 +102,7 @@ pack_dir = options['INSTALL_DIR'] / DRIVER_INSTALL_PREFIX.relative_to(DRIVER_INS
 DRIVER_PACK_DIRS = [
     f'{pack_dir}/lib64/={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR }',
     f'{pack_dir}/include/={DRIVER_INSTALL_PREFIX}/include',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.sh=/etc/profile.d/',
 ]
 
 action('media-driver: create rpm pkg',
