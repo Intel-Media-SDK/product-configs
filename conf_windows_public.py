@@ -37,6 +37,7 @@ MSBUILD_ARGUMENTS = {
     '/maxcpucount': options['CPU_CORES']
 }
 
+
 def clean_msbuild_dirs(repos_dir):
     import shutil
 
@@ -45,47 +46,84 @@ def clean_msbuild_dirs(repos_dir):
         log.info('remove directory %s', build_dir)
         shutil.rmtree(build_dir)
 
-action(
-    'Clean msbuild dirs',
-    stage=stage.CLEAN,
-    callfunc=(clean_msbuild_dirs, [options['REPOS_DIR']], {})
-)
 
-for platform in ['x64', 'Win32']:
-    # TODO: Release and/or Debug configurations should be previded by build scripts
-    for configuration in ['Release', 'Debug']:
-        vs_component(
-            f"Build dispatcher (2017) {platform}",
-            solution_path=options['REPOS_DIR'] / r'MediaSDK\api\mfx_dispatch\windows\libmfx_vs2015.sln',
-            msbuild_args={
-                '/property': {
-                    'Platform': platform,
-                    'Configuration': configuration
+def dispatcher(platform='x64', configuration='Release', build_environment=BUILD_ENVIRONMENT):
+    vs_component(
+        f"Build dispatcher (2017) {platform} {configuration}",
+        solution_path=options['REPOS_DIR'] / r'MediaSDK\api\mfx_dispatch\windows\libmfx_vs2015.sln',
+        msbuild_args={
+            '/property': {
+                'Platform': platform,
+                'Configuration': configuration
+            }
+        },
+        env=build_environment
+    )
+
+    install_package_file_suffixes = ['.lib', '.pdb']
+    if configuration == 'Debug':
+        install_package_file_suffixes.append('.idb')
+
+    for suffix in install_package_file_suffixes:
+        INSTALL_PKG_DATA_TO_ARCHIVE.append({
+            'from_path': options['REPOS_DIR'] / 'build',
+            'relative': [
+                {
+                    'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}{suffix}'
                 }
-            },
-            env=BUILD_ENVIRONMENT
-        )
+        ]})
 
-        install_package_file_suffixes = ['.lib', '.pdb']
-        if configuration == 'Debug':
-            install_package_file_suffixes.append('.idb')
-
-        # TODO: release and debug install packages should be separated
-        for suffix in install_package_file_suffixes:
-            INSTALL_PKG_DATA_TO_ARCHIVE.append({
-                'from_path': options['REPOS_DIR'] / 'build',
-                'relative': [
-                    {
-                        'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}{suffix}'
-                    }
-            ]})
-
-    DEV_PKG_DATA_TO_ARCHIVE.extend([{
+    dev_package = {
         'from_path': options['REPOS_DIR'] / 'build',
         'relative': [
             {
                 'path': rf'win_{platform}'
             }
         ]
+    }
+
+    # Need to avoid multiple adding the same (win_{platform}) directory to developer package
+    if dev_package not in DEV_PKG_DATA_TO_ARCHIVE:
+        DEV_PKG_DATA_TO_ARCHIVE.append(dev_package)
+
+
+def samples(platform='x64', configuration='Release', build_environment=BUILD_ENVIRONMENT):
+    vs_component(
+        f"Build Samples {platform} {configuration}",
+        solution_path=options['REPOS_DIR'] / r'MediaSDK\samples\AllSamples.sln',
+        env=build_environment,
+        msbuild_args={
+            '/property': {
+                'Platform': platform,
+                'Configuration': configuration
+            }
+        }
+    )
+
+    DEV_PKG_DATA_TO_ARCHIVE.extend([{
+        'from_path': options['REPOS_DIR'] / 'MediaSDK' / 'samples' / '_build',
+        'relative': [
+            {
+                'path': rf'{platform}\{configuration}',
+                'pack_as': rf'samples\{platform}\{configuration}'
+            }
+        ]
     }])
 
+action(
+    'Clean msbuild dirs',
+    stage=stage.CLEAN,
+    callfunc=(clean_msbuild_dirs, [options['REPOS_DIR']], {})
+)
+
+
+# TODO: add support for the build-type arg
+dispatcher(platform='x64', configuration='Release')
+dispatcher(platform='x64', configuration='Debug')
+dispatcher(platform='Win32', configuration='Release')
+dispatcher(platform='Win32', configuration='Debug')
+
+samples(platform='x64', configuration='Release')
+samples(platform='x64', configuration='Debug')
+samples(platform='Win32', configuration='Release')
+samples(platform='Win32', configuration='Debug')

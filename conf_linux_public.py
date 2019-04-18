@@ -18,22 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pathlib import Path
-
 MEDIA_SDK_REPO_NAME = 'MediaSDK'
-LIBVA_REPO_NAME = 'libva'
+PRODUCT_NAME = MEDIA_SDK_REPO_NAME.lower()
 PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-# TODO: get version from manifest
-LIBVA_VERSION = '2.4.0'
+
+DEPENDENCIES = [
+    'libva'
+]
 
 PRODUCT_REPOS = [
     {'name': MEDIA_SDK_REPO_NAME},
     # Give possibility to build linux for changes from product configs repository
     # This repo not needed for build and added only to support CI process
-    {'name': PRODUCT_CONFIGS_REPO_NAME},
-    # Define LibVA version to get by commit_id
-    {'name': LIBVA_REPO_NAME, 'branch': 'master', 'commit_id': LIBVA_VERSION},
+    {'name': PRODUCT_CONFIGS_REPO_NAME}
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -45,29 +43,11 @@ options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
 
+# Full build log for checking SDL options
+VERBOSE_BUILD_OUTPUT = True
+
 # Max size = current fastboot lib size + ~50Kb
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
-
-# Create subfolders for libVA
-libva_options = {
-    "BUILD_DIR": options["BUILD_DIR"] / "libva",
-    "INSTALL_DIR": options["INSTALL_DIR"] / "libva",
-    "LOGS_DIR": options["LOGS_DIR"] / "libva",
-    "LIBVA_PKG_DIR": options["BUILD_DIR"] / "libva_pkgconfig",  # Fake pkgconfig dir
-}
-
-LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
-
-# _DEB_PREFIX is used by default
-LIBVA_DEB_PREFIX = Path('/usr/local')
-LIBVA_CENTOS_PREFIX = Path('/usr')
-
-LIBVA_PKGCONFIG_DIR = LIBVA_DEB_PREFIX / 'lib/pkgconfig'
-
-LIBVA_LIB_INSTALL_DIRS = {
-    'rpm': 'lib64',
-    'deb': 'lib/x86_64-linux-gnu'
-}
 
 # TODO: install mediasdk to system
 MSDK_LIB_INSTALL_DIRS = {
@@ -76,57 +56,12 @@ MSDK_LIB_INSTALL_DIRS = {
 }
 
 
-def get_commit_number(repo_path=MEDIA_SDK_REPO_DIR):
-    if not repo_path.exists():
-        return '0'
-    import git
-    git_repo = git.Git(str(repo_path))
-    return str(git_repo.rev_list('--count', 'HEAD'))
+def set_env(repo_path, gcc_latest, clang_version):
+    build_num = get_commit_number(repo_path)
+    api_major_ver, api_minor_ver = get_api_version(f'{repo_path.name}/api')
 
-
-def get_api_version(repo_path=MEDIA_SDK_REPO_DIR):
-    """
-    :param name: Path to the MediaSDK folder
-    :type name: String or Path
-
-    Function finds the lines like:
-        `#define MFX_VERSION_MAJOR 1`
-        `#define MFX_VERSION_MINOR 26`
-    And prints the version like:
-        `1.26`
-    """
-    import re
-    import pathlib
-
-    mediasdk_api_header = pathlib.Path(repo_path) / 'api' / 'include' / 'mfxdefs.h'
-    if not mediasdk_api_header.exists():
-        raise Exception(f"No {mediasdk_api_header.name} found in {mediasdk_api_header.parent}")
-
-    with open(mediasdk_api_header, 'r') as lines:
-        major_version = ""
-        minor_version = ""
-        for line in lines:
-            major_version_pattern = re.search("MFX_VERSION_MAJOR\s(\d+)", line)
-            if major_version_pattern:
-                major_version = major_version_pattern.group(1)
-                continue
-
-            minor_version_pattern = re.search("MFX_VERSION_MINOR\s(\d+)", line)
-            if minor_version_pattern:
-                minor_version = minor_version_pattern.group(1)
-
-            if major_version and minor_version:
-                return f"{major_version}.{minor_version}"
-        raise Exception(f"API_VERSION did not found in {mediasdk_api_header}")
-
-# TODO: move functions to the shared module
-def set_env(repo_path, gcc_latest, clang_version, _get_commit_number=get_commit_number, _get_api_version=get_api_version):
-  
-    api_ver = _get_api_version(repo_path)
-    build_num = _get_commit_number(repo_path)
-
-    plugin_version = f'{api_ver}.3.{build_num}'
-    options["ENV"]["API_VERSION"] = api_ver
+    plugin_version = f'{api_major_ver}.{api_minor_ver}.3.{build_num}'
+    options["ENV"]["API_VERSION"] = f'{api_major_ver}.{api_minor_ver}'
     options["ENV"]['MFX_VERSION'] = f'8.0.16093{build_num}'
     options["ENV"]['MFX_HEVC_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_H265FEI_VERSION'] = f'{plugin_version}'
@@ -145,9 +80,9 @@ def set_env(repo_path, gcc_latest, clang_version, _get_commit_number=get_commit_
         options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
 
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
+    # Ubuntu Server: gcc_latest or clang
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
@@ -170,6 +105,7 @@ def check_lib_size(threshold_size, lib_path):
             log.warning("Library size could exceed threshold because stripping build binaries option is OFF")
         raise Exception(f"{lib_path.name} size = {current_lib_size}byte exceeds max_size = {threshold_size}byte")
 
+
 # Choose repository in accordance with prefix of product type
 if product_type.startswith("public"):
     repo_name = 'MediaSDK'
@@ -178,52 +114,33 @@ elif product_type.startswith("private"):
 else:
     raise IOError(f"Unknown product type '{product_type}'")
 
+# Prepare dependencies
+LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
+LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={LIBVA_PATH}',
+}
+
+action('LibVA: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
+
 
 action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
-# Build dependencies
-# Build LibVA
-action('LibVA: autogen.sh',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{LIBVA_REPO_DIR}/autogen.sh', GCC_LATEST, ENABLE_DEVTOOLSET))
 
-action('LibVA: make',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+cmake_command = ['cmake3', '--no-warn-unused-cli', '-Wno-dev -G "Unix Makefiles"', '-LA']
 
-action('LibVA: list artifacts',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=f'echo " " && ls ./va',
-       verbose=True)
 
-# libva should be installed before MediaSDK build
-# install on the build stage
-action('LibVA: make install',
-       work_dir=libva_options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={libva_options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
-
-# Create fake LibVA pkgconfigs to build MediaSDK from custom location
-pkgconfig_pattern = {'^prefix=.+': f'prefix={libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
-
-action('LibVA: change LibVA pkgconfigs',
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_PKGCONFIG_DIR.relative_to(LIBVA_PKGCONFIG_DIR.root),
-                                 pkgconfig_pattern], {'copy_to': libva_options["LIBVA_PKG_DIR"]}))
-
-cmake_command = ['cmake3']
-
-cmake_command.append('--no-warn-unused-cli')
-cmake_command.append('-Wno-dev -G "Unix Makefiles"')
-cmake_command.append('-LA')
-
-#Build without -Werror option in case of clang:
-#TODO: use the same command as for 'gcc'
+# Build without -Werror option in case of clang:
+# TODO: use the same command as for 'gcc'
 if args.get('compiler') == "clang":
     cmake_command.append(
         '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
     cmake_command.append(
         '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-#Default parameters (default flow):
+# Default parameters (default flow):
 else:
     cmake_command.append(
         '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
@@ -232,13 +149,13 @@ else:
 
 cmake_command.append('-DBUILD_TESTS=ON ')
 
-#In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
+# In all builders except Fastboot or clang build use parameter `-DENABLE_TOOLS=ON`:
 if 'defconfig' not in product_type and not args.get('fastboot'):
     cmake_command.append('-DBUILD_ALL=ON')
     cmake_command.append('-DENABLE_ALL=ON')
     cmake_command.append('-DENABLE_ITT=ON')
 
-#Additional (custom) options (they extend default parameters):
+# Additional (custom) options (they extend default parameters):
 if args.get('fastboot'):
     fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder/profiles/fastboot.cmake'
     cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
@@ -250,25 +167,25 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
-# Set path to fake LibVA pkgconfigs
 action('cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{libva_options["LIBVA_PKG_DIR"]}'})
+       env={'PKG_CONFIG_PATH': str(LIBVA_PKG_CONFIG_PATH)})
 
+BUILD_VERBOSE = 'VERBOSE=1' if VERBOSE_BUILD_OUTPUT else ''
 action('build',
-       cmd=get_building_cmd(f'make -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'make {BUILD_VERBOSE} -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
        verbose=True)
 
-#TODO: add check for clang compiler
+# TODO: add check for clang compiler
 if args.get('compiler') == "gcc":
     action('used compiler',
            cmd=f'echo " " && strings -f ./__bin/release/*.so | grep GCC',
            verbose=True)
 
-#TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
+# TODO: `|| echo` is a temporary fix in situations if nothing found by grep (return code 1)
 action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
@@ -292,6 +209,7 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+
 # Create configuration files
 # TODO: Should be a part of Cmake config
 intel_mediasdk_conf = options["INSTALL_DIR"] / 'intel-mediasdk.conf'
@@ -306,61 +224,6 @@ data = '/opt/intel/msdk_driver/lib64'
 action('create intel-mdf.conf',
        stage=stage.INSTALL,
        callfunc=(create_file, [intel_mdf_conf, data], {}))
-
-
-# LibVA: create rpm and deb packages
-# TODO: get LibVA version from manifest
-
-# LibVA: pkgconfig for OS Ubuntu
-pkgconfig_deb_pattern = {
-    '/lib': f"/{LIBVA_LIB_INSTALL_DIRS['deb']}",
-}
-
-action('LibVA: change pkgconfig for deb',
-       stage=stage.PACK,
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
-                                 pkgconfig_deb_pattern], {}))
-
-# Get package installation dirs for LibVA
-pack_dir = libva_options['INSTALL_DIR'] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)
-lib_install_to = LIBVA_DEB_PREFIX / LIBVA_LIB_INSTALL_DIRS['deb']
-include_install_to = LIBVA_DEB_PREFIX
-
-LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-]
-
-action('LibVA: create deb pkg',
-       stage=stage.PACK,
-       work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb',  LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
-
-# LibVA: pkgconfig for OS CentOS
-pkgconfig_rpm_pattern = {
-    '^prefix=.+': 'prefix=/usr',
-    f'/{LIBVA_LIB_INSTALL_DIRS["deb"]}': f'/{LIBVA_LIB_INSTALL_DIRS["rpm"]}',
-}
-
-action('LibVA: change pkgconfigs for rpm',
-       stage=stage.PACK,
-       callfunc=(update_config, [libva_options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root) / 'lib/pkgconfig',
-                                 pkgconfig_rpm_pattern], {}))
-
-# Get package installation dir for LibVA
-lib_install_to = LIBVA_CENTOS_PREFIX / LIBVA_LIB_INSTALL_DIRS['rpm']
-include_install_to = LIBVA_CENTOS_PREFIX
-
-LIBVA_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-]
-
-action('LibVA: create rpm pkg',
-       stage=stage.PACK,
-       work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', LIBVA_PACK_DIRS, ENABLE_RUBY24, LIBVA_VERSION, LIBVA_REPO_NAME))
-
 
 # Get api version for MediaSDK package
 action('count api version and build number',
@@ -408,10 +271,7 @@ INSTALL_PKG_DATA_TO_ARCHIVE.extend([
         'from_path': options['INSTALL_DIR'],
         'relative': [
             {
-                'path': 'opt',
-            },
-            {
-                'path': 'libva',
+                'path': 'opt'
             }
         ]
     },

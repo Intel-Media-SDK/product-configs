@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,5 +19,5 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'add_create_file', 'commit_id': 'd6f52129d7f285d940edded723f4a6d5e1ea38ea'}
 
+OPEN_SOURCE = {'branch': 'master', 'commit_id': '52dbfa9dc690d0875bbb7ac38bcdb40512e01e7a'}

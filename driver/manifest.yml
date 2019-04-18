@@ -1,14 +1,4 @@
 components:
-  mediasdk:
-    repository:
-    - branch: master
-      url: https://github.com/Intel-Media-SDK/MediaSDK
-      name: mediasdk
-      revision: intel-mediasdk-19.1.pre3
-      type: git
-      trigger: True
-    product_type: public_linux
-    version: 19.1.pre3
   libva:
     repository:
     - branch: master
@@ -39,24 +29,14 @@ components:
       trigger: True
     product_type: public_linux_driver
     version: 19.1.pre3
-  intel-graphics-compiler:
+  mediasdk:
     repository:
     - branch: master
-      url: https://github.com/intel/intel-graphics-compiler
-      name: intel-graphics-compiler
-      revision: igc_release_2019-03-12
+      url: https://github.com/Intel-Media-SDK/MediaSDK
+      name: mediasdk
+      revision: intel-mediasdk-19.1.pre3
       type: git
       trigger: True
-    product_type: public_linux_igc
-    version: igc_release_2019-03-12
-  opencl_runtime:
-    repository:
-    - branch: master
-      url: https://github.com/intel/compute-runtime
-      name: opencl_runtime
-      revision: 19.10.12542
-      type: git
-      trigger: True
-    product_type: public_linux_opencl_runtime
-    version: 19.10.12542
+    product_type: public_linux
+    version: 19.1.pre3
 version: 1

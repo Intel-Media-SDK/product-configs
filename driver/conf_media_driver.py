@@ -46,25 +46,27 @@ DRIVER_INSTALL_PREFIX = Path('/opt/intel/msdk_driver')
 DRIVER_LIB_DIR = 'lib64'
 
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
+    # Ubuntu Server: gcc_latest or clang
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
-cmake_command = ['cmake3']
-cmake_command.append(f'-DMEDIA_VERSION="$MEDIA_VERSION"')
-# By default install driver to /opt/intel/msdk_driver
-cmake_command.append(f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}')
-cmake_command.append(f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}')
-cmake_command.append(f'-DINSTALL_DRIVER_SYSCONF=OFF')
-# Path contains iHD_drv_video.so
-cmake_command.append(f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}')
+cmake_command = [
+    'cmake3',
+    f'-DMEDIA_VERSION="$MEDIA_VERSION"',
+    f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}',
+    # By default install driver to /opt/intel/msdk_driver
+    f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    f'-DINSTALL_DRIVER_SYSCONF=OFF',
+    # Path contains iHD_drv_video.so
+    f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    str(DRIVER_REPO_DIR)
+]
 
-cmake_command.append(str(DRIVER_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
 # Build Media Driver
