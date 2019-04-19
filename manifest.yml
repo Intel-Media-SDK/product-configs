@@ -14,31 +14,31 @@ components:
     - branch: master
       url: https://github.com/intel/libva
       name: libva
-      revision: c98b06d2b8c00dc4df628488b672711b3f0eb118
+      revision: 4d9d819d4859bf2fe2554d2619ddbf21cbedb90c
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: 2.5.pre1
+    version: "19.2"
   gmmlib:
     repository:
     - branch: master
       url: https://github.com/intel/gmmlib
       name: gmmlib
-      revision: intel-gmmlib-19.1.1
+      revision: 04a402ff9b6a47633b65e4704af3572b0a100353
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: 19.1.1
+    version: "19.2"
   media-driver:
     repository:
     - branch: master
       url: https://github.com/intel/media-driver
       name: media-driver
-      revision: intel-media-19.1.pre3
+      revision: 8317419a5b340130f737c425c8f0d61358453220
       type: git
       trigger: True
     product_type: public_linux_driver
-    version: 19.1.pre3
+    version: "19.2"
   intel-graphics-compiler:
     repository:
     - branch: master
