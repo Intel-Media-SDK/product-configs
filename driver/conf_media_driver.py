@@ -22,12 +22,17 @@ from pathlib import Path
 
 DRIVER_REPO_NAME = 'media-driver'
 PRODUCT_NAME = DRIVER_REPO_NAME
-# TODO: get Media-driver version from manifest
-DRIVER_VERSION = 'intel-media-18.4.0'
+
+DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 
+
+DEPENDENCIES = [
+    'libva',
+    'gmmlib'
+]
+
 # Repos_to_extract
-# TODO: get branch, commit_id from Manifest
 PRODUCT_REPOS = [
     {'name': DRIVER_REPO_NAME},
     # Give possibility to build the driver for changes from product configs repository
@@ -69,10 +74,36 @@ cmake_command = [
 
 cmake = ' '.join(cmake_command)
 
+# Prepare dependencies
+# Libva
+LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
+LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={LIBVA_PATH}',
+}
+action('LibVA: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
+
+# Gmmlib
+GMMLIB_PATH = options['DEPENDENCIES_DIR'] / 'gmmlib' / 'usr' / 'local'
+GMMLIB_PKG_CONFIG_PATH = GMMLIB_PATH / 'lib64' / 'pkgconfig'
+GMMLIB_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={GMMLIB_PATH}',
+    '^includedir=.+': f'includedir={GMMLIB_PATH}/include/igdgmm',
+    '^libdir=.+': f'libdir={GMMLIB_PATH}/lib64'
+}
+
+action('Gmmlib: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, GMMLIB_PKG_CONFIG_RPM_PATTERN], {}))
+
+
 # Build Media Driver
 action('media-driver: cmake',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
 action('media-driver: build',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
