@@ -28,7 +28,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: 19.1.1
+    version: 18.3.pre1
   media-driver:
     repository:
     - branch: intel-media-16.9
