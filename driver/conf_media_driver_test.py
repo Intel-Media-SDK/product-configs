@@ -20,9 +20,9 @@
 
 from pathlib import Path
 
-INSTALL = ['media-driver']
-# TODO: Temporarily hardcoded path. Prepare test scripts automatically
+INSTALL = ['libva', 'media-driver']
 TEST_SCRIPT_PATH = Path('/localdisk/driver_test_scripts')
+# TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TESTS = [
     'CABA1_SVA_B',
     'CABA1_Sony_D',
@@ -30,6 +30,11 @@ TESTS = [
     'avc_cqp_001',
     'scale_001'
 ]
+
+action(f'Create temp dir',
+       work_dir=TEST_SCRIPT_PATH,
+       cmd=f'mkdir temp',
+       verbose=True)
 
 for test_id in TESTS:
     action(f'Run test {test_id}',
