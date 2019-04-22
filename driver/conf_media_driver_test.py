@@ -18,11 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from pathlib import Path
+INSTALL = ['libva', 'ffmpeg', 'metrics_calc_lite', 'media-driver']
+TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 
-INSTALL = ['media-driver']
-# TODO: Temporarily hardcoded path. Prepare test scripts automatically
-TEST_SCRIPT_PATH = Path('/localdisk/driver_test_scripts')
 TESTS = [
     'CABA1_SVA_B',
     'CABA1_Sony_D',
@@ -31,8 +29,13 @@ TESTS = [
     'scale_001'
 ]
 
+action(f'Create temp dir',
+       work_dir=TEST_SCRIPT_PATH,
+       cmd=f'mkdir -p temp',
+       verbose=True)
+
 for test_id in TESTS:
     action(f'Run test {test_id}',
            work_dir=TEST_SCRIPT_PATH,
-           cmd=f'./run_test.sh {test_id}',
+           cmd=f'chmod +x run_test.sh && ./run_test.sh {test_id}',
            verbose=True)
