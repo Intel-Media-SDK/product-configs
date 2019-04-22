@@ -74,7 +74,7 @@ cmake_command = ['cmake3',
                  f'-DCMAKE_INSTALL_PREFIX={OPENCL_CENTOS_PREFIX}',
                  f'-DCMAKE_INSTALL_LIBDIR={OPENCL_LIB_INSTALL_DIRS["rpm"]}',
                  f'-DIGC_DIR={IGC_DIR}',
-                 f'-DSKIP_UNIT_TESTS=ON',
+                 f'-DDO_NOT_RUN_AUB_TESTS=1',
                  str(OPENCL_REPO_DIR)]
 
 # TODO: define path to igc
