@@ -33,7 +33,7 @@ TESTS = [
 
 action(f'Create temp dir',
        work_dir=TEST_SCRIPT_PATH,
-       cmd=f'mkdir temp',
+       cmd=f'mkdir -p temp',
        verbose=True)
 
 for test_id in TESTS:
