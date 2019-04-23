@@ -41,10 +41,10 @@ components:
     version: 19.1.pre3
   ffmpeg:
     repository:
-    - branch: release/4.1
+    - branch: master
       url: https://github.com/FFmpeg/FFmpeg
       name: ffmpeg
-      revision: n4.1.3
+      revision: a0877648472a25debc9bd7957684748a253c2b52
       type: git
       trigger: True
     product_type: public_linux_ffmpeg
@@ -54,7 +54,7 @@ components:
     - branch: master
       url: https://github.com/Intel-Media-SDK/tools
       name: metrics_calc_lite
-      revision: c118c7a059400bd1819a416118076f75de50b9ac
+      revision: 18f5c6bb99ec28a61a86a499f711d7045829ee42
       type: git
       trigger: True
     product_type: public_linux_metrics_calc
