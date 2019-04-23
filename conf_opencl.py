@@ -21,17 +21,17 @@
 from pathlib import Path
 
 OPENCL_REPO_NAME = 'opencl_runtime'
+PRODUCT_NAME = OPENCL_REPO_NAME
 # Codename for opencl_runtime is neo
 OPENCL_CODE_NAME = 'neo'
 
 # TODO: get OpenCL version from manifest
-OPENCL_VERSION = '19.11.12599'
+OPENCL_VERSION = manifest.get_component(PRODUCT_NAME).version
 OPENCL_REPO_DIR = options.get('REPOS_DIR') / OPENCL_REPO_NAME
 
 # Repos_to_extract
 PRODUCT_REPOS = [
-    {'name': OPENCL_REPO_NAME, 'commit_id': OPENCL_VERSION},
-
+    {'name': OPENCL_REPO_NAME},
     # This repo not needed for build and added only to support CI process
     {'name': 'product-configs'}
 ]

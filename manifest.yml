@@ -54,9 +54,9 @@ components:
     - branch: master
       url: https://github.com/intel/compute-runtime
       name: opencl_runtime
-      revision: 19.10.12542
+      revision: 19.11.12599
       type: git
       trigger: True
     product_type: public_linux_opencl_runtime
-    version: 19.10.12542
+    version: 19.11.12599
 version: 1
