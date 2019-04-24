@@ -20,4 +20,4 @@
 
 
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '0c5c1ab084f77f41f58c7133fe76c47b0d9a66e6'}
+OPEN_SOURCE = {'branch': 'master', 'bb': '1ceaa975d387667f108e43078650a0196345a995'}
