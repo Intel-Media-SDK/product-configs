@@ -1,34 +1,4 @@
 components:
-  libva:
-    repository:
-    - branch: master
-      url: https://github.com/intel/libva
-      name: libva
-      revision: c98b06d2b8c00dc4df628488b672711b3f0eb118
-      type: git
-      trigger: True
-    product_type: public_linux_libva
-    version: 2.5.pre1
-  gmmlib:
-    repository:
-    - branch: master
-      url: https://github.com/intel/gmmlib
-      name: gmmlib
-      revision: intel-gmmlib-19.1.1
-      type: git
-      trigger: True
-    product_type: public_linux_gmmlib
-    version: 19.1.1
-  media-driver:
-    repository:
-    - branch: master
-      url: https://github.com/intel/media-driver
-      name: media-driver
-      revision: intel-media-19.1.pre3
-      type: git
-      trigger: True
-    product_type: public_linux_driver
-    version: 19.1.pre3
   mediasdk:
     repository:
     - branch: master
@@ -38,6 +8,36 @@ components:
       type: git
       trigger: True
     product_type: public_linux
+    version: 19.1.pre3
+  libva:
+    repository:
+    - branch: master
+      url: https://github.com/intel/libva
+      name: libva
+      revision: 4d9d819d4859bf2fe2554d2619ddbf21cbedb90c
+      type: git
+      trigger: True
+    product_type: public_linux_libva
+    version: "19.2"
+  gmmlib:
+    repository:
+    - branch: master
+      url: https://github.com/intel/gmmlib
+      name: gmmlib
+      revision: 04a402ff9b6a47633b65e4704af3572b0a100353
+      type: git
+      trigger: True
+    product_type: public_linux_gmmlib
+    version: "19.2"
+  media-driver:
+    repository:
+    - branch: master
+      url: https://github.com/intel/media-driver
+      name: media-driver
+      revision: intel-media-19.1.pre3
+      type: git
+      trigger: True
+    product_type: public_linux_driver
     version: 19.1.pre3
   ffmpeg:
     repository:
