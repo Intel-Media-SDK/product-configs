@@ -19,5 +19,4 @@
 # SOFTWARE.
 
 
-
-OPEN_SOURCE = {'branch': 'infrastructure_mss2018_r2', 'commit_id': 'c2366adc23a05c3acd544791455d176045fa9899'}
+OPEN_SOURCE = {'branch': 'ted_updates', 'commit_id': 'b93c155c65e102ef17ea90d43fb3f755f5545fdf'}
