@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'ted_updates', 'commit_id': 'b93c155c65e102ef17ea90d43fb3f755f5545fdf'}
+OPEN_SOURCE = {'branch': 'ted_updates', 'commit_id': '03aa90c65003ab2ffe62a495f74a9a5e232689ae'}
