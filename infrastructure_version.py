@@ -20,4 +20,4 @@
 
 
 
-OPEN_SOURCE = {'branch': 'origin/ted_adapter', 'commit_id': '2c3dd7ed5d49d4da82941c70d8905eeb204e0c80'}
+OPEN_SOURCE = {'branch': 'ted_adapter', 'commit_id': '2c3dd7ed5d49d4da82941c70d8905eeb204e0c80'}
