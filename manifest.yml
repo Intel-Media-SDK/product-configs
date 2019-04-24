@@ -18,7 +18,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: 19.2
+    version: "19.2"
   gmmlib:
     repository:
     - branch: master
@@ -28,7 +28,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: 19.2
+    version: "19.2"
   media-driver:
     repository:
     - branch: master
@@ -38,7 +38,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_driver
-    version: 19.2
+    version: "19.2"
   intel-graphics-compiler:
     repository:
     - branch: master
