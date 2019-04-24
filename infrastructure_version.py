@@ -20,4 +20,4 @@
 
 
 
-OPEN_SOURCE = {'branch': 'ted', 'commit_id': '2c3dd7ed5d49d4da82941c70d8905eeb204e0c80'}
+OPEN_SOURCE = {'branch': 'infrastructure_mss2018_r2', 'commit_id': 'c2366adc23a05c3acd544791455d176045fa9899'}
