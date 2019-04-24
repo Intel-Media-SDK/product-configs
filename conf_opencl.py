@@ -21,24 +21,24 @@
 from pathlib import Path
 
 OPENCL_REPO_NAME = 'opencl_runtime'
+PRODUCT_NAME = OPENCL_REPO_NAME
 # Codename for opencl_runtime is neo
 OPENCL_CODE_NAME = 'neo'
 
 # TODO: get OpenCL version from manifest
-OPENCL_VERSION = '19.11.12599'
+OPENCL_VERSION = manifest.get_component(PRODUCT_NAME).version
 OPENCL_REPO_DIR = options.get('REPOS_DIR') / OPENCL_REPO_NAME
 
 # Repos_to_extract
 PRODUCT_REPOS = [
-    {'name': OPENCL_REPO_NAME, 'commit_id': OPENCL_VERSION},
-
+    {'name': OPENCL_REPO_NAME},
     # This repo not needed for build and added only to support CI process
     {'name': 'product-configs'}
 ]
 
 DEPENDENCIES = [
     'gmmlib',
-    'intel-graphic-compiler',
+    'intel-graphics-compiler',
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
@@ -55,9 +55,6 @@ OPENCL_LIB_INSTALL_DIRS = {
     'deb': 'lib/x86_64-linux-gnu'
 }
 
-# TODO: Export from Dependency directory
-GMMLIB_PKG_DIR = '/usr/local/lib64/pkgconfig/'
-IGC_DIR = '/usr/local/'
 
 # TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
@@ -69,27 +66,52 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
+# Prepare dependencies
+GMMLIB_PATH = options['DEPENDENCIES_DIR'] / 'gmmlib' / 'usr' / 'local'
+GMMLIB_PKG_CONFIG_PATH = GMMLIB_PATH / 'lib64' / 'pkgconfig'
+GMMLIB_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={GMMLIB_PATH}',
+    '^includedir=.+': f'includedir={GMMLIB_PATH}/include/igdgmm',
+    '^libdir=.+': f'libdir={GMMLIB_PATH}/lib64'
+}
+
+action('Gmmlib: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, GMMLIB_PKG_CONFIG_RPM_PATTERN], {}))
+
+IGC_PATH = options['DEPENDENCIES_DIR'] / 'intel-graphics-compiler' / 'usr' / 'local'
+IGC_PKG_CONFIG_PATH = IGC_PATH / 'lib' / 'pkgconfig'
+IGC_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={IGC_PATH}',
+    '^libdir=.+': 'libdir=${prefix}/lib'
+}
+
+action('IGC: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [IGC_PKG_CONFIG_PATH, IGC_PKG_CONFIG_RPM_PATTERN], {}))
+
+# Build OpenCL
 cmake_command = ['cmake3',
                  '-DBUILD_TYPE=Release',
                  f'-DCMAKE_INSTALL_PREFIX={OPENCL_CENTOS_PREFIX}',
                  f'-DCMAKE_INSTALL_LIBDIR={OPENCL_LIB_INSTALL_DIRS["rpm"]}',
-                 f'-DIGC_DIR={IGC_DIR}',
+                 f'-DIGC_DIR={IGC_PATH}',
+                 # TODO: WORKAROUND Enable tests when issue will be closed
+                 # https://github.com/intel/compute-runtime/issues/155
                  f'-DSKIP_UNIT_TESTS=ON',
                  str(OPENCL_REPO_DIR)]
 
-# TODO: define path to igc
-# TODO: WORKAROUND Enable tests when issue https://github.com/intel/compute-runtime/issues/155 is closed
 
 cmake = ' '.join(cmake_command)
 
-# Build OpenCL
+
 action('OpenCL: cmake',
        work_dir=options['BUILD_DIR'],
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': GMMLIB_PKG_DIR})
+       env={'PKG_CONFIG_PATH': f'{GMMLIB_PKG_CONFIG_PATH}'})
 
 action('OpenCL: build',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET),)
+       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('OpenCL: make install',
        stage=stage.INSTALL,
