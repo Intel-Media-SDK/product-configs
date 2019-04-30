@@ -20,3 +20,4 @@
 
 
 OPEN_SOURCE = {'branch': 'update_components_installer', 'commit_id': '0d93bd1b4d5606b2c992cda540799152e042931e'}
+
