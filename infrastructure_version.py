@@ -19,5 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'update_components_installer', 'commit_id': '0d93bd1b4d5606b2c992cda540799152e042931e'}
-
+OPEN_SOURCE = {'branch': 'master', 'commit_id': '000c0a3935b19f484ce8cbd6f5ecdb1324db8d87'}
