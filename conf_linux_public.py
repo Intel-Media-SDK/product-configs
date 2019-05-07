@@ -1,4 +1,4 @@
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -209,6 +209,21 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+# Create configuration files
+# TODO: Should be a part of Cmake config
+intel_mediasdk_conf = options["INSTALL_DIR"] / 'intel-mediasdk.conf'
+data = f'{MSDK_LIB_INSTALL_DIRS["rpm"]}/lib64'
+action('create intel-mediasdk.conf',
+       stage=stage.INSTALL,
+       callfunc=(create_file, [intel_mediasdk_conf, data], {}))
+
+intel_mdf_conf = options["INSTALL_DIR"] / 'intel-mdf.conf'
+data = '/opt/intel/msdk_driver/lib64'
+
+action('create intel-mdf.conf',
+       stage=stage.INSTALL,
+       callfunc=(create_file, [intel_mdf_conf, data], {}))                     
+                            
 # Get api version for MediaSDK package
 action('count api version and build number',
        stage=stage.PACK,
@@ -219,6 +234,8 @@ pack_dir = options['INSTALL_DIR'] / 'opt/intel/mediasdk'
 
 MEDIASDK_PACK_DIRS = [
     f'{pack_dir}/={MSDK_LIB_INSTALL_DIRS["rpm"]}/',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.conf=/etc/ld.so.conf.d/',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
 ]
 
 action('MediaSDK: create rpm pkg',
