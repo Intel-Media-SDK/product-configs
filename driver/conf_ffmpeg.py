@@ -63,7 +63,7 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
 
 action('ffmpeg: configure',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm --enable-vaapi', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('ffmpeg: make',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
