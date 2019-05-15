@@ -26,6 +26,10 @@ PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME).version
 FFMPEG_REPO_DIR = options.get('REPOS_DIR') / FFMPEG_REPO_NAME
 
+DEPENDENCIES = [
+    'libva'
+]
+
 PRODUCT_REPOS = [
     {'name': FFMPEG_REPO_NAME},
     {'name': PRODUCT_CONFIGS_REPO_NAME}
@@ -61,9 +65,23 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
+# Prepare dependencies
+# Libva
+LIBVA_PATH = options['DEPENDENCIES_DIR'] / 'libva' / 'usr' / 'local'
+LIBVA_PKG_CONFIG_PATH = LIBVA_PATH / 'lib64' / 'pkgconfig'
+LIBVA_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={LIBVA_PATH}',
+}
+
+action('LibVA: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
+
+# Build ffmpeg
 action('ffmpeg: configure',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm', GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}'})
 
 action('ffmpeg: make',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
