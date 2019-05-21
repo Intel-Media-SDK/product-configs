@@ -37,5 +37,5 @@ action(f'Create temp dir',
 for test_id in TESTS:
     action(f'Run test {test_id}',
            work_dir=TEST_SCRIPT_PATH,
-           cmd=f'chmod +x run_test.sh && ./run_test.sh {test_id}',
+           cmd=f'python3 run_test.py {test_id}',
            verbose=True)
