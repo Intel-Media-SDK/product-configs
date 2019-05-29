@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
+    {'name': 'MediaSDK', 'branch': 'refs/pull/1423/head', 'commit_id': '805baec76e8e260c72fb3b4d57bc50c87aab2b42'},
     # Give possibility to build windows for changes from product configs repository
     {'name': 'product-configs'}
 ]
@@ -61,35 +61,13 @@ def windows_build(platform='x64', configuration='Release', build_environment=BUI
     )
 
     DEV_PKG_DATA_TO_ARCHIVE.extend([{
-        'from_path': options['REPOS_DIR'] / 'MediaSDK' / 'samples' / '_build',
-        'relative': [
-            {
-                'path': rf'{platform}\{configuration}',
-                'pack_as': rf'samples\{platform}\{configuration}'
-            }
-        ]}])
-
-    for suffix in ['.lib', '.pdb']:
-        INSTALL_PKG_DATA_TO_ARCHIVE.append({
-            'from_path': options['REPOS_DIR'] / 'build',
-            'relative': [
-                {
-                    'path': rf'win_{platform}\lib\libmfx_vs2015{suffix}'
-                }
-            ]})
-
-    dev_package = {
         'from_path': options['REPOS_DIR'] / 'build',
         'relative': [
             {
-                'path': rf'win_{platform}'
+                'path': rf'win_{platform}\{configuration}',
+                'pack_as': rf'win_{platform}\{configuration}'
             }
-        ]
-    }
-
-    # Need to avoid multiple adding the same (win_{platform}) directory to developer package
-    if dev_package not in DEV_PKG_DATA_TO_ARCHIVE:
-        DEV_PKG_DATA_TO_ARCHIVE.append(dev_package)
+        ]}])
 
 
 action(
