@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 PRODUCT_REPOS = [
-    {'name': 'MediaSDK', 'branch': 'refs/pull/1423/head', 'commit_id': '805baec76e8e260c72fb3b4d57bc50c87aab2b42'},
+    {'name': 'MediaSDK'},
     # Give possibility to build windows for changes from product configs repository
     {'name': 'product-configs'}
 ]
