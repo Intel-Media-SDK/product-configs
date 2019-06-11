@@ -14,21 +14,21 @@ components:
     - branch: master
       url: https://github.com/intel/libva
       name: libva
-      revision: 4d9d819d4859bf2fe2554d2619ddbf21cbedb90c
+      revision: f98749b2fa12152ddff79a3fe851bbb6076165a2
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: "19.2"
+    version: "2.5.0.pre3"
   gmmlib:
     repository:
     - branch: master
       url: https://github.com/intel/gmmlib
       name: gmmlib
-      revision: 04a402ff9b6a47633b65e4704af3572b0a100353
+      revision: 5a931e80d9bc1da7967927fc2faf02def8bd1234
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: "19.2"
+    version: "19.2.1"
   media-driver:
     repository:
     - branch: master
@@ -60,3 +60,4 @@ components:
     product_type: public_linux_metrics_calc
     version: 1.0.1
 version: 1
+
