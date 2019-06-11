@@ -14,11 +14,11 @@ components:
     - branch: master
       url: https://github.com/intel/libva
       name: libva
-      revision: 4d9d819d4859bf2fe2554d2619ddbf21cbedb90c
+      revision: 520b9e54f95d722654ccf034f01a7f5bc043d338
       type: git
       trigger: True
     product_type: public_linux_libva
-    version: "19.2"
+    version: "2.5.0.pre3"
   gmmlib:
     repository:
     - branch: master
