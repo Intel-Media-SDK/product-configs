@@ -24,11 +24,11 @@ components:
     - branch: master
       url: https://github.com/intel/gmmlib
       name: gmmlib
-      revision: 04a402ff9b6a47633b65e4704af3572b0a100353
+      revision: 2818bfb6f46089dce037995d554d491e2c0b6b26
       type: git
       trigger: True
     product_type: public_linux_gmmlib
-    version: "19.2"
+    version: "19.2.1"
   media-driver:
     repository:
     - branch: master
