@@ -34,7 +34,7 @@ components:
     - branch: master
       url: https://github.com/intel/media-driver
       name: media-driver
-      revision: intel-media-19.1.pre3
+      revision: a344c1e1e1f75f6ad63479b836cc9cee1a9489ec
       type: git
       trigger: True
     product_type: public_linux_driver
