@@ -1,14 +1,14 @@
 components:
   mediasdk:
     repository:
-      mediasdk:
-        name: mediasdk
+      MediaSDK:
+        name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
         branch: master
         revision: intel-mediasdk-19.1.pre3
         type: git
     build_info:
-      trigger: mediasdk
+      trigger: MediaSDK
       product_type: public_linux
       build_type: release
       build_event: commit
