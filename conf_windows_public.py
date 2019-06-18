@@ -18,12 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    # Give possibility to build windows for changes from product configs repository
-    {'name': 'product-configs'}
-]
-
 BUILD_ENVIRONMENT = {
     'INTELMEDIASDKROOT': str(options['REPOS_DIR'] / 'MediaSDK' / 'api'),
     'MINIDDK_ROOT': r'C:\Program Files (x86)\Windows Kits\10',

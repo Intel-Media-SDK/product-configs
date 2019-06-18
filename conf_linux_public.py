@@ -19,19 +19,9 @@
 # SOFTWARE.
 
 MEDIA_SDK_REPO_NAME = 'MediaSDK'
-PRODUCT_NAME = MEDIA_SDK_REPO_NAME.lower()
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
-
 
 DEPENDENCIES = [
     'libva'
-]
-
-PRODUCT_REPOS = [
-    {'name': MEDIA_SDK_REPO_NAME},
-    # Give possibility to build linux for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': PRODUCT_CONFIGS_REPO_NAME}
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
