@@ -89,13 +89,13 @@ components:
       infrastructure:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
-        branch: master
-        revision: b470cd334cf66ea2b540afe0188729f4fb55299e
+        branch: one_ci_dev
+        revision: 8aa4906eb9558ed8280570b5dd5f89affaf43cd4
         type: git
       product-configs:
         name: product-configs
         url: https://github.com/Intel-Media-SDK/product-configs
-        branch: master
+        branch: one_ci_dev
         revision: null
         type: git
     build_info:
