@@ -90,7 +90,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: one_ci_dev
-        revision: 8aa4906eb9558ed8280570b5dd5f89affaf43cd4
+        revision: b327b10795ae661c19a38adfc089ac898a3ce8b9
         type: git
       product-configs:
         name: product-configs
