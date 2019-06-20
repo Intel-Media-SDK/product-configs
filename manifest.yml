@@ -21,7 +21,12 @@ components:
         branch: master
         revision: f98749b2fa12152ddff79a3fe851bbb6076165a2
         type: git
-        trigger: true
+      libva-utils:
+        name: libva-utils
+        url: https://github.com/intel/libva-utils
+        branch: master
+        revision: fbb17203aee1ff3f32a04a5f83e427245457890f
+        type: git
     build_info:
       trigger: libva
       product_type: public_linux_libva
@@ -48,14 +53,14 @@ components:
         name: media-driver
         url: https://github.com/intel/media-driver
         branch: master
-        revision: 8317419a5b340130f737c425c8f0d61358453220
+        revision: intel-media-19.1.pre3
         type: git
     build_info:
       trigger: media-driver
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: '19.2'
+    version: 19.1.pre3
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
@@ -63,6 +68,36 @@ components:
         url: https://github.com/intel/intel-graphics-compiler
         branch: master
         revision: igc_release_2019-03-12
+        type: git
+      llvm:
+        name: llvm
+        url: https://github.com/llvm-mirror/llvm
+        branch: master
+        revision: release_70
+        type: git
+      clang:
+        name: clang
+        url: https://github.com/llvm-mirror/clang
+        branch: master
+        revision: release_70
+        type: git
+      opencl-clang:
+        name: opencl-clang
+        url: https://github.com/intel/opencl-clang
+        branch: master
+        revision: ocl-open-70
+        type: git
+      SPIRV-LLVM-Translator:
+        name: SPIRV-LLVM-Translator
+        url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
+        branch: master
+        revision: llvm_release_70
+        type: git
+      llvm-patches:
+        name: llvm-patches
+        url: https://github.com/intel/llvm-patches
+        branch: master
+        revision: 3285b327fe05858e843dfb2d933ee79b3f24200f
         type: git
     build_info:
       trigger: intel-graphics-compiler
@@ -84,13 +119,41 @@ components:
       build_type: release
       build_event: commit
     version: 19.11.12599
+  ffmpeg:
+    repository:
+      FFmpeg:
+        name: FFmpeg
+        url: https://github.com/FFmpeg/FFmpeg
+        branch: master
+        revision: a0877648472a25debc9bd7957684748a253c2b52
+        type: git
+    build_info:
+      trigger: FFmpeg
+      product_type: public_linux_ffmpeg
+      build_type: release
+      build_event: commit
+    version: 4.1.3
+  metrics_calc_lite:
+    repository:
+      tools:
+        name: tools
+        url: https://github.com/Intel-Media-SDK/tools
+        branch: master
+        revision: 18f5c6bb99ec28a61a86a499f711d7045829ee42
+        type: git
+    build_info:
+      trigger: tools
+      product_type: public_linux_metrics_calc
+      build_type: release
+      build_event: commit
+    version: 1.0.1
   infra:
     repository:
       infrastructure:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: one_ci_dev
-        revision: b327b10795ae661c19a38adfc089ac898a3ce8b9
+        revision: 3e419b09923ed4faaafde4991e14d69f8c993002
         type: git
       product-configs:
         name: product-configs
@@ -103,6 +166,6 @@ components:
       product_type: null
       build_type: null
       build_event: commit
-    version: 1
-version: 1
+    version: 2
+version: 2
 
