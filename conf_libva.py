@@ -27,16 +27,6 @@ LIBVA_UTILS_REPO_NAME = 'libva-utils'
 
 # Libva-utils version maps libva version
 LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
-
-PRODUCT_NAME = LIBVA_REPO_NAME
-
-# Repos_to_extract
-PRODUCT_REPOS = [
-    {'name': LIBVA_REPO_NAME},
-    {'name': LIBVA_UTILS_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME},
-]
 
 LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
 

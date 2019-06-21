@@ -22,14 +22,9 @@ from pathlib import Path
 
 CALC_REPO_NAME = 'tools'
 PRODUCT_NAME = 'metrics_calc_lite'
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 CALC_VERSION = manifest.get_component(PRODUCT_NAME).version
 CALC_REPO_DIR = options.get('REPOS_DIR') / CALC_REPO_NAME / PRODUCT_NAME
 
-PRODUCT_REPOS = [
-    {'name': CALC_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME}
-]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9

@@ -21,7 +21,6 @@
 from pathlib import Path
 
 DRIVER_REPO_NAME = 'media-driver'
-PRODUCT_NAME = DRIVER_REPO_NAME
 
 DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
@@ -30,14 +29,6 @@ DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 DEPENDENCIES = [
     'libva',
     'gmmlib'
-]
-
-# Repos_to_extract
-PRODUCT_REPOS = [
-    {'name': DRIVER_REPO_NAME},
-    # Give possibility to build the driver for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
 ]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
