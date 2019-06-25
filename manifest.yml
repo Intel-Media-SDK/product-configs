@@ -14,7 +14,7 @@ components:
     - branch: master
       url: https://github.com/intel/libva
       name: libva
-      revision: f98749b2fa12152ddff79a3fe851bbb6076165a2
+      revision: b8d1208a63e316e12e96c7916f40eee636fd555f
       type: git
       trigger: True
     product_type: public_linux_libva
@@ -31,10 +31,10 @@ components:
     version: "19.2.1"
   media-driver:
     repository:
-    - branch: master
+    - branch: refs/pull/651/head
       url: https://github.com/intel/media-driver
       name: media-driver
-      revision: 8317419a5b340130f737c425c8f0d61358453220
+      revision: 306925fc24a3535469052c7014f57c8dfb5c90a9
       type: git
       trigger: True
     product_type: public_linux_driver
