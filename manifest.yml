@@ -34,7 +34,7 @@ components:
     - branch: master
       url: https://github.com/intel/media-driver
       name: media-driver
-      revision: 8317419a5b340130f737c425c8f0d61358453220
+      revision: b6af78a9ecd6d1df1d162f2437d532bbec14601f
       type: git
       trigger: True
     product_type: public_linux_driver
