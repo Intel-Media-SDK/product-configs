@@ -34,7 +34,7 @@ PRODUCT_NAME = LIBVA_REPO_NAME
 # Repos_to_extract
 PRODUCT_REPOS = [
     {'name': LIBVA_REPO_NAME},
-    {'name': LIBVA_UTILS_REPO_NAME},
+    {'name': LIBVA_UTILS_REPO_NAME, 'branch': 'v2.5-branch', 'commit_id': 'a04ba9224fc80a8f60757fbe99b190d62123608c'},
     {'name': PRODUCT_CONFIGS_REPO_NAME},
 ]
 
