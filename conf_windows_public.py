@@ -51,6 +51,7 @@ def windows_build(platform='x64', configuration='Release', build_environment=BUI
     vs_component(
         f"Build  {platform} {configuration}",
         solution_path=options['REPOS_DIR'] / r'MediaSDK\AllBuild.sln',
+        vs_version='vs2019',
         env=build_environment,
         msbuild_args={
             '/property': {
