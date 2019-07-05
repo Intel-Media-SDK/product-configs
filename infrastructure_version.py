@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 
-OPEN_SOURCE = {'branch': 'master', 'commit_id': '9c2907560153aa486a8aefadfb9477d8437f9350'}
+OPEN_SOURCE = {'branch': 'add_windows_support', 'commit_id': 'e41eb69e8950c238a2c003f09072c27129cba19a'}
