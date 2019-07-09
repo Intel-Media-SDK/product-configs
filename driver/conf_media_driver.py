@@ -108,7 +108,8 @@ action('media-driver: cmake',
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
 action('media-driver: build',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'LD_LIBRARY_PATH': f'{LIBVA_PKG_CONFIG_PATH.parent}:{GMMLIB_PKG_CONFIG_PATH.parent}'})
 
 action('media-driver: list artifacts',
         cmd=f'echo " " && ls ./media_driver',
