@@ -118,7 +118,8 @@ action('media-driver: list artifacts',
 action('media-driver: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'LD_LIBRARY_PATH': f'{LIBVA_PKG_CONFIG_PATH.parent}:{GMMLIB_PKG_CONFIG_PATH.parent}'})
 
 # Create configuration files
 intel_mediasdk_file = options["INSTALL_DIR"] / 'intel-mediasdk.sh'
