@@ -21,6 +21,14 @@ components:
         branch: master
         revision: b8d1208a63e316e12e96c7916f40eee636fd555f
         type: git
+    build_info:
+      trigger: libva
+      product_type: public_linux_libva
+      build_type: release
+      build_event: commit
+    version: 2.5.0.pre3
+  libva-utils:
+    repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
@@ -28,11 +36,11 @@ components:
         revision: fbb17203aee1ff3f32a04a5f83e427245457890f
         type: git
     build_info:
-      trigger: libva
-      product_type: public_linux_libva
+      trigger: libva-utils
+      product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.5.0.pre3
+    version: 2.5.0
   gmmlib:
     repository:
       gmmlib:
@@ -153,7 +161,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: one_ci_dev
-        revision: 310b47cba8bd62a29c673f320be585714491633d
+        revision: 05d3f14956bde1857f56d864545792e850f391b0
         type: git
       product-configs:
         name: product-configs

@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-INSTALL = ['libva', 'gmmlib', 'ffmpeg', 'metrics_calc_lite', 'media-driver', 'mediasdk']
+INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics_calc_lite', 'media-driver', 'mediasdk']
 
 TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TEST_ENV = {
