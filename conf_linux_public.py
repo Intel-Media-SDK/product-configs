@@ -37,7 +37,7 @@ PRODUCT_REPOS = [
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
-GCC_LATEST = '8.2.0'
+GCC_LATEST = '9.1.0'
 CLANG_VERSION = '6.0'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
@@ -72,8 +72,9 @@ def set_env(repo_path, gcc_latest, clang_version):
 
     compiler_version = args.get('compiler_version')
     if args.get('compiler') == "gcc" and compiler_version == gcc_latest:
-        options["ENV"]['CC'] = '/usr/bin/gcc-8'
-        options["ENV"]['CXX'] = '/usr/bin/g++-8'
+        # TODO: Add possibility to choose other gcc versions
+        options["ENV"]['CC'] = '/usr/bin/gcc-9'
+        options["ENV"]['CXX'] = '/usr/bin/g++-9'
         
     elif args.get('compiler') == "clang" and compiler_version == clang_version:
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
