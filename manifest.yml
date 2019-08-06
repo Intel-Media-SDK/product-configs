@@ -48,7 +48,7 @@ components:
       type: git
       trigger: True
     product_type: public_linux_igc
-    version: igc_release_2019-03-12
+    version: 19.03.12
   opencl_runtime:
     repository:
     - branch: master
