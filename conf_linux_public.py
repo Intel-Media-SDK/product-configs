@@ -138,9 +138,9 @@ cmake_command = ['cmake3', '--no-warn-unused-cli', '-Wno-dev -G "Unix Makefiles"
 # TODO: use the same command as for 'gcc'
 if args.get('compiler') == "clang":
     cmake_command.append(
-        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
     cmake_command.append(
-        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 # Default parameters (default flow):
 else:
     cmake_command.append(
