@@ -20,20 +20,15 @@
 
 from pathlib import Path
 
-FFMPEG_REPO_NAME = 'ffmpeg'
-PRODUCT_NAME = FFMPEG_REPO_NAME
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
-FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME).version
+FFMPEG_REPO_NAME = 'FFmpeg'
+
+FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME.lower()).version
 FFMPEG_REPO_DIR = options.get('REPOS_DIR') / FFMPEG_REPO_NAME
 
 DEPENDENCIES = [
     'libva'
 ]
 
-PRODUCT_REPOS = [
-    {'name': FFMPEG_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME}
-]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9

@@ -23,22 +23,8 @@ from pathlib import Path
 
 
 LIBVA_REPO_NAME = 'libva'
-LIBVA_UTILS_REPO_NAME = 'libva-utils'
-
-# Libva-utils version maps libva version
 LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-PRODUCT_NAME = LIBVA_REPO_NAME
-
-# Repos_to_extract
-PRODUCT_REPOS = [
-    {'name': LIBVA_REPO_NAME},
-    {'name': LIBVA_UTILS_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME},
-]
-
-LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
@@ -62,16 +48,16 @@ LIBVA_LIB_INSTALL_DIRS = {
 }
 
 LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
-LIBVA_UTILS_REPO_DIR = options.get('REPOS_DIR') / LIBVA_UTILS_REPO_NAME
 
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
+    # Ubuntu Server: gcc_latest or clang
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
+
 
 cmd = []
 cmd.append('--buildtype=release')
@@ -96,20 +82,6 @@ action('LibVA: list artifacts',
 action('LibVA: ninja-build install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
-
-# Build libva-utils
-action('libva-utils: meson',
-       work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'meson {LIBVA_UTILS_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET))
-
-action('libva-utils: ninja-build',
-       work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'ninja-build -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
-
-action('libva-utils: ninja-build install',
-       stage=stage.INSTALL,
-       work_dir=LIBVA_UTILS_BUILD_DIR,
        cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 
@@ -140,8 +112,7 @@ include_install_to = LIBVA_DEB_PREFIX
 
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib64/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-    f'{pack_dir}/bin/={include_install_to}/bin',
+    f'{pack_dir}/include/={include_install_to}/include'
 ]
 
 action('LibVA: create deb pkg',
@@ -166,8 +137,7 @@ include_install_to = LIBVA_CENTOS_PREFIX
 
 LIBVA_PACK_DIRS = [
     f'{pack_dir}/lib64/={lib_install_to}/',
-    f'{pack_dir}/include/={include_install_to}/include',
-    f'{pack_dir}/bin/={include_install_to}/bin',
+    f'{pack_dir}/include/={include_install_to}/include'
 ]
 
 action('LibVA: create rpm pkg',
