@@ -34,12 +34,25 @@ DEPENDENCIES = [
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
-GCC_LATEST = '8.2.0'
+GCC_LATEST = '9.2.0'
+CLANG_VERSION = '8'
 options["STRIP_BINARIES"] = True
 
 DRIVER_INSTALL_PREFIX = Path('/opt/intel/msdk_driver')
 # Installation by default: /opt/intel/msdk_driver/lib64
 DRIVER_LIB_DIR = 'lib64'
+
+
+def set_env(gcc_latest, clang_version):
+    compiler_version = args.get('compiler_version')
+    if args.get('compiler') == "gcc" and compiler_version == gcc_latest:
+        # TODO: Add possibility to choose other gcc versions
+        options["ENV"]['CC'] = '/usr/bin/gcc-9'
+        options["ENV"]['CXX'] = '/usr/bin/g++-9'
+
+    elif args.get('compiler') == "clang" and compiler_version == clang_version:
+        options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
+        options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
 
 
 # TODO: add more smart logic or warnings?! (potential danger zone)
@@ -49,6 +62,10 @@ def get_building_cmd(command, gcc_latest, enable_devtoolset):
         return command
     else:
         return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
+
+
+action('set CC and CXX environment variables',
+       callfunc=(set_env, [GCC_LATEST, CLANG_VERSION], {}))
 
 
 cmake_command = [
