@@ -5,7 +5,7 @@ components:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
         branch: master
-        revision: intel-mediasdk-19.1.pre3
+        revision: null
         type: git
     build_info:
       trigger: MediaSDK
@@ -61,7 +61,7 @@ components:
         name: media-driver
         url: https://github.com/intel/media-driver
         branch: master
-        revision: intel-media-19.1.pre3
+        revision: null
         type: git
     build_info:
       trigger: media-driver
@@ -161,7 +161,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
-        revision: 262a68b07ec5d7dbe90d837e5464502fca760173
+        revision: 05cf8131d0ffc81edc52c5e4535a929d7a2517f6
         type: git
       product-configs:
         name: product-configs
