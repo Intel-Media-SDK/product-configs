@@ -12,7 +12,7 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.1.pre3
+    version: 19.3.pre5
   libva:
     repository:
       libva:
@@ -26,7 +26,7 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.5.0.pre3
+    version: 2.6.0.pre1
   libva-utils:
     repository:
       libva-utils:
@@ -54,7 +54,7 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.2.1
+    version: 19.3.2
   media-driver:
     repository:
       media-driver:
@@ -68,7 +68,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.1.pre3
+    version: 19.3.pre4
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
@@ -140,7 +140,7 @@ components:
       product_type: public_linux_ffmpeg
       build_type: release
       build_event: commit
-    version: 4.1.3
+    version: 4.2.1
   metrics_calc_lite:
     repository:
       tools:
