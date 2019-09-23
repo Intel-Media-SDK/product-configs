@@ -22,8 +22,9 @@ from pathlib import Path
 
 FFMPEG_REPO_NAME = 'FFmpeg'
 
-FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME.lower()).version
 FFMPEG_REPO_DIR = options.get('REPOS_DIR') / FFMPEG_REPO_NAME
+BUILD_NUM = get_commit_number(FFMPEG_REPO_DIR)
+FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME.lower()).version + f'.{BUILD_NUM}'
 
 DEPENDENCIES = [
     'libva'

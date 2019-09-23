@@ -22,8 +22,9 @@ from pathlib import Path
 
 DRIVER_REPO_NAME = 'media-driver'
 
-DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
+BUILD_NUM = get_commit_number(DRIVER_REPO_DIR)
+DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
 DEPENDENCIES = [

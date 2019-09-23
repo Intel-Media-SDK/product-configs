@@ -23,7 +23,10 @@ from pathlib import Path
 
 
 LIBVA_REPO_NAME = 'libva'
-LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version
+
+LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
+BUILD_NUM = get_commit_number(LIBVA_REPO_DIR)
+LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'

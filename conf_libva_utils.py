@@ -22,7 +22,10 @@
 from pathlib import Path
 
 LIBVA_UTILS_REPO_NAME = 'libva-utils'
-LIBVA_UTILS_VERSION = manifest.get_component(LIBVA_UTILS_REPO_NAME).version
+
+LIBVA_UTILS_REPO_DIR = options.get('REPOS_DIR') / LIBVA_UTILS_REPO_NAME
+BUILD_NUM = get_commit_number(LIBVA_UTILS_REPO_DIR)
+LIBVA_UTILS_VERSION = manifest.get_component(LIBVA_UTILS_REPO_NAME).version + f'.{BUILD_NUM}'
 
 DEPENDENCIES = [
     'libva'

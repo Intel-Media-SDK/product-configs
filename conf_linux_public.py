@@ -230,15 +230,17 @@ MEDIASDK_PACK_DIRS = [
     f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
 ]
 
+BUILD_NUM = get_commit_number(MEDIA_SDK_REPO_DIR)
+
 action('MediaSDK: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
 action('MediaSDK: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
