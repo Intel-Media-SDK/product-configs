@@ -24,7 +24,9 @@ DRIVER_REPO_NAME = 'media-driver'
 
 DRIVER_REPO_DIR = options.get('REPOS_DIR') / DRIVER_REPO_NAME
 BUILD_NUM = get_commit_number(DRIVER_REPO_DIR)
-DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version + f'.{BUILD_NUM}'
+
+DRIVER_VERSION = manifest.get_component(DRIVER_REPO_NAME).version
+DRIVER_PKG_VERSION = DRIVER_VERSION + f'.{BUILD_NUM}'
 
 
 DEPENDENCIES = [
@@ -71,7 +73,7 @@ action('set CC and CXX environment variables',
 
 cmake_command = [
     'cmake3',
-    f'-DMEDIA_VERSION="$MEDIA_VERSION"',
+    f'-DMEDIA_VERSION="{DRIVER_VERSION}"',
     f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}',
     # By default install driver to /opt/intel/msdk_driver
     f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
@@ -149,13 +151,13 @@ DRIVER_PACK_DIRS = [
 action('media-driver: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', DRIVER_PACK_DIRS, ENABLE_RUBY24, DRIVER_VERSION, DRIVER_REPO_NAME.lower()))
+       cmd=get_packing_cmd('rpm', DRIVER_PACK_DIRS, ENABLE_RUBY24, DRIVER_PKG_VERSION, DRIVER_REPO_NAME.lower()))
 
 
 action('media-driver: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', DRIVER_PACK_DIRS, ENABLE_RUBY24, DRIVER_VERSION, DRIVER_REPO_NAME.lower()))
+       cmd=get_packing_cmd('deb', DRIVER_PACK_DIRS, ENABLE_RUBY24, DRIVER_PKG_VERSION, DRIVER_REPO_NAME.lower()))
 
 # TODO: Define where to copy
 INSTALL_PKG_DATA_TO_ARCHIVE.extend([
