@@ -22,8 +22,9 @@ from pathlib import Path
 
 GMMLIB_REPO_NAME = 'gmmlib'
 
-GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version
 GMMLIB_REPO_DIR = options.get('REPOS_DIR') / GMMLIB_REPO_NAME
+BUILD_NUM = get_commit_number(GMMLIB_REPO_DIR)
+GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'

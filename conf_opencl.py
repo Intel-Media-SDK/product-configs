@@ -25,8 +25,9 @@ OPENCL_REPO_NAME = 'opencl_runtime'
 OPENCL_CODE_NAME = 'neo'
 
 # TODO: get OpenCL version from manifest
-OPENCL_VERSION = manifest.get_component(OPENCL_REPO_NAME).version
 OPENCL_REPO_DIR = options.get('REPOS_DIR') / OPENCL_REPO_NAME
+BUILD_NUM = get_commit_number(OPENCL_REPO_DIR)
+OPENCL_VERSION = manifest.get_component(OPENCL_REPO_NAME).version + f'.{BUILD_NUM}'
 
 DEPENDENCIES = [
     'gmmlib',

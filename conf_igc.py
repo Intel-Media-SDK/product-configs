@@ -24,7 +24,9 @@ from pathlib import Path
 IGC_REPO_NAME = 'intel-graphics-compiler'
 IGC_PACK_NAME = 'intel-igc-opencl'
 
-IGC_VERSION = manifest.get_component(IGC_REPO_NAME).version
+IGC_REPO_DIR = options.get('REPOS_DIR') / IGC_REPO_NAME
+BUILD_NUM = get_commit_number(IGC_REPO_DIR)
+IGC_VERSION = manifest.get_component(IGC_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
