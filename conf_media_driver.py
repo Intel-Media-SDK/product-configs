@@ -77,6 +77,7 @@ cmake_command = [
     f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}',
     # By default install driver to /opt/intel/msdk_driver
     f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    f'-DCMAKE_SKIP_RPATH=TRUE',
     f'-DINSTALL_DRIVER_SYSCONF=OFF',
     # Path contains iHD_drv_video.so
     f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
