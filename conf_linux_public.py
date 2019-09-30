@@ -69,6 +69,7 @@ def set_env(repo_path, gcc_latest, clang_version):
     elif args.get('compiler') == "clang" and compiler_version == clang_version:
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
         options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
+        options["ENV"]['ASM'] = f'/usr/bin/clang-{compiler_version}'
 
 
 # TODO: add more smart logic or warnings?! (potential danger zone)
@@ -124,19 +125,11 @@ action('count api version and build number',
 cmake_command = ['cmake3', '--no-warn-unused-cli', '-Wno-dev -G "Unix Makefiles"', '-LA']
 
 
-# Build without -Werror option in case of clang:
-# TODO: use the same command as for 'gcc'
-if args.get('compiler') == "clang":
-    cmake_command.append(
-        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append(
-        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 # Default parameters (default flow):
-else:
-    cmake_command.append(
-        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append(
-        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(
+    '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(
+    '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 cmake_command.append('-DBUILD_TESTS=ON ')
 
