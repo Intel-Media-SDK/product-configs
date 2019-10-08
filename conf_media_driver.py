@@ -118,8 +118,10 @@ action('media-driver: cmake',
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
+options["LD_LIBRARY_PATH"] = f'{options["BUILD_DIR"]}/media_driver:{GMMLIB_PATH}/lib64'
+
 action('media-driver: build',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'LD_LIBRARY_PATH={options["LD_LIBRARY_PATH"]} make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 action('media-driver: list artifacts',
         cmd=f'echo " " && ls ./media_driver',
@@ -128,7 +130,7 @@ action('media-driver: list artifacts',
 action('media-driver: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=get_building_cmd(f'LD_LIBRARY_PATH={options["LD_LIBRARY_PATH"]} make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
 
 # Create configuration files
 intel_mediasdk_file = options["INSTALL_DIR"] / 'intel-mediasdk.sh'
