@@ -12,14 +12,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.0
+    version: 19.3.1
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: b8d1208a63e316e12e96c7916f40eee636fd555f
+        revision: d49b99d5d88f66e2e1ca451cf19251c7950c870d
         type: git
     build_info:
       trigger: libva
@@ -33,42 +33,42 @@ components:
         name: libva-utils
         url: https://github.com/intel/libva-utils
         branch: master
-        revision: fbb17203aee1ff3f32a04a5f83e427245457890f
+        revision: 81b5929f2b71d0b657e6ef605a522edc3bcd3e80
         type: git
     build_info:
       trigger: libva-utils
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.5.0
+    version: 2.6.0.pre1
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: intel-gmmlib-19.3.1
+        revision: intel-gmmlib-19.3.2
         type: git
     build_info:
       trigger: gmmlib
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.3.1
+    version: 19.3.2
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
         branch: intel-media-19.3
-        revision: intel-media-19.3.0
+        revision: intel-media-19.3.1
         type: git
     build_info:
       trigger: media-driver
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.3.0
+    version: 19.3.1
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
@@ -119,14 +119,14 @@ components:
         name: opencl_runtime
         url: https://github.com/intel/compute-runtime
         branch: master
-        revision: 19.11.12599
+        revision: 19.41.14441
         type: git
     build_info:
       trigger: opencl_runtime
       product_type: public_linux_opencl_runtime
       build_type: release
       build_event: commit
-    version: 19.11.12599
+    version: 19.41.14441
   ffmpeg:
     repository:
       FFmpeg:
