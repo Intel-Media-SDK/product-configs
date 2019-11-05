@@ -21,7 +21,7 @@
 BUILD_ENVIRONMENT = {
     'INTELMEDIASDKROOT': str(options['REPOS_DIR'] / 'MediaSDK' / 'api'),
     'MINIDDK_ROOT': r'C:\Program Files (x86)\Windows Kits\10',
-    'MINIDDK_VERSION': '10.0.17134.0',
+    'MINIDDK_VERSION': '10.0.18362.0',
     'MSBuildEmitSolution': '1'
 }
 
