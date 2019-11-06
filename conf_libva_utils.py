@@ -35,7 +35,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
-CLANG_VERSION = '6.0'
+CLANG_VERSION = '9'
 options["STRIP_BINARIES"] = True
 # _DEB_PREFIX is used by default
 LIBVA_UTILS_DEB_PREFIX = Path('/usr/local')
