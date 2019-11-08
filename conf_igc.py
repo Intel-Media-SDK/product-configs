@@ -23,30 +23,11 @@ from pathlib import Path
 
 IGC_REPO_NAME = 'intel-graphics-compiler'
 IGC_PACK_NAME = 'intel-igc-opencl'
-PRODUCT_NAME = IGC_REPO_NAME
-# Dependency repos
-LLVM_REPO_NAME = 'llvm'
-CLANG_REPO_NAME = 'clang'
-OPENCL_CLANG_REPO_NAME = 'opencl-clang'
-LLVM_SPIRV_REPO_NAME = 'spirv-llvm-translator'
-LLVM_PATCHES = 'llvm-patches'
 
-IGC_VERSION = manifest.get_component(IGC_REPO_NAME).version
+IGC_REPO_DIR = options.get('REPOS_DIR') / IGC_REPO_NAME
+BUILD_NUM = get_commit_number(IGC_REPO_DIR)
+IGC_VERSION = manifest.get_component(IGC_REPO_NAME).version + f'.{BUILD_NUM}'
 
-# Repos_to_extract
-PRODUCT_REPOS = [
-    {'name': IGC_REPO_NAME},
-
-    # Dependencies needed to build igc
-    {'name': LLVM_REPO_NAME, 'branch': 'master', 'commit_id': 'release_70'},
-    {'name': CLANG_REPO_NAME, 'branch': 'master', 'commit_id': 'release_70'},
-    {'name': OPENCL_CLANG_REPO_NAME, 'branch': 'master', 'commit_id': 'ocl-open-70'},
-    {'name': LLVM_SPIRV_REPO_NAME, 'branch': 'master', 'commit_id': 'llvm_release_70'},
-    {'name': LLVM_PATCHES},
-
-    # This repo not needed for build and added only to support CI process
-    {'name': 'product-configs'}
-]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
@@ -55,12 +36,12 @@ GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = False
 
 DEPENDENCY_STRUCTURE = {
-        LLVM_REPO_NAME: 'llvm_source',
-        CLANG_REPO_NAME: 'llvm_source/tools/clang',
-        OPENCL_CLANG_REPO_NAME: 'llvm_source/projects/opencl-clang',
-        LLVM_SPIRV_REPO_NAME: 'llvm_source/projects/llvm-spirv',
-        LLVM_PATCHES: 'llvm_patches',
-        IGC_REPO_NAME: 'igc',
+        'llvm': 'llvm_source',
+        'clang': 'llvm_source/tools/clang',
+        'opencl-clang': 'llvm_source/projects/opencl-clang',
+        'SPIRV-LLVM-Translator': 'llvm_source/projects/llvm-spirv',
+        'llvm-patches': 'llvm_patches',
+        'intel-graphics-compiler': 'igc',
     }
 
 # By default install to the system
@@ -98,13 +79,15 @@ def build_dependency_structure(src_dir, dst_dir, dependency_structure):
     for repo_name, link_name in dependency_structure.items():
         copytree(str(src_dir / repo_name), str(dst_dir / link_name))
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
+
+# TODO: add more smart logic or warnings?! (potential danger zone)
 def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
+    # Ubuntu Server: gcc_latest or clang
     if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
         return command
     else:
         return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
+
 
 cmake_command = ['cmake3']
 
@@ -116,6 +99,7 @@ cmake = ' '.join(cmake_command)
 
 # Make Structure
 action('igc: create repos structure',
+       stage=stage.EXTRACT,
        work_dir=options['BUILD_DIR'],
        callfunc=(build_dependency_structure, [options['REPOS_DIR'], options['BUILD_DIR'], DEPENDENCY_STRUCTURE], {}))
 

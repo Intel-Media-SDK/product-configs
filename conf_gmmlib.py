@@ -21,17 +21,11 @@
 from pathlib import Path
 
 GMMLIB_REPO_NAME = 'gmmlib'
-PRODUCT_NAME = GMMLIB_REPO_NAME
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
 
-GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version
 GMMLIB_REPO_DIR = options.get('REPOS_DIR') / GMMLIB_REPO_NAME
+BUILD_NUM = get_commit_number(GMMLIB_REPO_DIR)
+GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version + f'.{BUILD_NUM}'
 
-# Repos_to_extract
-PRODUCT_REPOS = [
-    {'name': GMMLIB_REPO_NAME},
-    {'name': PRODUCT_CONFIGS_REPO_NAME},
-]
 
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9

@@ -18,16 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-PRODUCT_REPOS = [
-    {'name': 'MediaSDK'},
-    # Give possibility to build windows for changes from product configs repository
-    {'name': 'product-configs'}
-]
-
 BUILD_ENVIRONMENT = {
     'INTELMEDIASDKROOT': str(options['REPOS_DIR'] / 'MediaSDK' / 'api'),
     'MINIDDK_ROOT': r'C:\Program Files (x86)\Windows Kits\10',
-    'MINIDDK_VERSION': '10.0.17134.0',
+    'MINIDDK_VERSION': '10.0.18362.0',
     'MSBuildEmitSolution': '1'
 }
 
@@ -47,50 +41,11 @@ def clean_msbuild_dirs(repos_dir):
         shutil.rmtree(build_dir)
 
 
-def dispatcher(platform='x64', configuration='Release', build_environment=BUILD_ENVIRONMENT):
+def windows_build(platform='x64', configuration='Release', build_environment=BUILD_ENVIRONMENT):
     vs_component(
-        f"Build dispatcher (2017) {platform} {configuration}",
-        solution_path=options['REPOS_DIR'] / r'MediaSDK\api\mfx_dispatch\windows\libmfx_vs2015.sln',
-        msbuild_args={
-            '/property': {
-                'Platform': platform,
-                'Configuration': configuration
-            }
-        },
-        env=build_environment
-    )
-
-    install_package_file_suffixes = ['.lib', '.pdb']
-    if configuration == 'Debug':
-        install_package_file_suffixes.append('.idb')
-
-    for suffix in install_package_file_suffixes:
-        INSTALL_PKG_DATA_TO_ARCHIVE.append({
-            'from_path': options['REPOS_DIR'] / 'build',
-            'relative': [
-                {
-                    'path': rf'win_{platform}\lib\libmfx_vs2015{"" if configuration == "Release" else "_d"}{suffix}'
-                }
-        ]})
-
-    dev_package = {
-        'from_path': options['REPOS_DIR'] / 'build',
-        'relative': [
-            {
-                'path': rf'win_{platform}'
-            }
-        ]
-    }
-
-    # Need to avoid multiple adding the same (win_{platform}) directory to developer package
-    if dev_package not in DEV_PKG_DATA_TO_ARCHIVE:
-        DEV_PKG_DATA_TO_ARCHIVE.append(dev_package)
-
-
-def samples(platform='x64', configuration='Release', build_environment=BUILD_ENVIRONMENT):
-    vs_component(
-        f"Build Samples {platform} {configuration}",
-        solution_path=options['REPOS_DIR'] / r'MediaSDK\samples\AllSamples.sln',
+        f"Build  {platform} {configuration}",
+        solution_path=options['REPOS_DIR'] / r'MediaSDK\AllBuild.sln',
+        vs_version='vs2019',
         env=build_environment,
         msbuild_args={
             '/property': {
@@ -101,14 +56,14 @@ def samples(platform='x64', configuration='Release', build_environment=BUILD_ENV
     )
 
     DEV_PKG_DATA_TO_ARCHIVE.extend([{
-        'from_path': options['REPOS_DIR'] / 'MediaSDK' / 'samples' / '_build',
+        'from_path': options['REPOS_DIR'] / 'build',
         'relative': [
             {
-                'path': rf'{platform}\{configuration}',
-                'pack_as': rf'samples\{platform}\{configuration}'
+                'path': rf'win_{platform}\{configuration}',
+                'pack_as': rf'win_{platform}\{configuration}'
             }
-        ]
-    }])
+        ]}])
+
 
 action(
     'Clean msbuild dirs',
@@ -116,14 +71,7 @@ action(
     callfunc=(clean_msbuild_dirs, [options['REPOS_DIR']], {})
 )
 
-
-# TODO: add support for the build-type arg
-dispatcher(platform='x64', configuration='Release')
-dispatcher(platform='x64', configuration='Debug')
-dispatcher(platform='Win32', configuration='Release')
-dispatcher(platform='Win32', configuration='Debug')
-
-samples(platform='x64', configuration='Release')
-samples(platform='x64', configuration='Debug')
-samples(platform='Win32', configuration='Release')
-samples(platform='Win32', configuration='Debug')
+windows_build(platform='x64', configuration='Release')
+windows_build(platform='x64', configuration='Debug')
+windows_build(platform='Win32', configuration='Release')
+windows_build(platform='Win32', configuration='Debug')
