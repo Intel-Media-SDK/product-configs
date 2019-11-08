@@ -47,12 +47,13 @@ action(f'Create temp dir for driver tests',
        cmd=f'mkdir -p temp',
        verbose=True)
 
-for test_id in DRIVER_TESTS:
-    action(f'Run media-driver test {test_id}',
-           work_dir=TEST_SCRIPT_PATH,
-           cmd=f'python3 run_test.py {test_id}',
-           env=TEST_ENV,
-           verbose=True)
+# Disable driver tests for mss2018_r2 branch
+# for test_id in DRIVER_TESTS:
+#     action(f'Run media-driver test {test_id}',
+#            work_dir=TEST_SCRIPT_PATH,
+#            cmd=f'python3 run_test.py {test_id}',
+#            env=TEST_ENV,
+#            verbose=True)
 
 action(f'Run MediaSDK TED test',
        work_dir=infra_path,
