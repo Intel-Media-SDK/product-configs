@@ -19,27 +19,16 @@
 # SOFTWARE.
 
 MEDIA_SDK_REPO_NAME = 'MediaSDK'
-PRODUCT_NAME = MEDIA_SDK_REPO_NAME.lower()
-PRODUCT_CONFIGS_REPO_NAME = 'product-configs'
-
 
 DEPENDENCIES = [
     'libva'
 ]
 
-
-PRODUCT_REPOS = [
-    {'name': MEDIA_SDK_REPO_NAME},
-    # Give possibility to build linux for changes from product configs repository
-    # This repo not needed for build and added only to support CI process
-    {'name': PRODUCT_CONFIGS_REPO_NAME}
-]
-
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
-GCC_LATEST = '8.2.0'
-CLANG_VERSION = '6.0'
+GCC_LATEST = '9.2.0'
+CLANG_VERSION = '9'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
@@ -73,12 +62,14 @@ def set_env(repo_path, gcc_latest, clang_version):
 
     compiler_version = args.get('compiler_version')
     if args.get('compiler') == "gcc" and compiler_version == gcc_latest:
-        options["ENV"]['CC'] = '/usr/bin/gcc-8'
-        options["ENV"]['CXX'] = '/usr/bin/g++-8'
+        # TODO: Add possibility to choose other gcc versions
+        options["ENV"]['CC'] = '/usr/bin/gcc-9'
+        options["ENV"]['CXX'] = '/usr/bin/g++-9'
         
     elif args.get('compiler') == "clang" and compiler_version == clang_version:
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
         options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
+        options["ENV"]['ASM'] = f'/usr/bin/clang-{compiler_version}'
 
 
 # TODO: add more smart logic or warnings?! (potential danger zone)
@@ -134,19 +125,11 @@ action('count api version and build number',
 cmake_command = ['cmake3', '--no-warn-unused-cli', '-Wno-dev -G "Unix Makefiles"', '-LA']
 
 
-# Build without -Werror option in case of clang:
-# TODO: use the same command as for 'gcc'
-if args.get('compiler') == "clang":
-    cmake_command.append(
-        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append(
-        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 # Default parameters (default flow):
-else:
-    cmake_command.append(
-        '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
-    cmake_command.append(
-        '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(
+    '-DCMAKE_C_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
+cmake_command.append(
+    '-DCMAKE_CXX_FLAGS_RELEASE="-O2 -Wformat -Wformat-security -Wall -Werror -D_FORTIFY_SOURCE=2 -fstack-protector-strong"')
 
 cmake_command.append('-DBUILD_TESTS=ON ')
 
@@ -191,6 +174,11 @@ action('binary versions',
        cmd=f'echo " " && strings -f ./__bin/release/*.so | grep mediasdk || echo',
        verbose=True)
 
+if build_event != 'klocwork':
+    action('run_unit_tests',
+           cmd=f'ctest --verbose',
+           verbose=True)
+
 action('install',
        stage=stage.INSTALL,
        cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
@@ -205,6 +193,22 @@ if args.get('fastboot'):
            stage=stage.INSTALL,
            callfunc=(check_lib_size, [FASTBOOT_LIB_MAX_SIZE, MEDIA_SDK_BUILD_DIR / '__bin/release/libmfxhw64-fastboot.so.{ENV[API_VERSION]}'], {}))
 
+
+# Create configuration files
+# TODO: Should be a part of Cmake config
+intel_mediasdk_conf = options["INSTALL_DIR"] / 'intel-mediasdk.conf'
+data = f'{MSDK_LIB_INSTALL_DIRS["rpm"]}/lib64'
+action('create intel-mediasdk.conf',
+       stage=stage.INSTALL,
+       callfunc=(create_file, [intel_mediasdk_conf, data], {}))
+
+intel_mdf_conf = options["INSTALL_DIR"] / 'intel-mdf.conf'
+data = '/opt/intel/msdk_driver/lib64'
+
+action('create intel-mdf.conf',
+       stage=stage.INSTALL,
+       callfunc=(create_file, [intel_mdf_conf, data], {}))
+
 # Get api version for MediaSDK package
 action('count api version and build number',
        stage=stage.PACK,
@@ -215,17 +219,21 @@ pack_dir = options['INSTALL_DIR'] / 'opt/intel/mediasdk'
 
 MEDIASDK_PACK_DIRS = [
     f'{pack_dir}/={MSDK_LIB_INSTALL_DIRS["rpm"]}/',
+    f'{options["INSTALL_DIR"]}/intel-mediasdk.conf=/etc/ld.so.conf.d/',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
 ]
+
+BUILD_NUM = get_commit_number(MEDIA_SDK_REPO_DIR)
 
 action('MediaSDK: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
 action('MediaSDK: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
