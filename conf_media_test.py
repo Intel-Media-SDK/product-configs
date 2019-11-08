@@ -28,32 +28,12 @@ TEST_ENV = {
     'LIBVA_DRIVER_NAME': 'iHD'
 }
 
-DRIVER_TESTS = [
-    'CABA1_SVA_B',
-    'CABA1_Sony_D',
-    'avc_cbr_001',
-    'avc_cqp_001',
-    'scale_001'
-]
 
 ARTIFACTS_LAYOUT = {
     str(options['LOGS_DIR']): 'logs',
     str(infra_path / 'ted/results'): 'mediasdk',
     str(infra_path / 'smoke_test' / 'hevc_fei_tests_res.log'): 'hevc_fei_tests.log'
 }
-
-action(f'Create temp dir for driver tests',
-       work_dir=TEST_SCRIPT_PATH,
-       cmd=f'mkdir -p temp',
-       verbose=True)
-
-# Disable driver tests for mss2018_r2 branch
-# for test_id in DRIVER_TESTS:
-#     action(f'Run media-driver test {test_id}',
-#            work_dir=TEST_SCRIPT_PATH,
-#            cmd=f'python3 run_test.py {test_id}',
-#            env=TEST_ENV,
-#            verbose=True)
 
 action(f'Run MediaSDK TED test',
        work_dir=infra_path,
