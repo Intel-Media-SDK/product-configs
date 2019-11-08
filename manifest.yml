@@ -1,62 +1,181 @@
 components:
   mediasdk:
     repository:
-    - branch: master
-      url: https://github.com/Intel-Media-SDK/MediaSDK
-      name: mediasdk
-      revision: intel-mediasdk-19.1.pre3
-      type: git
-      trigger: True
-    product_type: public_linux
+      MediaSDK:
+        name: MediaSDK
+        url: https://github.com/Intel-Media-SDK/MediaSDK
+        branch: master
+        revision: intel-mediasdk-19.1.pre3
+        type: git
+    build_info:
+      trigger: MediaSDK
+      product_type: public_linux
+      build_type: release
+      build_event: commit
     version: 19.1.pre3
   libva:
     repository:
-    - branch: master
-      url: https://github.com/intel/libva
-      name: libva
-      revision: b3be72a5a110880f70626d7c3bed953cdde124b2
-      type: git
-      trigger: True
-    product_type: public_linux_libva
+      libva:
+        name: libva
+        url: https://github.com/intel/libva
+        branch: master
+        revision: b3be72a5a110880f70626d7c3bed953cdde124b2
+        type: git
+    build_info:
+      trigger: libva
+      product_type: public_linux_libva
+      build_type: release
+      build_event: commit
     version: 2.1.1.pre1
+  libva-utils:
+    repository:
+      libva-utils:
+        name: libva-utils
+        url: https://github.com/intel/libva-utils
+        branch: master
+        revision: fbb17203aee1ff3f32a04a5f83e427245457890f
+        type: git
+    build_info:
+      trigger: libva-utils
+      product_type: public_linux_libva_utils
+      build_type: release
+      build_event: commit
+    version: 2.5.0
   gmmlib:
     repository:
-    - branch: master
-      url: https://github.com/intel/gmmlib
-      name: gmmlib
-      revision: 375036ac3596ca9f55d2a070bac4bcffbf3fa7fd
-      type: git
-      trigger: True
-    product_type: public_linux_gmmlib
+      gmmlib:
+        name: gmmlib
+        url: https://github.com/intel/gmmlib
+        branch: master
+        revision: 375036ac3596ca9f55d2a070bac4bcffbf3fa7fd
+        type: git
+    build_info:
+      trigger: gmmlib
+      product_type: public_linux_gmmlib
+      build_type: release
+      build_event: commit
     version: 18.3.pre1
   media-driver:
     repository:
-    - branch: intel-media-16.9
-      url: https://github.com/VCDP/media-driver
-      name: media-driver
-      revision: 0a76ca321594fdbabe93ba6615d7d81b4cc4e65b
-      type: git
-      trigger: True
-    product_type: public_linux_driver
+      media-driver:
+        name: media-driver
+        url: https://github.com/VCDP/media-driver
+        branch: intel-media-16.9
+        revision: 0a76ca321594fdbabe93ba6615d7d81b4cc4e65b
+        type: git
+    build_info:
+      trigger: media-driver
+      product_type: public_linux_driver
+      build_type: release
+      build_event: commit
     version: 16.9.2
   intel-graphics-compiler:
     repository:
-    - branch: master
-      url: https://github.com/intel/intel-graphics-compiler
-      name: intel-graphics-compiler
-      revision: igc_release_2019-03-12
-      type: git
-      trigger: True
-    product_type: public_linux_igc
-    version: igc_release_2019-03-12
+      intel-graphics-compiler:
+        name: intel-graphics-compiler
+        url: https://github.com/intel/intel-graphics-compiler
+        branch: master
+        revision: igc_release_2019-03-12
+        type: git
+      llvm:
+        name: llvm
+        url: https://github.com/llvm-mirror/llvm
+        branch: master
+        revision: release_80
+        type: git
+      clang:
+        name: clang
+        url: https://github.com/llvm-mirror/clang
+        branch: master
+        revision: release_80
+        type: git
+      opencl-clang:
+        name: opencl-clang
+        url: https://github.com/intel/opencl-clang
+        branch: master
+        revision: ocl-open-80
+        type: git
+      SPIRV-LLVM-Translator:
+        name: SPIRV-LLVM-Translator
+        url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
+        branch: master
+        revision: llvm_release_80
+        type: git
+      llvm-patches:
+        name: llvm-patches
+        url: https://github.com/intel/llvm-patches
+        branch: master
+        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        type: git
+    build_info:
+      trigger: intel-graphics-compiler
+      product_type: public_linux_igc
+      build_type: release
+      build_event: commit
+    version: 19.03.12
   opencl_runtime:
     repository:
-    - branch: master
-      url: https://github.com/intel/compute-runtime
-      name: opencl_runtime
-      revision: 19.10.12542
-      type: git
-      trigger: True
-    product_type: public_linux_opencl_runtime
+      opencl_runtime:
+        name: opencl_runtime
+        url: https://github.com/intel/compute-runtime
+        branch: master
+        revision: 19.10.12542
+        type: git
+    build_info:
+      trigger: opencl_runtime
+      product_type: public_linux_opencl_runtime
+      build_type: release
+      build_event: commit
     version: 19.10.12542
-version: 1
+  ffmpeg:
+    repository:
+      FFmpeg:
+        name: FFmpeg
+        url: https://github.com/FFmpeg/FFmpeg
+        branch: master
+        revision: a0877648472a25debc9bd7957684748a253c2b52
+        type: git
+    build_info:
+      trigger: FFmpeg
+      product_type: public_linux_ffmpeg
+      build_type: release
+      build_event: commit
+    version: 4.2.1
+  metrics_calc_lite:
+    repository:
+      tools:
+        name: tools
+        url: https://github.com/Intel-Media-SDK/tools
+        branch: master
+        revision: 18f5c6bb99ec28a61a86a499f711d7045829ee42
+        type: git
+    build_info:
+      trigger: tools
+      product_type: public_linux_metrics_calc
+      build_type: release
+      build_event: commit
+    version: 1.0.1
+  infra:
+    repository:
+      infrastructure:
+        name: infrastructure
+        url: https://github.com/Intel-Media-SDK/infrastructure
+        branch: master
+        revision: 389fca00b5225f1cac02ee348fee6090b99294b2
+        type: git
+      product-configs:
+        name: product-configs
+        url: https://github.com/Intel-Media-SDK/product-configs
+        branch: master
+        revision: null
+        type: git
+    build_info:
+      trigger: product-configs
+      product_type: public_linux
+      build_type: release
+      build_event: commit
+    version: 2
+event:
+  component: null
+  repository: null
+version: 2
