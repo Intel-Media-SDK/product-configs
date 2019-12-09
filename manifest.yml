@@ -33,7 +33,7 @@ components:
         name: libva-utils
         url: https://github.com/intel/libva-utils
         branch: master
-        revision: 0e012b179499c0cdb9c7e9a1b176255f65286a0f
+        revision: cbbadf0301e17ac195e58265062c7e11be7fdd47
         type: git
     build_info:
       trigger: libva-utils

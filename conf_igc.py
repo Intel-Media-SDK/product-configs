@@ -50,7 +50,7 @@ IGC_DEB_PREFIX = Path('/usr/local')
 IGC_CENTOS_PREFIX = Path('/usr')
 
 # By default
-PKGCONFIG = 'lib/pkgconfig'
+PKGCONFIG = 'lib64/pkgconfig'
 IGC_PKGCONFIG_DIR = IGC_DEB_PREFIX / PKGCONFIG
 
 IGC_LIB_INSTALL_DIRS = {
@@ -137,7 +137,7 @@ lib_install_to = IGC_DEB_PREFIX / IGC_LIB_INSTALL_DIRS['deb']
 include_install_to = IGC_DEB_PREFIX
 
 IGC_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/lib64/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
     f'{pack_dir}/bin/={include_install_to}/bin',
 ]
@@ -164,7 +164,7 @@ lib_install_to = IGC_CENTOS_PREFIX / IGC_LIB_INSTALL_DIRS['rpm']
 include_install_to = IGC_CENTOS_PREFIX
 
 IGC_PACK_DIRS = [
-    f'{pack_dir}/lib/={lib_install_to}/',
+    f'{pack_dir}/lib64/={lib_install_to}/',
     f'{pack_dir}/include/={include_install_to}/include',
     f'{pack_dir}/bin/={include_install_to}/bin',
 ]
