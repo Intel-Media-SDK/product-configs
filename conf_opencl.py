@@ -101,7 +101,8 @@ cmake = ' '.join(cmake_command)
 action('OpenCL: cmake',
        work_dir=options['BUILD_DIR'],
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{GMMLIB_PKG_CONFIG_PATH}:{IGC_PKG_CONFIG_PATH}'})
+       env={'PKG_CONFIG_PATH': f'{GMMLIB_PKG_CONFIG_PATH}:{IGC_PKG_CONFIG_PATH}',
+            'LD_LIBRARY_PATH': f'{IGC_PKG_CONFIG_PATH.parent}'})
 
 action('OpenCL: build',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
