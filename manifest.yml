@@ -81,31 +81,31 @@ components:
         name: llvm
         url: https://github.com/llvm-mirror/llvm
         branch: master
-        revision: release_80
+        revision: release_90
         type: git
       clang:
         name: clang
         url: https://github.com/llvm-mirror/clang
         branch: master
-        revision: release_80
+        revision: release_90
         type: git
       opencl-clang:
         name: opencl-clang
         url: https://github.com/intel/opencl-clang
         branch: master
-        revision: ocl-open-80
+        revision: ocl-open-90
         type: git
       SPIRV-LLVM-Translator:
         name: SPIRV-LLVM-Translator
         url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
         branch: master
-        revision: llvm_release_80
+        revision: llvm_release_90
         type: git
       llvm-patches:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
-        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        revision: 1c93162ab33af968c22fe1cbfb12ea87f5a25bfa
         type: git
     build_info:
       trigger: intel-graphics-compiler

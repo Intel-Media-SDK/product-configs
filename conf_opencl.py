@@ -73,10 +73,10 @@ action('Gmmlib: change pkgconfigs',
        callfunc=(update_config, [GMMLIB_PKG_CONFIG_PATH, GMMLIB_PKG_CONFIG_RPM_PATTERN], {}))
 
 IGC_PATH = options['DEPENDENCIES_DIR'] / 'intel-graphics-compiler' / 'usr' / 'local'
-IGC_PKG_CONFIG_PATH = IGC_PATH / 'lib' / 'pkgconfig'
+IGC_PKG_CONFIG_PATH = IGC_PATH / 'lib64' / 'pkgconfig'
 IGC_PKG_CONFIG_RPM_PATTERN = {
     '^prefix=.+': f'prefix={IGC_PATH}',
-    '^libdir=.+': 'libdir=${prefix}/lib'
+    '^libdir=.+': 'libdir=${prefix}/lib64'
 }
 
 action('IGC: change pkgconfigs',
@@ -101,8 +101,7 @@ cmake = ' '.join(cmake_command)
 action('OpenCL: cmake',
        work_dir=options['BUILD_DIR'],
        cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{GMMLIB_PKG_CONFIG_PATH}:{IGC_PKG_CONFIG_PATH}',
-            'LD_LIBRARY_PATH': f'{IGC_PKG_CONFIG_PATH.parent}'})
+       env={'PKG_CONFIG_PATH': f'{GMMLIB_PKG_CONFIG_PATH}:{IGC_PKG_CONFIG_PATH}'})
 
 action('OpenCL: build',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
