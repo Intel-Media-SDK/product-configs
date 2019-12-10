@@ -119,14 +119,14 @@ components:
         name: opencl_runtime
         url: https://github.com/intel/compute-runtime
         branch: master
-        revision: 19.41.14441
+        revision: 19.48.14977
         type: git
     build_info:
       trigger: opencl_runtime
       product_type: public_linux_opencl_runtime
       build_type: release
       build_event: commit
-    version: 19.41.14441
+    version: 19.48.14977
   ffmpeg:
     repository:
       FFmpeg:
