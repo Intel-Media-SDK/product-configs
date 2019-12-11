@@ -105,7 +105,7 @@ components:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
-        revision: 1c93162ab33af968c22fe1cbfb12ea87f5a25bfa
+        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
         type: git
     build_info:
       trigger: intel-graphics-compiler
