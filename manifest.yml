@@ -19,7 +19,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 09c8c2e20b7763fc44299172dbb16061b57f9c71
+        revision: c9bb65b673fb62ba5dace005699901c91e90abab
         type: git
     build_info:
       trigger: libva
@@ -105,7 +105,7 @@ components:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
-        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        revision: 1c93162ab33af968c22fe1cbfb12ea87f5a25bfa
         type: git
     build_info:
       trigger: intel-graphics-compiler
