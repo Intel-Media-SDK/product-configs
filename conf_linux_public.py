@@ -144,7 +144,8 @@ if args.get('fastboot'):
     fastboot_cmake_path = MEDIA_SDK_REPO_DIR / 'builder/profiles/fastboot.cmake'
     cmake_command.append(f'-DMFX_CONFIG_FILE={fastboot_cmake_path}')
 
-if args.get('api_latest'):
+if args.get('api_latest') or args.get('compiler') == "clang" or \
+    (args.get('compiler') == "gcc" and args.get('compiler_version') == GCC_LATEST and not args.get('fastboot')):
     cmake_command.append('-DAPI:STRING=latest')
 
 cmake_command.append(str(MEDIA_SDK_REPO_DIR))
