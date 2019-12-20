@@ -4,7 +4,7 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
+        branch: intel-mediasdk-19.4
         revision: null
         type: git
     build_info:
@@ -12,94 +12,94 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 19.4.0
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 95eb8cf469367b532b391042fa0e77ca513ac94e
+        revision: 09c8c2e20b7763fc44299172dbb16061b57f9c71
         type: git
     build_info:
       trigger: libva
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.6.0.pre1
+    version: 2.6.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
-        branch: master
-        revision: fbb17203aee1ff3f32a04a5f83e427245457890f
+        branch: v2.6-branch
+        revision: 8ea1eba433dcbceb0e5dcb54b8e3f984987f7a17
         type: git
     build_info:
       trigger: libva-utils
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.5.0
+    version: 2.6.0
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 94306f5443b97d9762dbb35ba65b341ee3e91cf0
+        revision: intel-gmmlib-19.3.4.2
         type: git
     build_info:
       trigger: gmmlib
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.3.3
+    version: 19.3.4.2
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
-        branch: master
-        revision: null
+        branch: intel-media-19.4
+        revision: fe586caa2aa85f4869eb97a70c8a489bba9a00a5
         type: git
     build_info:
       trigger: media-driver
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.3.pre4
+    version: 19.4.0
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
         name: intel-graphics-compiler
         url: https://github.com/intel/intel-graphics-compiler
         branch: master
-        revision: igc_release_2019-03-12
+        revision: 0933210dba9acb3e25d121b9b7d99e87d840e7ab
         type: git
       llvm:
         name: llvm
         url: https://github.com/llvm-mirror/llvm
         branch: master
-        revision: release_80
+        revision: release_90
         type: git
       clang:
         name: clang
         url: https://github.com/llvm-mirror/clang
         branch: master
-        revision: release_80
+        revision: release_90
         type: git
       opencl-clang:
         name: opencl-clang
         url: https://github.com/intel/opencl-clang
         branch: master
-        revision: ocl-open-80
+        revision: ocl-open-90
         type: git
       SPIRV-LLVM-Translator:
         name: SPIRV-LLVM-Translator
         url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
         branch: master
-        revision: llvm_release_80
+        revision: llvm_release_90
         type: git
       llvm-patches:
         name: llvm-patches
@@ -112,21 +112,21 @@ components:
       product_type: public_linux_igc
       build_type: release
       build_event: commit
-    version: 19.03.12
+    version: igc-1.0.2990
   opencl_runtime:
     repository:
       opencl_runtime:
         name: opencl_runtime
         url: https://github.com/intel/compute-runtime
         branch: master
-        revision: 19.11.12599
+        revision: 19.48.14977
         type: git
     build_info:
       trigger: opencl_runtime
       product_type: public_linux_opencl_runtime
       build_type: release
       build_event: commit
-    version: 19.11.12599
+    version: 19.48.14977
   ffmpeg:
     repository:
       FFmpeg:
