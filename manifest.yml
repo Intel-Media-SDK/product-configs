@@ -19,7 +19,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 09c8c2e20b7763fc44299172dbb16061b57f9c71
+        revision: 7eec6f8ffb399ac33d545b0368079c29ebe6af24
         type: git
     build_info:
       trigger: libva
@@ -47,7 +47,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: f78be970a6c3aef6d0347159f9c3f250421af16c
+        revision: ebfcfd565031dbd7b45089d9054cd44a501f14a9
         type: git
     build_info:
       trigger: gmmlib
