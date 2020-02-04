@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,8 @@ VERBOSE_BUILD_OUTPUT = True
 FASTBOOT_LIB_MAX_SIZE = 1 * 1024 * 1024 + 256 * 1024  # byte
 
 # TODO: install mediasdk to system
-MSDK_LIB_INSTALL_DIRS = {
-    'rpm': '/opt/intel/mediasdk',
-    'deb': '/opt/intel/mediasdk'
-}
+MSDK_DEFAULT_INSTALL_DIR = 'opt/intel/mediasdk'
+MSDK_LIB_INSTALL_DIR = '/usr'
 
 
 def set_env(repo_path, gcc_latest, clang_version):
@@ -196,13 +194,6 @@ if args.get('fastboot'):
 
 
 # Create configuration files
-# TODO: Should be a part of Cmake config
-intel_mediasdk_conf = options["INSTALL_DIR"] / 'intel-mediasdk.conf'
-data = f'{MSDK_LIB_INSTALL_DIRS["rpm"]}/lib64'
-action('create intel-mediasdk.conf',
-       stage=stage.INSTALL,
-       callfunc=(create_file, [intel_mediasdk_conf, data], {}))
-
 intel_mdf_conf = options["INSTALL_DIR"] / 'intel-mdf.conf'
 data = '/opt/intel/msdk_driver/lib64'
 
@@ -216,26 +207,42 @@ action('count api version and build number',
        callfunc=(set_env, [MEDIA_SDK_REPO_DIR, GCC_LATEST, CLANG_VERSION], {}))
 
 # Get package installation dirs for MediaSDK
-pack_dir = options['INSTALL_DIR'] / 'opt/intel/mediasdk'
+pack_dir = options['INSTALL_DIR'] / MSDK_DEFAULT_INSTALL_DIR
 
-MEDIASDK_PACK_DIRS = [
-    f'{pack_dir}/={MSDK_LIB_INSTALL_DIRS["rpm"]}/',
-    f'{options["INSTALL_DIR"]}/intel-mediasdk.conf=/etc/ld.so.conf.d/',
-    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
+RPM_MEDIASDK_PACK_DIRS = [
+    f'{pack_dir}/={MSDK_LIB_INSTALL_DIR}/',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/'
 ]
 
 BUILD_NUM = get_commit_number(MEDIA_SDK_REPO_DIR)
 
+action('Temporary move pkgconfig directory',
+       stage=stage.PACK,
+       work_dir=options['INSTALL_DIR'],
+       cmd=f'mv {MSDK_DEFAULT_INSTALL_DIR}/lib64/pkgconfig ./')
+
 action('MediaSDK: create rpm pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('rpm', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('rpm', RPM_MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
+
+DEB_MEDIASDK_PACK_DIRS = [
+    f'{pack_dir}/bin/={MSDK_LIB_INSTALL_DIR}/bin/',
+    f'{pack_dir}/include/={MSDK_LIB_INSTALL_DIR}/include/',
+    f'{pack_dir}/share/={MSDK_LIB_INSTALL_DIR}/share/',
+    f'{pack_dir}/lib64={MSDK_LIB_INSTALL_DIR}/lib/x86_64-linux-gnu',
+    f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
+]
 
 action('MediaSDK: create deb pkg',
        stage=stage.PACK,
        work_dir=options['PACK_DIR'],
-       cmd=get_packing_cmd('deb', MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
+       cmd=get_packing_cmd('deb', DEB_MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
+action('Restore pkgconfig directory',
+       stage=stage.PACK,
+       work_dir=options['INSTALL_DIR'],
+       cmd=f'mv pkgconfig {MSDK_DEFAULT_INSTALL_DIR}/lib64/')
 
 DEV_PKG_DATA_TO_ARCHIVE.extend([
     {
