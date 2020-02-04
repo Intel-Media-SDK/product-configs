@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,6 @@ INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics_calc_lite', 'med
 
 TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TEST_ENV = {
-    'MFX_HOME': '/opt/intel/mediasdk',
-    'LD_LIBRARY_PATH': '/opt/intel/mediasdk/lib64',
     'LIBVA_DRIVERS_PATH': '/opt/intel/msdk_driver/lib64',
     'LIBVA_DRIVER_NAME': 'iHD'
 }
