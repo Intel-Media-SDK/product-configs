@@ -22,6 +22,7 @@ INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics_calc_lite', 'med
 
 TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TEST_ENV = {
+    'MFX_HOME': '/usr',
     'LIBVA_DRIVERS_PATH': '/opt/intel/msdk_driver/lib64',
     'LIBVA_DRIVER_NAME': 'iHD'
 }
