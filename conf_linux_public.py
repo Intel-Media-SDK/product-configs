@@ -226,10 +226,12 @@ action('MediaSDK: create rpm pkg',
        cmd=get_packing_cmd('rpm', RPM_MEDIASDK_PACK_DIRS, ENABLE_RUBY24, '{ENV[API_VERSION]}' + f'.{BUILD_NUM}', MEDIA_SDK_REPO_NAME.lower()))
 
 DEB_MEDIASDK_PACK_DIRS = [
-    f'{pack_dir}/bin/={MSDK_LIB_INSTALL_DIR}/bin/',
-    f'{pack_dir}/include/={MSDK_LIB_INSTALL_DIR}/include/',
-    f'{pack_dir}/share/={MSDK_LIB_INSTALL_DIR}/share/',
-    f'{pack_dir}/lib64={MSDK_LIB_INSTALL_DIR}/lib/x86_64-linux-gnu',
+    # TODO: fix package layout
+    f'{pack_dir}/={MSDK_LIB_INSTALL_DIR}/',
+    # f'{pack_dir}/bin/={MSDK_LIB_INSTALL_DIR}/bin/',
+    # f'{pack_dir}/include/={MSDK_LIB_INSTALL_DIR}/include/',
+    # f'{pack_dir}/share/={MSDK_LIB_INSTALL_DIR}/share/',
+    # f'{pack_dir}/lib64={MSDK_LIB_INSTALL_DIR}/lib/x86_64-linux-gnu',
     f'{options["INSTALL_DIR"]}/intel-mdf.conf=/etc/ld.so.conf.d/',
 ]
 
