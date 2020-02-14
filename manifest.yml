@@ -6,6 +6,7 @@ components:
         url: https://github.com/Intel-Media-SDK/MediaSDK
         branch: master
         revision: null
+        commit_time: null
         type: git
     build_info:
       trigger: MediaSDK
@@ -19,7 +20,8 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 7eec6f8ffb399ac33d545b0368079c29ebe6af24
+        revision: 04acc7860feb6252ccadccaf049cd60e1ba3097b
+        commit_time: null
         type: git
     build_info:
       trigger: libva
@@ -34,6 +36,7 @@ components:
         url: https://github.com/intel/libva-utils
         branch: master
         revision: 81b5929f2b71d0b657e6ef605a522edc3bcd3e80
+        commit_time: null
         type: git
     build_info:
       trigger: libva-utils
@@ -48,6 +51,7 @@ components:
         url: https://github.com/intel/gmmlib
         branch: master
         revision: 879f3044c4bde12dff3c72f2a073ae9506f7fc52
+        commit_time: null
         type: git
     build_info:
       trigger: gmmlib
@@ -62,6 +66,7 @@ components:
         url: https://github.com/intel/media-driver
         branch: master
         revision: null
+        commit_time: null
         type: git
     build_info:
       trigger: media-driver
@@ -76,36 +81,42 @@ components:
         url: https://github.com/intel/intel-graphics-compiler
         branch: master
         revision: 0933210dba9acb3e25d121b9b7d99e87d840e7ab
+        commit_time: null
         type: git
       llvm:
         name: llvm
         url: https://github.com/llvm-mirror/llvm
         branch: master
         revision: release_90
+        commit_time: null
         type: git
       clang:
         name: clang
         url: https://github.com/llvm-mirror/clang
         branch: master
         revision: release_90
+        commit_time: null
         type: git
       opencl-clang:
         name: opencl-clang
         url: https://github.com/intel/opencl-clang
         branch: master
         revision: ocl-open-90
+        commit_time: null
         type: git
       SPIRV-LLVM-Translator:
         name: SPIRV-LLVM-Translator
         url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
         branch: master
         revision: llvm_release_90
+        commit_time: null
         type: git
       llvm-patches:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
         revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        commit_time: null
         type: git
     build_info:
       trigger: intel-graphics-compiler
@@ -120,6 +131,7 @@ components:
         url: https://github.com/intel/compute-runtime
         branch: master
         revision: 20.01.15264
+        commit_time: null
         type: git
     build_info:
       trigger: opencl_runtime
@@ -134,6 +146,7 @@ components:
         url: https://github.com/FFmpeg/FFmpeg
         branch: master
         revision: a0877648472a25debc9bd7957684748a253c2b52
+        commit_time: null
         type: git
     build_info:
       trigger: FFmpeg
@@ -148,6 +161,7 @@ components:
         url: https://github.com/Intel-Media-SDK/tools
         branch: master
         revision: 18f5c6bb99ec28a61a86a499f711d7045829ee42
+        commit_time: null
         type: git
     build_info:
       trigger: tools
@@ -162,12 +176,14 @@ components:
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
         revision: 59fdf15ad498d5f1b69a744af21406f09e54b8a6
+        commit_time: null
         type: git
       product-configs:
         name: product-configs
         url: https://github.com/Intel-Media-SDK/product-configs
         branch: master
         revision: null
+        commit_time: null
         type: git
     build_info:
       trigger: product-configs
@@ -179,4 +195,3 @@ event:
   component: null
   repository: null
 version: 2
-
