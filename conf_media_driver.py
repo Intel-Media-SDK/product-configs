@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -81,8 +81,14 @@ cmake_command = [
     # Path contains iHD_drv_video.so
     f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
     f'-DBUILD_TYPE={options["BUILD_TYPE"]}',
-    str(DRIVER_REPO_DIR)
 ]
+
+if product_type == 'public_linux_driver_kernels_off':
+    cmake_command.append('-DENABLE_KERNELS=OFF')
+elif product_type == 'public_linux_driver_nonfree_kernels_off':
+    cmake_command.append('-DENABLE_NONFREE_KERNELS=OFF')
+
+cmake_command.append(str(DRIVER_REPO_DIR))
 
 cmake = ' '.join(cmake_command)
 
