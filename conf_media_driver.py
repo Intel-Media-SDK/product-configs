@@ -37,7 +37,7 @@ DEPENDENCIES = [
 ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
-GCC_LATEST = '9.2.0'
+GCC_LATEST = '9.2.1'
 CLANG_VERSION = '9'
 options["STRIP_BINARIES"] = True
 
