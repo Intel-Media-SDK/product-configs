@@ -20,7 +20,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 8e467a6e02e3ac011692f9d6b96f4f96881e49e2
+        revision: 48f446b32a4fe76d542c56c87f9427e8d14e073d
         commit_time: null
         type: git
     build_info:
@@ -176,6 +176,7 @@ components:
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
         revision: e1e5adeb43009ce86aa257e69be587e4861b1d72
+        commit_time: null
         type: git
       product-configs:
         name: product-configs
@@ -194,4 +195,3 @@ event:
   component: null
   repository: null
 version: 2
-
