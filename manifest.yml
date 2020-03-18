@@ -4,7 +4,7 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
+        branch: intel-mediasdk-20.1
         revision: null
         commit_time: null
         type: git
@@ -13,7 +13,7 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 20.1.0
   libva:
     repository:
       libva:
@@ -50,7 +50,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: c01f0041811a3f1ff7913e620ba93e6c3ec10820
+        revision: 8b7394754018dcad181597b8a1c60cd9e9961c8c
         commit_time: null
         type: git
     build_info:
@@ -64,7 +64,7 @@ components:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
-        branch: master
+        branch: intel-media-20.1
         revision: null
         commit_time: null
         type: git
@@ -73,7 +73,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.4.0
+    version: 20.1.0
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
