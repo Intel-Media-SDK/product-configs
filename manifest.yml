@@ -19,7 +19,7 @@ components:
       libva:
         name: libva
         url: https://github.com/intel/libva
-        branch: master
+        branch: 2.7.0.pre1
         revision: ef8cbc9f03f7a9a043a29438a9b74e75a0c49bb8
         commit_time: null
         type: git
@@ -28,7 +28,7 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.7.0.pre1
   libva-utils:
     repository:
       libva-utils:
