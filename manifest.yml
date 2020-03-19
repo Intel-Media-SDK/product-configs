@@ -20,7 +20,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 2.7.0.pre1
+        revision: 64520e9ec90ed30e016d7c633d746b3bf538c702
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.7.0.pre1
+    version: 2.7.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
         branch: master
-        revision: 81b5929f2b71d0b657e6ef605a522edc3bcd3e80
+        revision: bd01ba5a6b53370ee6465f393051908f9c6ddeba
         commit_time: null
         type: git
     build_info:
@@ -43,14 +43,14 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.7.0
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 8b7394754018dcad181597b8a1c60cd9e9961c8c
+        revision: e8d18d62e6ff0f98169079b944366f06fb1debd5
         commit_time: null
         type: git
     build_info:
@@ -58,7 +58,7 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.4.1
+    version: 20.1.0
   media-driver:
     repository:
       media-driver:
