@@ -87,14 +87,14 @@ components:
         name: llvm
         url: https://github.com/llvm-mirror/llvm
         branch: master
-        revision: release_90
+        revision: 2c4ca6832fa6b306ee6a7010bfb80a3f2596f824
         commit_time: null
         type: git
       clang:
         name: clang
         url: https://github.com/llvm-mirror/clang
         branch: master
-        revision: release_90
+        revision: 65acf43270ea2894dffa0d0b292b92402f80c8cb
         commit_time: null
         type: git
       opencl-clang:
