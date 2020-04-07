@@ -20,7 +20,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: 5539944cd491c35f6e8dc2818d56727db7a1c2cf
+        revision: 42ce2a4af77456a5bf1cc42ed4a6fc0f1168b328
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.7.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
         branch: master
-        revision: 81b5929f2b71d0b657e6ef605a522edc3bcd3e80
+        revision: c85cfdd5fe5ee143213af57c7daaf04dfe59947e
         commit_time: null
         type: git
     build_info:
@@ -43,7 +43,7 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.8.0
   gmmlib:
     repository:
       gmmlib:
