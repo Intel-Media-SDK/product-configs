@@ -28,7 +28,7 @@ ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '9.2.1'
-CLANG_VERSION = '9'
+CLANG_VERSION = '10'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
