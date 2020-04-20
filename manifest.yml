@@ -5,7 +5,7 @@ components:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
         branch: intel-mediasdk-20.1
-        revision: intel-mediasdk-20.1.0
+        revision: intel-mediasdk-20.1.1
         commit_time: null
         type: git
     build_info:
@@ -13,14 +13,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 20.1.0
+    version: 20.1.1
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
         branch: v2.7-branch
-        revision: 2.7.0
+        revision: 2.7.1
         commit_time: null
         type: git
     build_info:
@@ -28,7 +28,7 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.7.0
+    version: 2.7.1
   libva-utils:
     repository:
       libva-utils:
@@ -43,7 +43,7 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.7.0
+    version: 2.7.1
   gmmlib:
     repository:
       gmmlib:
