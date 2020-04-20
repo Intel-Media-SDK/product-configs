@@ -175,7 +175,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
-        revision: e1e5adeb43009ce86aa257e69be587e4861b1d72
+        revision: 2e07735a0db9c03123bab8e960d5923a0778fe0a
         commit_time: null
         type: git
       product-configs:
