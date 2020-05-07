@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -72,9 +72,12 @@ action('LibVA: change pkgconfigs',
 LIBVA_UTILS_BUILD_DIR = options["BUILD_DIR"] / LIBVA_UTILS_REPO_NAME
 LIBVA_UTILS_REPO_DIR = options.get('REPOS_DIR') / LIBVA_UTILS_REPO_NAME
 
+cflags = '-fstack-protector-strong -fPIC -pie -O2 -D_FORTIFY_SOURCE=2'
+meson_args = f'-D c_args="{cflags}" -D c_link_args="{cflags}" -D cpp_args="{cflags}" -D cpp_link_args="{cflags}"'
+
 action('libva-utils: meson',
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'meson {LIBVA_UTILS_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET),
+       cmd=get_building_cmd(f'meson {meson_args} {LIBVA_UTILS_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET),
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}'})
 
 action('libva-utils: ninja-build',
