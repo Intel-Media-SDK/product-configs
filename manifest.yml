@@ -80,21 +80,14 @@ components:
         name: intel-graphics-compiler
         url: https://github.com/intel/intel-graphics-compiler
         branch: master
-        revision: 0933210dba9acb3e25d121b9b7d99e87d840e7ab
+        revision: f94e38306fa0b84f23306d4b5c4da1c52fa5a956
         commit_time: null
         type: git
-      llvm:
-        name: llvm
-        url: https://github.com/llvm-mirror/llvm
+      llvm-project:
+        name: llvm-project
+        url: https://github.com/llvm/llvm-project
         branch: master
-        revision: release_90
-        commit_time: null
-        type: git
-      clang:
-        name: clang
-        url: https://github.com/llvm-mirror/clang
-        branch: master
-        revision: release_90
+        revision: release/9.x
         commit_time: null
         type: git
       opencl-clang:
@@ -115,7 +108,7 @@ components:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
-        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        revision: 595c1e3eeb30afc8b6c20855f6a69560f7a9864a
         commit_time: null
         type: git
     build_info:
@@ -123,7 +116,7 @@ components:
       product_type: public_linux_igc
       build_type: release
       build_event: commit
-    version: igc-1.0.2990
+    version: igc-1.0.3899
   opencl_runtime:
     repository:
       opencl_runtime:

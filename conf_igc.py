@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,9 @@ GCC_LATEST = '8.2.0'
 options["STRIP_BINARIES"] = False
 
 DEPENDENCY_STRUCTURE = {
-        'llvm': 'llvm_source',
-        'clang': 'llvm_source/tools/clang',
-        'opencl-clang': 'llvm_source/projects/opencl-clang',
-        'SPIRV-LLVM-Translator': 'llvm_source/projects/llvm-spirv',
+        'llvm-project': 'llvm-project',
+        'opencl-clang': 'llvm-project/llvm/projects/opencl-clang',
+        'SPIRV-LLVM-Translator': 'llvm-project/llvm/projects/llvm-spirv',
         'llvm-patches': 'llvm_patches',
         'intel-graphics-compiler': 'igc',
     }
@@ -77,7 +76,7 @@ def build_dependency_structure(src_dir, dst_dir, dependency_structure):
     '''
 
     for repo_name, link_name in dependency_structure.items():
-        copytree(str(src_dir / repo_name), str(dst_dir / link_name))
+        copytree(str(src_dir / repo_name), str(dst_dir / link_name), symlinks=True, ignore_dangling_symlinks=True)
 
 
 # TODO: add more smart logic or warnings?! (potential danger zone)
@@ -102,6 +101,11 @@ action('igc: create repos structure',
        stage=stage.EXTRACT,
        work_dir=options['BUILD_DIR'],
        callfunc=(build_dependency_structure, [options['REPOS_DIR'], options['BUILD_DIR'], DEPENDENCY_STRUCTURE], {}))
+
+action('igc: move clang dir',
+       stage=stage.EXTRACT,
+       cmd="mv llvm-project/clang llvm-project/llvm/tools/",
+       work_dir=options['BUILD_DIR'])
 
 # Build igc
 action('igc: cmake',
