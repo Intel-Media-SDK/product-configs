@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -101,6 +101,7 @@ action('LibVA: change LibVA pkgconfigs',
 # Update pkgconfig prefix
 pkgconfig_deb_pattern = {
     'libdir=.*/lib64': "libdir=${prefix}/"+LIBVA_LIB_INSTALL_DIRS['deb'],
+    '^includedir=.*/include': 'includedir=${prefix}/include'
 }
 
 action('LibVA: change pkgconfig for deb',
