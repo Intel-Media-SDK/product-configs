@@ -50,7 +50,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: d7a0586104096f3e2241e2a773c6bc41a9e2c422
+        revision: 3f1ff2303d72da79861ea3c6a8c3e80f9bb609f9
         commit_time: null
         type: git
     build_info:
