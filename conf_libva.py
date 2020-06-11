@@ -89,8 +89,7 @@ action('LibVA: ninja-build install',
 
 
 # Create fake LibVA pkgconfigs to build MediaSDK from custom location
-pkgconfig_pattern = {'^prefix=.+': f'prefix={options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}',
-                     '^includedir=.+': 'includedir=${prefix}/include'}
+pkgconfig_pattern = {'^prefix=.+': f'prefix={options["INSTALL_DIR"] / LIBVA_DEB_PREFIX.relative_to(LIBVA_DEB_PREFIX.root)}'}
 
 action('LibVA: change LibVA pkgconfigs',
        stage=stage.INSTALL,
@@ -102,6 +101,7 @@ action('LibVA: change LibVA pkgconfigs',
 # Update pkgconfig prefix
 pkgconfig_deb_pattern = {
     'libdir=.*/lib64': "libdir=${prefix}/"+LIBVA_LIB_INSTALL_DIRS['deb'],
+    '^includedir=.*/include': 'includedir=${prefix}/include'
 }
 
 action('LibVA: change pkgconfig for deb',
