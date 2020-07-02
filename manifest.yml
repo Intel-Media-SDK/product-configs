@@ -4,7 +4,7 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
+        branch: intel-mediasdk-20.2
         revision: null
         commit_time: null
         type: git
@@ -13,14 +13,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 20.2.0
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
-        branch: master
-        revision: afca400d5629409ae7d51c4b1109a1b73ab2844a
+        branch: v2.8-branch
+        revision: 2.8.0
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.7.0
+    version: 2.8.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
-        branch: master
-        revision: f5a83e630e9c0d4d1621ff8da11f09017f0cdd79
+        branch: v2.8-branch
+        revision: 2.8.0
         commit_time: null
         type: git
     build_info:
@@ -50,7 +50,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 40c7d14fd16a4282410a2f6b0cd59251c8e41d5c
+        revision: intel-gmmlib-20.2.2
         commit_time: null
         type: git
     build_info:
@@ -58,13 +58,13 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.4.1
+    version: 20.2.2
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
-        branch: master
+        branch: intel-media-20.2
         revision: null
         commit_time: null
         type: git
@@ -73,7 +73,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.4.0
+    version: 20.2.0
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
