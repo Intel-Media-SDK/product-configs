@@ -4,8 +4,8 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
-        revision: null
+        branch: intel-mediasdk-20.1
+        revision: intel-mediasdk-20.1.1
         commit_time: null
         type: git
     build_info:
@@ -13,14 +13,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 20.1.1
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
-        branch: master
-        revision: ef8cbc9f03f7a9a043a29438a9b74e75a0c49bb8
+        branch: v2.7-branch
+        revision: 2.7.1
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.7.1
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
-        branch: master
-        revision: 81b5929f2b71d0b657e6ef605a522edc3bcd3e80
+        branch: v2.7-branch
+        revision: 2.7.1
         commit_time: null
         type: git
     build_info:
@@ -43,14 +43,14 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.6.0
+    version: 2.7.1
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: c01f0041811a3f1ff7913e620ba93e6c3ec10820
+        revision: intel-gmmlib-20.1.1
         commit_time: null
         type: git
     build_info:
@@ -58,14 +58,14 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.4.1
+    version: 20.1.1
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
-        branch: master
-        revision: null
+        branch: intel-media-20.1
+        revision: intel-media-20.1.1
         commit_time: null
         type: git
     build_info:
@@ -73,14 +73,14 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.4.0
+    version: 20.1.1
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
         name: intel-graphics-compiler
         url: https://github.com/intel/intel-graphics-compiler
         branch: master
-        revision: 0933210dba9acb3e25d121b9b7d99e87d840e7ab
+        revision: igc-1.0.3471
         commit_time: null
         type: git
       llvm:
@@ -101,21 +101,21 @@ components:
         name: opencl-clang
         url: https://github.com/intel/opencl-clang
         branch: master
-        revision: ocl-open-90
+        revision: c1b069759162e1d3caaaf1ab2cdc7a8db7e3de8b
         commit_time: null
         type: git
       SPIRV-LLVM-Translator:
         name: SPIRV-LLVM-Translator
         url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
         branch: master
-        revision: llvm_release_90
+        revision: v9.0.1-1
         commit_time: null
         type: git
       llvm-patches:
         name: llvm-patches
         url: https://github.com/intel/llvm-patches
         branch: master
-        revision: 605739e09f4b5b176a93613c43727fd37fd77e71
+        revision: 1c93162ab33af968c22fe1cbfb12ea87f5a25bfa
         commit_time: null
         type: git
     build_info:
@@ -123,14 +123,14 @@ components:
       product_type: public_linux_igc
       build_type: release
       build_event: commit
-    version: igc-1.0.2990
+    version: igc-1.0.3471
   opencl_runtime:
     repository:
       opencl_runtime:
         name: opencl_runtime
         url: https://github.com/intel/compute-runtime
         branch: master
-        revision: 20.01.15264
+        revision: 20.10.16087
         commit_time: null
         type: git
     build_info:
@@ -138,7 +138,7 @@ components:
       product_type: public_linux_opencl_runtime
       build_type: release
       build_event: commit
-    version: 20.01.15264
+    version: 20.10.16087
   ffmpeg:
     repository:
       FFmpeg:
