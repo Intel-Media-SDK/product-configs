@@ -147,7 +147,7 @@ components:
       build_type: release
       build_event: commit
     version: 4.2.1
-  metrics_calc_lite:
+  metrics-calc-lite:
     repository:
       tools:
         name: tools
@@ -168,7 +168,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
-        revision: 032340354c1117446fb22fb1183d383589a8971e
+        revision: 51348b4367aaca0fcce93a623f239307c5f5a8d0
         commit_time: null
         type: git
       product-configs:

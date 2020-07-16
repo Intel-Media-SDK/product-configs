@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics_calc_lite', 'media-driver', 'mediasdk']
+INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics-calc-lite', 'media-driver', 'mediasdk']
 
 TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TEST_ENV = {
