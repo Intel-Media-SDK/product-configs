@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,8 @@ BUILD_NUM = get_commit_number(FFMPEG_REPO_DIR)
 FFMPEG_VERSION = manifest.get_component(FFMPEG_REPO_NAME.lower()).version + f'.{BUILD_NUM}'
 
 DEPENDENCIES = [
-    'libva'
+    'libva',
+    'mediasdk'
 ]
 
 
@@ -73,11 +74,23 @@ action('LibVA: change pkgconfigs',
        stage=stage.EXTRACT,
        callfunc=(update_config, [LIBVA_PKG_CONFIG_PATH, LIBVA_PKG_CONFIG_RPM_PATTERN], {}))
 
+
+# Mediasdk
+MEDIASDK_PATH = options['DEPENDENCIES_DIR'] / 'mediasdk' / 'opt' / 'intel' / 'mediasdk'
+MEDIASDK_PKG_CONFIG_PATH = MEDIASDK_PATH / 'lib64' / 'pkgconfig'
+MEDIASDK_PKG_CONFIG_RPM_PATTERN = {
+    '^prefix=.+': f'prefix={MEDIASDK_PATH}',
+}
+
+action('Mediasdk: change pkgconfigs',
+       stage=stage.EXTRACT,
+       callfunc=(update_config, [MEDIASDK_PKG_CONFIG_PATH, MEDIASDK_PKG_CONFIG_RPM_PATTERN], {}))
+
 # Build ffmpeg
 action('ffmpeg: configure',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm', GCC_LATEST, ENABLE_DEVTOOLSET),
-       env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}'})
+       cmd=get_building_cmd(f'{FFMPEG_REPO_DIR}/configure --disable-x86asm --enable-libmfx', GCC_LATEST, ENABLE_DEVTOOLSET),
+       env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{MEDIASDK_PKG_CONFIG_PATH}'})
 
 action('ffmpeg: make',
        cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
