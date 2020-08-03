@@ -147,7 +147,7 @@ components:
       build_type: release
       build_event: commit
     version: 4.2.1
-  metrics_calc_lite:
+  metrics-calc-lite:
     repository:
       tools:
         name: tools
