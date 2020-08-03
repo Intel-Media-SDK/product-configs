@@ -21,9 +21,9 @@
 from pathlib import Path
 
 CALC_REPO_NAME = 'tools'
-PRODUCT_NAME = 'metrics_calc_lite'
+PRODUCT_NAME = 'metrics-calc-lite'
 
-CALC_REPO_DIR = options.get('REPOS_DIR') / CALC_REPO_NAME / PRODUCT_NAME
+CALC_REPO_DIR = options.get('REPOS_DIR') / CALC_REPO_NAME / 'metrics_calc_lite'
 BUILD_NUM = get_commit_number(CALC_REPO_DIR)
 CALC_VERSION = manifest.get_component(PRODUCT_NAME).version + f'.{BUILD_NUM}'
 
