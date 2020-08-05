@@ -24,7 +24,6 @@ DEPENDENCIES = [
     'libva'
 ]
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '10'
@@ -70,15 +69,6 @@ def set_env(repo_path, gcc_latest, clang_version):
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
         options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
         options["ENV"]['ASM'] = f'/usr/bin/clang-{compiler_version}'
-
-
-# TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
 
 
 def check_lib_size(threshold_size, lib_path):
@@ -153,12 +143,12 @@ cmake_command.append(str(MEDIA_SDK_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
 action('cmake',
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       cmd=cmake,
        env={'PKG_CONFIG_PATH': str(LIBVA_PKG_CONFIG_PATH)})
 
 BUILD_VERBOSE = 'VERBOSE=1' if VERBOSE_BUILD_OUTPUT else ''
 action('build',
-       cmd=get_building_cmd(f'make {BUILD_VERBOSE} -j{options["CPU_CORES"]}', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make {BUILD_VERBOSE} -j{options["CPU_CORES"]}')
 
 action('list artifacts',
        cmd=f'echo " " && ls ./__bin/release',
@@ -182,7 +172,7 @@ if build_event != 'klocwork':
 
 action('install',
        stage=stage.INSTALL,
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
 
 if args.get('fastboot'):
     # TODO: Pass data between stages with pickle in build scripts instead

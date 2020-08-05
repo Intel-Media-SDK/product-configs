@@ -29,7 +29,6 @@ BUILD_NUM = get_commit_number(LIBVA_REPO_DIR)
 LIBVA_VERSION = manifest.get_component(LIBVA_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
@@ -53,15 +52,6 @@ LIBVA_LIB_INSTALL_DIRS = {
 LIBVA_REPO_DIR = options.get('REPOS_DIR') / LIBVA_REPO_NAME
 
 
-# TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
-
-
 cmd = []
 cmd.append('--buildtype=release')
 cmd.append('-Ddriverdir=/opt/intel/mediasdk/lib64')
@@ -71,11 +61,11 @@ cmd.append('-Dc_link_args="-z noexecstack -z relro -z now"')
 # Build LibVA
 action('LibVA: meson',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'meson {(" ").join(cmd)} {LIBVA_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'meson {(" ").join(cmd)} {LIBVA_REPO_DIR}')
 
 action('LibVA: ninja-build',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'ninja-build -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'ninja-build -j`nproc`')
 
 action('LibVA: list artifacts',
        work_dir=options['BUILD_DIR'],
@@ -85,7 +75,7 @@ action('LibVA: list artifacts',
 action('LibVA: ninja-build install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'DESTDIR={options["INSTALL_DIR"]} ninja-build install')
 
 
 # Create fake LibVA pkgconfigs to build MediaSDK from custom location
