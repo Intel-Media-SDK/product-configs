@@ -28,7 +28,6 @@ BUILD_NUM = get_commit_number(CALC_REPO_DIR)
 CALC_VERSION = manifest.get_component(PRODUCT_NAME).version + f'.{BUILD_NUM}'
 
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
@@ -46,26 +45,17 @@ CALC_LIB_INSTALL_DIRS = {
 }
 
 
-# TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
-
-
 action('metrics calc: cmake',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'cmake {CALC_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'cmake {CALC_REPO_DIR}')
 
 action('metrics calc: make',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd='make -j`nproc`')
 
 action('metrics calc: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
 
 
 # Get package installation dir for metrics calc

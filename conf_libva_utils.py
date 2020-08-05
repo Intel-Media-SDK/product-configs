@@ -31,7 +31,6 @@ DEPENDENCIES = [
     'libva'
 ]
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
@@ -45,15 +44,6 @@ LIBVA_UTILS_INSTALL_DIRS = {
     'rpm': 'lib64',
     'deb': 'lib/x86_64-linux-gnu'
 }
-
-
-# TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
 # Prepare dependencies
@@ -77,18 +67,18 @@ meson_args = f'-D c_args="{cflags}" -D c_link_args="{cflags}" -D cpp_args="{cfla
 
 action('libva-utils: meson',
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'meson {meson_args} {LIBVA_UTILS_REPO_DIR}', GCC_LATEST, ENABLE_DEVTOOLSET),
+       cmd=f'meson {meson_args} {LIBVA_UTILS_REPO_DIR}',
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}'})
 
 action('libva-utils: ninja-build',
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'ninja-build -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET),
+       cmd='ninja-build -j`nproc`',
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}'})
 
 action('libva-utils: ninja-build install',
        stage=stage.INSTALL,
        work_dir=LIBVA_UTILS_BUILD_DIR,
-       cmd=get_building_cmd(f'DESTDIR={options["INSTALL_DIR"]} ninja-build install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'DESTDIR={options["INSTALL_DIR"]} ninja-build install')
 
 # Get package installation dirs for LibVA
 pack_dir = options['INSTALL_DIR'] / LIBVA_UTILS_DEB_PREFIX.relative_to(LIBVA_UTILS_DEB_PREFIX.root)

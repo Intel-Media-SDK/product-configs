@@ -34,7 +34,6 @@ DEPENDENCIES = [
     'gmmlib'
 ]
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '10'
@@ -56,15 +55,6 @@ def set_env(gcc_latest, clang_version):
     elif args.get('compiler') == "clang" and compiler_version == clang_version:
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
         options["ENV"]['CXX'] = f'/usr/bin/clang++-{compiler_version}'
-
-
-# TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-    # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}'  # enable new compiler on CentOS
 
 
 action('set CC and CXX environment variables',
@@ -120,20 +110,20 @@ action('Gmmlib: change pkgconfigs',
 # Build Media Driver
 action('media-driver: cmake',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET),
+       cmd=cmake,
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
 action('media-driver: build',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make -j`nproc`')
 
 action('media-driver: list artifacts',
-        cmd=f'echo " " && ls ./media_driver',
-        verbose=True)
+       cmd=f'echo " " && ls ./media_driver',
+       verbose=True)
 
 action('media-driver: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
 
 # Create configuration files
 intel_mediasdk_file = options["INSTALL_DIR"] / 'intel-mediasdk.sh'

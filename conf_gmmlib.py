@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2019-2020 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ BUILD_NUM = get_commit_number(GMMLIB_REPO_DIR)
 GMMLIB_VERSION = manifest.get_component(GMMLIB_REPO_NAME).version + f'.{BUILD_NUM}'
 
 
-ENABLE_DEVTOOLSET = 'source /opt/rh/devtoolset-6/enable'
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '8.2.0'
@@ -47,15 +46,6 @@ GMMLIB_LIB_INSTALL_DIRS = {
 }
 
 
-#TODO: add more smart logic or warnings?! (potential danger zone)
-def get_building_cmd(command, gcc_latest, enable_devtoolset):
-     # Ubuntu Server: gcc_latest or clang
-    if args.get('compiler') == "clang" or (args.get('compiler') == "gcc" and args.get('compiler_version') == gcc_latest):
-        return command
-    else:
-        return f'{enable_devtoolset} && {command}' #enable new compiler on CentOS
-
-
 cmake_command = ['cmake3']
 cmake_command.append('-DCMAKE_SHARED_LINKER_FLAGS="-pie -z noexecstack -z relro -z now"')
 cmake_command.append(str(GMMLIB_REPO_DIR))
@@ -64,10 +54,10 @@ cmake = ' '.join(cmake_command)
 # Build gmmlib
 action('gmmlib: cmake',
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(cmake, GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=cmake)
 
 action('gmmlib: build',
-       cmd=get_building_cmd(f'make -j`nproc`', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd='make -j`nproc`')
 
 action('gmmlib: list artifacts',
          cmd=f'echo " " && ls ./Source/GmmLib',
@@ -76,7 +66,7 @@ action('gmmlib: list artifacts',
 action('gmmlib: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=get_building_cmd(f'make DESTDIR={options["INSTALL_DIR"]} install', GCC_LATEST, ENABLE_DEVTOOLSET))
+       cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
 
 # gmmlib: pkgconfig for OS Ubuntu
 # Update pkgconfig prefix
