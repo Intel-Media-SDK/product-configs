@@ -50,7 +50,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: c882f7266bb25b3463635ab231078b049e62f7d1
+        revision: c1b7e077b5b0b6b97057562aaec574f0da97b37b
         commit_time: null
         type: git
     build_info:
@@ -168,7 +168,7 @@ components:
         name: infrastructure
         url: https://github.com/Intel-Media-SDK/infrastructure
         branch: master
-        revision: 62091e1fe9c5a4e8dd362179c9988e49b470a5e9
+        revision: 8e026dc127dace0dd7025b99f8e13cb13dae73bf
         commit_time: null
         type: git
       product-configs:
