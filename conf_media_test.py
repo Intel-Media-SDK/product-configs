@@ -20,12 +20,15 @@
 
 INSTALL = ['libva', 'libva-utils', 'gmmlib', 'ffmpeg', 'metrics-calc-lite', 'media-driver', 'mediasdk']
 
+MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / 'MediaSDK'
+
 TEST_SCRIPT_PATH = infra_path / 'driver_tests'
 TEST_ENV = {
     'MFX_HOME': '/opt/intel/mediasdk',
     'LD_LIBRARY_PATH': '/opt/intel/mediasdk/lib64',
     'LIBVA_DRIVERS_PATH': '/opt/intel/msdk_driver/lib64',
-    'LIBVA_DRIVER_NAME': 'iHD'
+    'LIBVA_DRIVER_NAME': 'iHD',
+    'PATH': f'{PATH}:/opt/intel/mediasdk/share/mfx/samples'
 }
 
 DRIVER_TESTS = [
@@ -38,7 +41,7 @@ DRIVER_TESTS = [
 
 ARTIFACTS_LAYOUT = {
     str(options['LOGS_DIR']): 'logs',
-    str(infra_path / 'ted/results'): 'mediasdk',
+    str(MEDIA_SDK_REPO_DIR / 'tests/results'): 'mediasdk',
     str(infra_path / 'smoke_test' / 'hevc_fei_tests_res.log'): 'hevc_fei_tests.log'
 }
 
@@ -55,8 +58,8 @@ for test_id in DRIVER_TESTS:
            verbose=True)
 
 action(f'Run MediaSDK TED test',
-       work_dir=infra_path,
-       cmd=f'python3 ted/ted.py',
+       work_dir=MEDIA_SDK_REPO_DIR,
+       cmd=f'python3 tests/ted.py',
        env=TEST_ENV,
        verbose=True)
 
