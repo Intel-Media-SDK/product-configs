@@ -20,7 +20,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: e82ae8ca6e466071ff0e8f82a1367cb720fb1df4
+        revision: 61a690773555bac6f1d57da9b629ce2218c1fc60
         commit_time: null
         type: git
     build_info:
