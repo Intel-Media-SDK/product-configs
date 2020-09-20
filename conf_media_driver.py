@@ -67,6 +67,7 @@ cmake_command = [
     f'-DCMAKE_INSTALL_PREFIX={DRIVER_INSTALL_PREFIX}',
     # By default install driver to /opt/intel/msdk_driver
     f'-DCMAKE_INSTALL_LIBDIR={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
+    f'-DCMAKE_SKIP_RPATH=TRUE',
     f'-DINSTALL_DRIVER_SYSCONF=OFF',
     # Path contains iHD_drv_video.so
     f'-DLIBVA_DRIVERS_PATH={DRIVER_INSTALL_PREFIX / DRIVER_LIB_DIR}',
@@ -113,8 +114,9 @@ action('media-driver: cmake',
        cmd=cmake,
        env={'PKG_CONFIG_PATH': f'{LIBVA_PKG_CONFIG_PATH}:{GMMLIB_PKG_CONFIG_PATH}'})
 
+options["LD_LIBRARY_PATH"] = f'{options["BUILD_DIR"]}/media_driver:{GMMLIB_PATH}/lib64'
 action('media-driver: build',
-       cmd=f'make -j`nproc`')
+       cmd=f'LD_LIBRARY_PATH={options["LD_LIBRARY_PATH"]} make -j`nproc`')
 
 action('media-driver: list artifacts',
        cmd=f'echo " " && ls ./media_driver',
@@ -123,7 +125,7 @@ action('media-driver: list artifacts',
 action('media-driver: make install',
        stage=stage.INSTALL,
        work_dir=options['BUILD_DIR'],
-       cmd=f'make DESTDIR={options["INSTALL_DIR"]} install')
+       cmd=f'LD_LIBRARY_PATH={options["LD_LIBRARY_PATH"]} make DESTDIR={options["INSTALL_DIR"]} install')
 
 # Create configuration files
 intel_mediasdk_file = options["INSTALL_DIR"] / 'intel-mediasdk.sh'
