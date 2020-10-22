@@ -27,7 +27,7 @@ DEPENDENCIES = [
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
 GCC_LATEST = '10'
-CLANG_VERSION = '10'
+CLANG_VERSION = '11'
 options["STRIP_BINARIES"] = True
 MEDIA_SDK_REPO_DIR = options.get('REPOS_DIR') / MEDIA_SDK_REPO_NAME
 MEDIA_SDK_BUILD_DIR = options.get('BUILD_DIR')
@@ -59,11 +59,12 @@ def set_env(repo_path, gcc_latest, clang_version):
     options["ENV"]['MFX_H264LA_VERSION'] = f'{plugin_version}'
     options["ENV"]['MFX_HOME'] = f'{str(repo_path)}'
 
+    # TODO: remove compiler version
     compiler_version = args.get('compiler_version')
     if args.get('compiler') == "gcc" and compiler_version == gcc_latest:
         # TODO: Add possibility to choose other gcc versions
-        options["ENV"]['CC'] = '/usr/bin/gcc-10'
-        options["ENV"]['CXX'] = '/usr/bin/g++-10'
+        options["ENV"]['CC'] = f'/usr/bin/gcc-{compiler_version}'
+        options["ENV"]['CXX'] = f'/usr/bin/g++-{compiler_version}'
         
     elif args.get('compiler') == "clang" and compiler_version == clang_version:
         options["ENV"]['CC'] = f'/usr/bin/clang-{compiler_version}'
