@@ -36,8 +36,8 @@ DEPENDENCIES = [
 
 # Workaround to run fpm tool on CentOS 6.9
 ENABLE_RUBY24 = 'source /opt/rh/rh-ruby24/enable'
-GCC_LATEST = '10'
-CLANG_VERSION = '11'
+GCC_LATEST = "10"
+CLANG_VERSION = "11"
 options["STRIP_BINARIES"] = True
 
 DRIVER_INSTALL_PREFIX = Path('/opt/intel/msdk_driver')
