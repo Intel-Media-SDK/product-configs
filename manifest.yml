@@ -4,8 +4,8 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: refs/pull/2422/head
-        revision: dd269a76e52705273290b5b1337a80faa627c7f1
+        branch: master
+        revision: null
         commit_time: null
         type: git
     build_info:
