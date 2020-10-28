@@ -40,6 +40,7 @@ DEPENDENCY_STRUCTURE = {
         'SPIRV-LLVM-Translator': 'llvm-project/llvm/projects/llvm-spirv',
         'llvm-patches': 'llvm_patches',
         'intel-graphics-compiler': 'igc',
+        'vc-intrinsics': 'vc-intrinsics',
     }
 
 # By default install to the system
@@ -82,7 +83,7 @@ cmake_command = ['cmake3']
 
 IGC_REPO_DIR = options['BUILD_DIR'] / f'{DEPENDENCY_STRUCTURE[IGC_REPO_NAME]}/IGC'
 
-cmake_command.append('-Who-dev')
+cmake_command.append('-Wno-dev')
 cmake_command.append(str(IGC_REPO_DIR))
 cmake = ' '.join(cmake_command)
 
