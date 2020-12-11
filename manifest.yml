@@ -4,7 +4,7 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
+        branch: intel-mediasdk-20.5
         revision: null
         commit_time: null
         type: git
@@ -13,14 +13,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 20.5.1
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
-        branch: master
-        revision: 8ed365dcefdcb699661a88f2dda236aeac52815a
+        branch: v2.10-branch
+        revision: e3c7598743f10477f5799df42c806ba4945fd5c1
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.7.0
+    version: 2.10.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
-        branch: master
-        revision: f5a83e630e9c0d4d1621ff8da11f09017f0cdd79
+        branch: v2.9-branch
+        revision: 50c7f19d65e2535940e31c6711352b36d6d64fd7
         commit_time: null
         type: git
     build_info:
@@ -43,14 +43,14 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.8.0
+    version: 2.9.1
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 1598c1b46fb911cb9060d1a5380aec1ca1ef2c19
+        revision: 8057a638c1bdf973b29c98dc9ebf5822a514e80c
         commit_time: null
         type: git
     build_info:
@@ -58,14 +58,14 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.4.1
+    version: 20.3.4
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
         branch: master
-        revision: null
+        revision: 051b2a8c516a89ef5e012660e12e913c479a27a3
         commit_time: null
         type: git
     build_info:
@@ -73,7 +73,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.4.0
+    version: 20.5.0
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
