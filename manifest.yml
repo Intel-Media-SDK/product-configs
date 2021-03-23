@@ -4,7 +4,7 @@ components:
       MediaSDK:
         name: MediaSDK
         url: https://github.com/Intel-Media-SDK/MediaSDK
-        branch: master
+        branch: intel-mediasdk-21.1
         revision: null
         commit_time: null
         type: git
@@ -13,14 +13,14 @@ components:
       product_type: public_linux
       build_type: release
       build_event: commit
-    version: 19.3.pre5
+    version: 21.1.3
   libva:
     repository:
       libva:
         name: libva
         url: https://github.com/intel/libva
-        branch: master
-        revision: 2267778c516f97a6df8552ce1d6552e7f809ae5d
+        branch: v2.11-branch
+        revision: 64d75c08a720b73f4474b9265ca6dc99f947af8b
         commit_time: null
         type: git
     build_info:
@@ -28,14 +28,14 @@ components:
       product_type: public_linux_libva
       build_type: release
       build_event: commit
-    version: 2.10.0
+    version: 2.11.0
   libva-utils:
     repository:
       libva-utils:
         name: libva-utils
         url: https://github.com/intel/libva-utils
-        branch: master
-        revision: f5a83e630e9c0d4d1621ff8da11f09017f0cdd79
+        branch: v2.11-branch
+        revision: b70ba2f4303fb11f7071328cf608c72fbf2297d3
         commit_time: null
         type: git
     build_info:
@@ -43,7 +43,7 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.8.0
+    version: 2.11.0
   gmmlib:
     repository:
       gmmlib:
@@ -58,14 +58,14 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 19.4.1
+    version: 21.1.0
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
         branch: master
-        revision: dda4227d741cab639c90a6f0346e7535dad2d0bd
+        revision: cde19e98602ada27fc6bfa094cb3a9a07027540c
         commit_time: null
         type: git
     build_info:
@@ -73,7 +73,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 19.4.0
+    version: 21.1.0
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
