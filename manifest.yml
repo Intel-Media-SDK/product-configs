@@ -35,7 +35,7 @@ components:
         name: libva-utils
         url: https://github.com/intel/libva-utils
         branch: v2.11-branch
-        revision: b70ba2f4303fb11f7071328cf608c72fbf2297d3
+        revision: 959b2f20cf99d4611eab66164af3d7e4a84f674b
         commit_time: null
         type: git
     build_info:
@@ -43,14 +43,14 @@ components:
       product_type: public_linux_libva_utils
       build_type: release
       build_event: commit
-    version: 2.11.0
+    version: 2.11.1
   gmmlib:
     repository:
       gmmlib:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 2f966e9edeb81452fa87780f46525b88554b1554
+        revision: 60a77187c43ff23a0888b2f297ae5c93cc50a666
         commit_time: null
         type: git
     build_info:
@@ -58,14 +58,14 @@ components:
       product_type: public_linux_gmmlib
       build_type: release
       build_event: commit
-    version: 21.1.0
+    version: 21.1.1
   media-driver:
     repository:
       media-driver:
         name: media-driver
         url: https://github.com/intel/media-driver
-        branch: master
-        revision: cde19e98602ada27fc6bfa094cb3a9a07027540c
+        branch: intel-media-21.1
+        revision: null
         commit_time: null
         type: git
     build_info:
@@ -73,7 +73,7 @@ components:
       product_type: public_linux_driver
       build_type: release
       build_event: commit
-    version: 21.1.0
+    version: 21.1.3
   intel-graphics-compiler:
     repository:
       intel-graphics-compiler:
