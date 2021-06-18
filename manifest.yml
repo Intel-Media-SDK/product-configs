@@ -20,7 +20,7 @@ components:
         name: libva
         url: https://github.com/intel/libva
         branch: master
-        revision: fae0a978c304961b670027f644fb9305c009a9bd
+        revision: 8803fc5363b635f950dc904e880a35f1c13eae88
         commit_time: null
         type: git
     build_info:
@@ -50,7 +50,7 @@ components:
         name: gmmlib
         url: https://github.com/intel/gmmlib
         branch: master
-        revision: 60a77187c43ff23a0888b2f297ae5c93cc50a666
+        revision: d7d935ca1b3de558012c83f4737af05b4d4ee7fe
         commit_time: null
         type: git
     build_info:
